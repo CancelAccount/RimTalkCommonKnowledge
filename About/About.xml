@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ModMetaData>
+  <name>Rimtalk Auto Faction Info</name>
+  <author>Cancelation</author>
+  <packageId>Cancelation.RimtalkAutoFactionInfo</packageId>
+  <supportedVersions>
+    <li>1.6</li>
+  </supportedVersions>
+  <description>
+    Rimtalk自动注入派系常识：
+    需要依赖Rimtalk记忆扩展。
+    创建存档时，自动获取派系的相关信息并注入到常识库中。
+
+    Rimtalk Auto Faction Info:
+    Need Rimtalk-Expand Memory.
+    Inject faction info into Rimtalk memory when creating a new save.
+  </description>
+  <loadAfter>
+    <li>brrainz.harmony</li>
+    <li>cj.rimtalk</li>
+    <li>cj.rimtalk.expandmemory</li>
+  </loadAfter>
+  <modDependencies>
+    <li>
+      <packageId>cj.rimtalk.expandmemory</packageId>
+      <displayName>Rimtalk-Expand Memory</displayName>
+      <steamWorkshopUrl>https://steamcommunity.com/sharedfiles/filedetails/?id=3608181242</steamWorkshopUrl>
+    </li>
+  </modDependencies>
+</ModMetaData>

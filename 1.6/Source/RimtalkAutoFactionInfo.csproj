@@ -1,0 +1,34 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework>
+    <AssemblyName>RimtalkAutoFactionInfo</AssemblyName>
+    <RootNamespace>RimtalkAutoFactionInfo</RootNamespace>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+  </PropertyGroup>
+
+  <!-- 路径集中声明，业务代码与其余配置里不得再出现裸路径字面量 -->
+  <PropertyGroup>
+    <RimWorldDir>..\..\..\..\</RimWorldDir>
+    <ManagedDir>$(RimWorldDir)RimWorldWin64_Data\Managed\</ManagedDir>
+    <Workshop294100>$(RimWorldDir)..\..\workshop\content\294100\</Workshop294100>
+    <RimTalkMemoryDir>$(Workshop294100)3608181242\1.6\Assemblies\</RimTalkMemoryDir>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>$(ManagedDir)Assembly-CSharp.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <!-- 上游注入 API：编译期校验签名；Private=false 表示不把上游 dll 复制进本 mod 的 Assemblies -->
+    <Reference Include="RimTalkMemoryPatch">
+      <HintPath>$(RimTalkMemoryDir)RimTalkMemoryPatch.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+
+  <Target Name="CopyToAssemblies" AfterTargets="Build">
+    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(ProjectDir)..\Assemblies" />
+  </Target>
+
+</Project>

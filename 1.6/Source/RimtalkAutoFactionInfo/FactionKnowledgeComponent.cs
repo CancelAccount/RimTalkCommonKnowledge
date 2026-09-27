@@ -1,0 +1,410 @@
+using System;
+using System.Collections.Generic;
+using RimWorld;
+using Verse;
+
+namespace RimtalkAutoFactionInfo
+{
+    /// <summary>
+    /// 注入时机与内容校正的挂载点（FR-1 / FR-11）。
+    /// 靠 <c>GameComponent</c> 子类被引擎自动发现，**不需要 Def、不需要 Harmony**（证据 ⑪）。
+    /// 构造签名必须是 <c>(Game game)</c>：引擎用 <c>Activator.CreateInstance(type, game)</c> 反射实例化。
+    /// </summary>
+    public class FactionKnowledgeComponent : GameComponent
+    {
+        /// <summary>
+        /// 上次实际写入的好感度（<c>faction.loadID</c> → 数值）。
+        /// 仅用于 FR-11 的「只有好感度小幅波动」判定，**不持久化**：
+        /// 读档后为空，会保守地重写一次，从而顺带校正存档期间产生的陈旧内容。
+        /// </summary>
+        private readonly Dictionary<int, int> lastWrittenGoodwill = new Dictionary<int, int>();
+
+        /// <summary>
+        /// 上次写入内容时的游戏 tick（<c>faction.loadID</c> → <c>TicksGame</c>），用于非质变覆写的冷却判定（FR-12）。
+        /// **不持久化**：读档后为空则视为冷却已结束，允许立即校正一次陈旧内容。
+        /// </summary>
+        private readonly Dictionary<int, int> lastWriteTick = new Dictionary<int, int>();
+
+        /// <summary>
+        /// 上次写入时该派系的关系种类（<c>faction.loadID</c> → <c>PlayerRelationKind</c>），
+        /// 用于识别「质变」——质变不受覆写冷却限制（FR-12）。**不持久化**。
+        /// </summary>
+        private readonly Dictionary<int, FactionRelationKind> lastRelationKind =
+            new Dictionary<int, FactionRelationKind>();
+
+        /// <summary>
+        /// 引擎反射实例化所需的构造（证据 ⑪）：
+        /// <c>Game.FillComponents()</c> 用 <c>Activator.CreateInstance(type, this)</c> 传 Game，
+        /// 因此子类**必须**有 <c>(Game game)</c> 构造；
+        /// 但 <c>GameComponent</c> 自身**没有** <c>(Game)</c> 构造（只有一个隐式无参构造），
+        /// 故此处**不能**写 <c>: base(game)</c>（会报 CS1729）。引擎自带的
+        /// <c>GameComponent_PsychicRitualManager(Game game)</c> 即为此写法。
+        /// </summary>
+        public FactionKnowledgeComponent(Game game)
+        {
+        }
+
+        /// <summary>新开档：地图生成完毕、玩家派系与初始关系均已就绪后调用（证据 ⑫）。</summary>
+        public override void StartedNewGame()
+        {
+            SyncFactionKnowledge(isPeriodic: false);
+            SyncXenotypeKnowledge();
+        }
+
+        /// <summary>读档：每次进入存档都调用；内容一致则完全不写，陈旧则自动校正（D4 / FR-11）。</summary>
+        public override void LoadedGame()
+        {
+            SyncFactionKnowledge(isPeriodic: false);
+            SyncXenotypeKnowledge();
+        }
+
+        /// <summary>
+        /// 每 tick 由引擎调用（<c>GameComponentUtility.GameComponentTick</c>，证据 ㉚），
+        /// 此处自行节流到每 <c>REFRESH_INTERVAL_TICKS</c>（1 游戏小时）执行一次内容校正（FR-11）。
+        /// 关系质变、好感度累积变化、领袖更替、据点增减后，派系常识不会长期停留在开档快照。
+        /// 异种人条目**不参与**定时刷新：其内容几乎不变，读档补齐即可。
+        /// </summary>
+        public override void GameComponentTick()
+        {
+            if (!RimTalkMemoryBridge.IsLibraryAvailable || Find.TickManager == null)
+            {
+                return;
+            }
+            if (Find.TickManager.TicksGame % FactionKnowledgeConfig.REFRESH_INTERVAL_TICKS != 0)
+            {
+                return;
+            }
+            SyncFactionKnowledge(isPeriodic: true);
+        }
+
+        /// <summary>
+        /// 同步全部有效派系常识（FR-2 筛选 / FR-3 内容 / FR-4 标签 / FR-5 幂等 / FR-11 校正 / FR-12 冷却）。
+        /// 对每个派系：库内无条目 → 写入；内容一致 → 只校准基准；内容不同 → 判断下述三种情形。
+        /// **质变**（关系种类翻转）立即重写；**仅好感度小幅波动**（差值未达阈值）直接不写；
+        /// 其余**非质变**改动要等到覆写冷却结束才重写。
+        /// 新档、读档、定时轮询**共用这一套逻辑**，因此天然幂等，也不存在「新档必须先删后写」的特殊路径。
+        /// 单个派系失败不中断整体（逐个 try/catch）。
+        /// </summary>
+        /// <param name="isPeriodic">为真表示这是定时轮询：无变化时保持静默，避免日志刷屏。</param>
+        private void SyncFactionKnowledge(bool isPeriodic)
+        {
+            int written = 0;
+            int skippedConsistent = 0;
+            int skippedMinorGoodwill = 0;
+            int skippedCooldown = 0;
+            int skippedEmpty = 0;
+
+            List<Faction> targets = FactionKnowledgeBuilder.CollectTargets();
+
+            for (int i = 0; i < targets.Count; i++)
+            {
+                Faction faction = targets[i];
+                try
+                {
+                    string tag;
+                    string content;
+                    if (!FactionKnowledgeBuilder.TryBuild(faction, out tag, out content))
+                    {
+                        skippedEmpty++;
+                        KnowledgeLog.Detail("忽略（无派系名）：" + faction.def.defName);
+                        continue;
+                    }
+
+                    // 主键用稳定的派系名（tag 第一段），而非整串 tag：tag 尾段会随特征异种人变化（D17）
+                    string existingContent;
+                    List<string> managedIds = RimTalkMemoryBridge.FindManagedIds(
+                        faction.Name, FactionKnowledgeConfig.FACTION_CONTENT_PREFIX, out existingContent);
+
+                    int currentGoodwill = faction.HasGoodwill ? faction.PlayerGoodwill : 0;
+                    bool hasEntry = managedIds.Count > 0;
+
+                    if (hasEntry &&
+                        string.Equals(existingContent, content, StringComparison.Ordinal))
+                    {
+                        // 内容逐字一致：无需任何写入，只校准各项基准
+                        lastWrittenGoodwill[faction.loadID] = currentGoodwill;
+                        lastWriteTick[faction.loadID] = CurrentTick;
+                        lastRelationKind[faction.loadID] = faction.PlayerRelationKind;
+                        skippedConsistent++;
+                        continue;
+                    }
+
+                    if (hasEntry)
+                    {
+                        // 质变（关系种类翻转）不受冷却限制，立即重写；其余非质变改动才受冷却约束（FR-12）
+                        bool relationChanged = IsRelationKindChanged(faction);
+
+                        // 差异仅来自好感度且未达阈值 → 直接不写（此判定独立于冷却）
+                        if (!relationChanged &&
+                            ShouldSkipMinorGoodwillChange(faction, existingContent, content, currentGoodwill))
+                        {
+                            skippedMinorGoodwill++;
+                            continue;
+                        }
+
+                        if (!relationChanged && !IsRewriteCooldownElapsed(faction))
+                        {
+                            skippedCooldown++;
+                            KnowledgeLog.Detail("跳过（非质变改动，覆写冷却中）：" + tag);
+                            continue;
+                        }
+                    }
+
+                    // 多条时整体清除，避免异常情况下残留（正常幂等只会有 1 条）
+                    for (int j = 0; j < managedIds.Count; j++)
+                    {
+                        RimTalkMemoryBridge.Remove(managedIds[j]);
+                    }
+
+                    string id = RimTalkMemoryBridge.AddLore(
+                        tag, content, FactionKnowledgeConfig.DEFAULT_IMPORTANCE);
+                    if (string.IsNullOrEmpty(id))
+                    {
+                        KnowledgeLog.Error("写入失败（上游未返回条目 id）：" + tag);
+                        continue;
+                    }
+
+                    lastWrittenGoodwill[faction.loadID] = currentGoodwill;
+                    lastWriteTick[faction.loadID] = CurrentTick;
+                    lastRelationKind[faction.loadID] = faction.PlayerRelationKind;
+                    written++;
+                    KnowledgeLog.Detail((hasEntry ? "已刷新：" : "已写入：") + content);
+                }
+                catch (Exception exception)
+                {
+                    KnowledgeLog.Error(
+                        "处理派系失败：" + (faction != null ? faction.Name : "null"), exception);
+                }
+            }
+
+            if (isPeriodic)
+            {
+                // 轮询常态就是「什么都没变」，只在真的重写时才说话
+                if (written > 0)
+                {
+                    KnowledgeLog.Summary("派系常识已刷新 " + written + " 条（关系 / 好感度 / 领袖 / 据点有变）。");
+                }
+                return;
+            }
+
+            KnowledgeLog.Summary(
+                "派系常识：候选 " + targets.Count + " 个，" +
+                "写入 " + written + " 条，" +
+                "跳过 " + skippedConsistent + " 条（内容一致），" +
+                "略过 " + skippedMinorGoodwill + " 条（仅好感度小幅波动），" +
+                "略过 " + skippedCooldown + " 条（非质变改动，覆写冷却中），" +
+                "忽略 " + skippedEmpty + " 个（无派系名）。");
+        }
+
+        /// <summary>
+        /// 判断「内容差异是否只源于好感度的小幅波动」，是则本次可以不重写（FR-11）。
+        /// </summary>
+        /// <remarks>
+        /// 判定手法：把库内内容里的「上次写入的好感度句」整句替换为「当前好感度句」——
+        /// 因为该句模板固定且数值唯一，替换是安全的。替换后若与新建内容逐字相同，
+        /// 说明关系、领袖、据点、成员等**其它各段都没变**，差异只来自好感度数值；
+        /// 此时再要求差值达到阈值才重写。
+        /// 任何一处不成立（无基准 / 关系句结构变化 / 其它段变化）都返回 <c>false</c>，即照常重写。
+        /// </remarks>
+        private bool ShouldSkipMinorGoodwillChange(
+            Faction faction, string existingContent, string newContent, int currentGoodwill)
+        {
+            // 关系句 / 好感度句本身的出现与否变了 → 结构性变化，必须重写
+            if (!faction.HasGoodwill)
+            {
+                return false;
+            }
+
+            int lastGoodwill;
+            if (!lastWrittenGoodwill.TryGetValue(faction.loadID, out lastGoodwill))
+            {
+                // 无基准（首次校正或刚读档）→ 保守重写，宁可多写一次也不留陈旧内容
+                return false;
+            }
+
+            string oldSentence = string.Format(FactionKnowledgeConfig.FACTION_SEG_GOODWILL, lastGoodwill);
+            string newSentence = string.Format(FactionKnowledgeConfig.FACTION_SEG_GOODWILL, currentGoodwill);
+            string normalizedExisting = existingContent.Replace(oldSentence, newSentence);
+            if (!string.Equals(normalizedExisting, newContent, StringComparison.Ordinal))
+            {
+                // 除好感度外还有别的段变了 → 必须重写
+                return false;
+            }
+
+            int delta = currentGoodwill - lastGoodwill;
+            if (delta < 0)
+            {
+                delta = -delta;
+            }
+            return delta < FactionKnowledgeConfig.GOODWILL_REFRESH_THRESHOLD;
+        }
+
+        /// <summary>当前游戏 tick；<c>TickManager</c> 不可用时返回 0。</summary>
+        private static int CurrentTick
+        {
+            get { return Find.TickManager != null ? Find.TickManager.TicksGame : 0; }
+        }
+
+        /// <summary>
+        /// 该派系的关系种类（敌对 / 中立 / 盟友）相对**上次写入**是否发生了变化——即「质变」（FR-12）。
+        /// 质变意味着内容里的核心事实被推翻，必须立刻改写，因此**不受**覆写冷却约束。
+        /// </summary>
+        /// <remarks>无基准（首次校正或刚读档）时返回 <c>true</c>：既然内容已经不一致，就立即校正一次。</remarks>
+        private bool IsRelationKindChanged(Faction faction)
+        {
+            FactionRelationKind lastKind;
+            if (!lastRelationKind.TryGetValue(faction.loadID, out lastKind))
+            {
+                return true;
+            }
+            return lastKind != faction.PlayerRelationKind;
+        }
+
+        /// <summary>
+        /// 非质变覆写的冷却是否已结束（FR-12）。
+        /// 冷却时长取 <see cref="KnowledgeDebug.CurrentRewriteCooldownTicks"/>：常态 3 天，调试「快速刷新」开启时 1 小时。
+        /// </summary>
+        /// <remarks>无记录（首次校正或刚读档）时返回 <c>true</c>：允许立即校正一次陈旧内容。</remarks>
+        private bool IsRewriteCooldownElapsed(Faction faction)
+        {
+            int lastTick;
+            if (!lastWriteTick.TryGetValue(faction.loadID, out lastTick))
+            {
+                return true;
+            }
+            return CurrentTick - lastTick >= KnowledgeDebug.CurrentRewriteCooldownTicks;
+        }
+
+        /// <summary>
+        /// 同步异种人常识（FR-9）：缺失才补，不做定时刷新。
+        /// 未启用 Biotech DLC 时整体跳过且不报错（FR-9.0）；
+        /// 与派系同步互相独立：本方法自带外层 try/catch，自身失败不影响已完成的派系注入。
+        /// </summary>
+        private static void SyncXenotypeKnowledge()
+        {
+            if (!ModsConfig.BiotechActive)
+            {
+                KnowledgeLog.Summary("异种人常识：未启用 Biotech DLC，本次跳过。");
+                return;
+            }
+
+            int candidates = 0;
+            int written = 0;
+            int skippedExisting = 0;
+            int skippedEmpty = 0;
+
+            try
+            {
+                // 先建反向索引，再取条目集合：索引只统计显式声明的派系-异种人关系
+                List<Faction> targets = FactionKnowledgeBuilder.CollectTargets();
+                Dictionary<XenotypeDef, List<string>> factionNamesByXenotype =
+                    BuildXenotypeFactionIndex(targets);
+                List<XenotypeDef> xenotypes =
+                    XenotypeKnowledgeBuilder.CollectEntryXenotypesFromAll(targets);
+                candidates = xenotypes.Count;
+
+                for (int i = 0; i < xenotypes.Count; i++)
+                {
+                    XenotypeDef xenotype = xenotypes[i];
+                    try
+                    {
+                        List<string> factionNames;
+                        if (!factionNamesByXenotype.TryGetValue(xenotype, out factionNames))
+                        {
+                            factionNames = new List<string>();
+                        }
+
+                        string tag;
+                        string content;
+                        if (!XenotypeKnowledgeBuilder.TryBuild(xenotype, factionNames, out tag, out content))
+                        {
+                            skippedEmpty++;
+                            KnowledgeLog.Detail("忽略（无名称）：" + (xenotype != null ? xenotype.defName : "null"));
+                            continue;
+                        }
+
+                        List<string> managedIds = RimTalkMemoryBridge.FindManagedIds(
+                            tag, FactionKnowledgeConfig.XENOTYPE_CONTENT_PREFIX);
+                        if (managedIds.Count > 0)
+                        {
+                            skippedExisting++;
+                            KnowledgeLog.Detail("跳过（已存在）：" + tag);
+                            continue;
+                        }
+
+                        string id = RimTalkMemoryBridge.AddLore(
+                            tag, content, FactionKnowledgeConfig.DEFAULT_IMPORTANCE);
+                        if (string.IsNullOrEmpty(id))
+                        {
+                            KnowledgeLog.Error("写入失败（上游未返回条目 id）：" + tag);
+                            continue;
+                        }
+
+                        written++;
+                        KnowledgeLog.Detail("已写入：" + content);
+                    }
+                    catch (Exception exception)
+                    {
+                        KnowledgeLog.Error(
+                            "处理异种人失败：" + (xenotype != null ? xenotype.defName : "null"), exception);
+                    }
+                }
+            }
+            catch (Exception exception)
+            {
+                KnowledgeLog.Error("异种人常识注入整体失败（派系常识不受影响）。", exception);
+            }
+
+            KnowledgeLog.Summary(
+                "异种人常识：候选 " + candidates + " 个，" +
+                "写入 " + written + " 条，" +
+                "跳过 " + skippedExisting + " 条（已存在），" +
+                "忽略 " + skippedEmpty + " 个。");
+        }
+
+        /// <summary>
+        /// 建立「异种人 → 出没派系名」反向索引（FR-9.2 ③）。
+        /// 只统计显式声明的关系（<c>FactionDef.xenotypeSet</c> ∪ 主理念 <c>memes[].xenotypeSet</c>），
+        /// **不含基础异种人补差**：否则每个派系都会把智人种列进去，列表噪声极大。
+        /// </summary>
+        private static Dictionary<XenotypeDef, List<string>> BuildXenotypeFactionIndex(List<Faction> factions)
+        {
+            Dictionary<XenotypeDef, List<string>> index = new Dictionary<XenotypeDef, List<string>>();
+            if (factions == null)
+            {
+                return index;
+            }
+
+            for (int i = 0; i < factions.Count; i++)
+            {
+                Faction faction = factions[i];
+                if (faction == null)
+                {
+                    continue;
+                }
+                string name = faction.Name;
+                if (string.IsNullOrEmpty(name))
+                {
+                    continue;
+                }
+
+                List<XenotypeDef> xenotypes = XenotypeKnowledgeBuilder.CollectExplicitXenotypes(faction);
+                for (int j = 0; j < xenotypes.Count; j++)
+                {
+                    XenotypeDef xenotype = xenotypes[j];
+                    List<string> names;
+                    if (!index.TryGetValue(xenotype, out names))
+                    {
+                        names = new List<string>();
+                        index[xenotype] = names;
+                    }
+                    if (!names.Contains(name))
+                    {
+                        names.Add(name);
+                    }
+                }
+            }
+            return index;
+        }
+    }
+}

@@ -1,0 +1,22 @@
+# ===== 构建中间产物 =====
+# bin / obj 由 dotnet build 生成，一律不入库
+1.6/Source/bin/
+1.6/Source/obj/
+
+# 调试符号：不入库
+# 注意：1.6/Assemblies/ 下的 mod dll 是刻意入库的（clone 即可玩，不依赖任何外部构建）；
+# 若改为不跟踪二进制，再补一行 1.6/Assemblies/*.dll
+*.pdb
+
+# ===== IDE / 编辑器 =====
+.vs/
+.idea/
+.trae/
+*.user
+*.suo
+*.DotSettings.user
+
+# ===== 操作系统杂项 =====
+Thumbs.db
+desktop.ini
+.DS_Store
