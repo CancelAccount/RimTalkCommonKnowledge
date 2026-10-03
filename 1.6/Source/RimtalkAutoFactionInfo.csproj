@@ -5,6 +5,20 @@
     <AssemblyName>RimtalkAutoFactionInfo</AssemblyName>
     <RootNamespace>RimtalkAutoFactionInfo</RootNamespace>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <!-- 关闭 TFM 子目录追加：OutputPath 直接就是 dll 落点（否则会多出 net48\ 一层） -->
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <!-- 关闭 git 提交号嵌入，保证 dll 字节只由源码决定，同工具链跨 commit 可复现（见 rimworld-mod-release 技能） -->
+    <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+  </PropertyGroup>
+
+  <!-- 输出目录按配置隔离：F5 调试 dll 永不覆盖入库的发行 dll。
+       Debug -> 1.6\AssembliesDebug（.gitignore 忽略）；Release -> 1.6\Assemblies（入库）。
+       打包脚本依赖此约定，不要改回「编译后再复制」（见 rimworld-mod-release 技能）。 -->
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+    <OutputPath>..\AssembliesDebug\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <OutputPath>..\Assemblies\</OutputPath>
   </PropertyGroup>
 
   <!-- 路径集中声明，业务代码与其余配置里不得再出现裸路径字面量 -->
@@ -13,6 +27,8 @@
     <ManagedDir>$(RimWorldDir)RimWorldWin64_Data\Managed\</ManagedDir>
     <Workshop294100>$(RimWorldDir)..\..\workshop\content\294100\</Workshop294100>
     <RimTalkMemoryDir>$(Workshop294100)3608181242\1.6\Assemblies\</RimTalkMemoryDir>
+    <!-- HarmonyMod 的 1.6 程序集目录；游戏自身 Managed 目录不含 0Harmony.dll，只能从工坊模组引用 -->
+    <HarmonyDir>$(Workshop294100)2009463077\Current\Assemblies\</HarmonyDir>
   </PropertyGroup>
 
   <ItemGroup>
@@ -20,15 +36,21 @@
       <HintPath>$(ManagedDir)Assembly-CSharp.dll</HintPath>
       <Private>false</Private>
     </Reference>
+    <!-- Rect 等 Unity 基础类型（Verse.Rect 实为 UnityEngine.Rect 别名），Unity 程序集随游戏提供 -->
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>$(ManagedDir)UnityEngine.CoreModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
     <!-- 上游注入 API：编译期校验签名；Private=false 表示不把上游 dll 复制进本 mod 的 Assemblies -->
     <Reference Include="RimTalkMemoryPatch">
       <HintPath>$(RimTalkMemoryDir)RimTalkMemoryPatch.dll</HintPath>
       <Private>false</Private>
     </Reference>
+    <!-- Harmony 运行时由 brrainz.harmony 提供（About.xml 已 loadAfter），编译期仅校验签名 -->
+    <Reference Include="0Harmony">
+      <HintPath>$(HarmonyDir)0Harmony.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
   </ItemGroup>
-
-  <Target Name="CopyToAssemblies" AfterTargets="Build">
-    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(ProjectDir)..\Assemblies" />
-  </Target>
 
 </Project>

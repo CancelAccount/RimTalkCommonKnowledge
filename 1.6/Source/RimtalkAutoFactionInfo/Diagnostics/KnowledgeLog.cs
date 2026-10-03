@@ -5,7 +5,7 @@ namespace RimtalkAutoFactionInfo
 {
     /// <summary>
     /// 统一日志入口：本 mod 所有日志必须经此类输出，保证前缀、语言与分级口径一致。
-    /// 分级口径（Spec 01 §FR-8）：
+    /// 分级口径：
     /// 汇总级 Summary 无条件输出；明细级 Detail 仅在 VerboseEnabled 为真时输出；
     /// 告警 Warn / WarnOnce 与错误 Error 始终输出。
     /// </summary>

@@ -3,6 +3,7 @@
   <name>Rimtalk Auto Faction Info</name>
   <author>Cancelation</author>
   <packageId>Cancelation.RimtalkAutoFactionInfo</packageId>
+  <modVersion>2026.10.03</modVersion>
   <supportedVersions>
     <li>1.6</li>
   </supportedVersions>

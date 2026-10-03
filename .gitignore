@@ -3,6 +3,13 @@
 1.6/Source/bin/
 1.6/Source/obj/
 
+# Debug 编译输出：csproj 已把 Debug 配置隔离到此目录，防止调试 dll 覆盖入库的发行 dll
+1.6/AssembliesDebug/
+
+# ===== 发布流水线产物 =====
+# Tools/Build-Release.ps1 的输出（stage 组装目录 + 两个 zip），一律不入库
+dist/
+
 # 调试符号：不入库
 # 注意：1.6/Assemblies/ 下的 mod dll 是刻意入库的（clone 即可玩，不依赖任何外部构建）；
 # 若改为不跟踪二进制，再补一行 1.6/Assemblies/*.dll

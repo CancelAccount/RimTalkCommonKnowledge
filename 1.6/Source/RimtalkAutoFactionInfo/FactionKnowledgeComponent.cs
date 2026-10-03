@@ -1,39 +1,41 @@
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using RimWorld;
 using Verse;
 
 namespace RimtalkAutoFactionInfo
 {
     /// <summary>
-    /// 注入时机与内容校正的挂载点（FR-1 / FR-11）。
-    /// 靠 <c>GameComponent</c> 子类被引擎自动发现，**不需要 Def、不需要 Harmony**（证据 ⑪）。
+    /// 注入时机与内容校正的挂载点。
+    /// 靠 <c>GameComponent</c> 子类被引擎自动发现，**不需要 Def、不需要 Harmony**。
     /// 构造签名必须是 <c>(Game game)</c>：引擎用 <c>Activator.CreateInstance(type, game)</c> 反射实例化。
     /// </summary>
     public class FactionKnowledgeComponent : GameComponent
     {
         /// <summary>
         /// 上次实际写入的好感度（<c>faction.loadID</c> → 数值）。
-        /// 仅用于 FR-11 的「只有好感度小幅波动」判定，**不持久化**：
+        /// 仅用于「只有好感度小幅波动」的判定，**不持久化**：
         /// 读档后为空，会保守地重写一次，从而顺带校正存档期间产生的陈旧内容。
         /// </summary>
         private readonly Dictionary<int, int> lastWrittenGoodwill = new Dictionary<int, int>();
 
         /// <summary>
-        /// 上次写入内容时的游戏 tick（<c>faction.loadID</c> → <c>TicksGame</c>），用于非质变覆写的冷却判定（FR-12）。
+        /// 上次写入内容时的游戏 tick（<c>faction.loadID</c> → <c>TicksGame</c>），用于非质变覆写的冷却判定。
         /// **不持久化**：读档后为空则视为冷却已结束，允许立即校正一次陈旧内容。
         /// </summary>
         private readonly Dictionary<int, int> lastWriteTick = new Dictionary<int, int>();
 
         /// <summary>
-        /// 上次写入时该派系的关系种类（<c>faction.loadID</c> → <c>PlayerRelationKind</c>），
-        /// 用于识别「质变」——质变不受覆写冷却限制（FR-12）。**不持久化**。
+        /// 上次写入时该派系的**质变指纹**（<c>faction.loadID</c> → 指纹）。
+        /// 普通派系的指纹是关系种类（敌对 / 中立 / 盟友）；
+        /// 我方派系的指纹是「派系名 + 据点集合 + 飞船集合 + 殖民者数 + 奴隶数」。
+        /// 指纹变化即「质变」，不受覆写冷却限制。**不持久化**。
         /// </summary>
-        private readonly Dictionary<int, FactionRelationKind> lastRelationKind =
-            new Dictionary<int, FactionRelationKind>();
+        private readonly Dictionary<int, string> lastQualitativeKey = new Dictionary<int, string>();
 
         /// <summary>
-        /// 引擎反射实例化所需的构造（证据 ⑪）：
+        /// 引擎反射实例化所需的构造：
         /// <c>Game.FillComponents()</c> 用 <c>Activator.CreateInstance(type, this)</c> 传 Game，
         /// 因此子类**必须**有 <c>(Game game)</c> 构造；
         /// 但 <c>GameComponent</c> 自身**没有** <c>(Game)</c> 构造（只有一个隐式无参构造），
@@ -44,23 +46,113 @@ namespace RimtalkAutoFactionInfo
         {
         }
 
-        /// <summary>新开档：地图生成完毕、玩家派系与初始关系均已就绪后调用（证据 ⑫）。</summary>
-        public override void StartedNewGame()
+        /// <summary>
+        /// 引擎初始化完毕（<c>Game.FinalizeInit()</c> → <c>GameComponentUtility.FinalizeInit()</c>）。
+        /// 新开档与读档两条路径都在本回调**之后**才调用 <c>StartedNewGame()</c> / <c>LoadedGame()</c>，
+        /// 因此这里输出的是「本次运行跑的是哪个包」这一环境头信息，先于注入日志出现。
+        /// </summary>
+        public override void FinalizeInit()
         {
-            SyncFactionKnowledge(isPeriodic: false);
-            SyncXenotypeKnowledge();
+            LogModOrigin();
         }
 
-        /// <summary>读档：每次进入存档都调用；内容一致则完全不写，陈旧则自动校正（D4 / FR-11）。</summary>
+        /// <summary>新开档：地图生成完毕、玩家派系与初始关系均已就绪后调用。</summary>
+        public override void StartedNewGame()
+        {
+            RunInitialSync();
+        }
+
+        /// <summary>读档：每次进入存档都调用；内容一致则完全不写，陈旧则自动校正。</summary>
         public override void LoadedGame()
         {
-            SyncFactionKnowledge(isPeriodic: false);
-            SyncXenotypeKnowledge();
+            RunInitialSync();
         }
 
         /// <summary>
-        /// 每 tick 由引擎调用（<c>GameComponentUtility.GameComponentTick</c>，证据 ㉚），
-        /// 此处自行节流到每 <c>REFRESH_INTERVAL_TICKS</c>（1 游戏小时）执行一次内容校正（FR-11）。
+        /// 新开档与读档共用的首次同步：先派系、后异种人，最后补一条合计。
+        /// 两侧各自已有计数汇总，此处再给一行「总计」，便于一眼确认本次注入了多少条。
+        /// </summary>
+        private void RunInitialSync()
+        {
+            int factionWritten = SyncFactionKnowledge(isPeriodic: false);
+            int xenotypeWritten = SyncXenotypeKnowledge();
+            KnowledgeLog.Summary(string.Format(
+                FactionKnowledgeConfig.LOG_INJECTION_TOTAL, factionWritten, xenotypeWritten));
+        }
+
+        /// <summary>
+        /// 输出本 mod 的包标识与加载来源，便于确认本次运行加载的是创意工坊版还是本地版。
+        /// </summary>
+        private static void LogModOrigin()
+        {
+            ModContentPack owner = FindOwningMod();
+            if (owner == null)
+            {
+                KnowledgeLog.Warn("未能从已加载 mod 列表中定位本 mod，跳过包信息输出（不影响注入）。");
+                return;
+            }
+
+            ModMetaData meta = owner.ModMetaData;
+            ContentSource source = meta != null ? meta.Source : ContentSource.Undefined;
+            KnowledgeLog.Summary(string.Format(
+                FactionKnowledgeConfig.LOG_MOD_ORIGIN, owner.PackageId, DescribeSource(source)));
+        }
+
+        /// <summary>
+        /// 反查本 mod 所属的 <see cref="ModContentPack"/>：遍历运行时 mod 列表，
+        /// 取「已加载程序集中含本类所在程序集」的那一个。
+        /// </summary>
+        /// <remarks>
+        /// 用程序集**全名**比较而非引用比较：<c>loadedAssemblies</c> 是 <c>List&lt;Assembly&gt;</c>，
+        /// 其 <c>Contains</c> 走引用相等，而 mod 程序集由 <c>Assembly.LoadFrom</c> 载入，
+        /// 依赖引用身份不够稳；全名比较在程序集重载后依然成立。
+        /// </remarks>
+        private static ModContentPack FindOwningMod()
+        {
+            string selfName = typeof(FactionKnowledgeComponent).Assembly.FullName;
+            List<ModContentPack> mods = LoadedModManager.RunningModsListForReading;
+
+            for (int i = 0; i < mods.Count; i++)
+            {
+                ModContentPack mod = mods[i];
+                if (mod == null || mod.assemblies == null)
+                {
+                    continue;
+                }
+
+                List<Assembly> loaded = mod.assemblies.loadedAssemblies;
+                for (int j = 0; j < loaded.Count; j++)
+                {
+                    if (string.Equals(loaded[j].FullName, selfName, StringComparison.Ordinal))
+                    {
+                        return mod;
+                    }
+                }
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// 把加载来源枚举转成可读文案，用于启动日志。
+        /// 本 mod 只会从创意工坊或本地 Mods 文件夹加载，故不映射官方目录（<c>OfficialModsFolder</c>，
+        /// 那是 Core 等官方内容包所在位置）；其余取值一律按「未知来源」兜底。
+        /// </summary>
+        private static string DescribeSource(ContentSource source)
+        {
+            switch (source)
+            {
+                case ContentSource.SteamWorkshop:
+                    return FactionKnowledgeConfig.MOD_SOURCE_STEAM_WORKSHOP;
+                case ContentSource.ModsFolder:
+                    return FactionKnowledgeConfig.MOD_SOURCE_MODS_FOLDER;
+                default:
+                    return FactionKnowledgeConfig.MOD_SOURCE_UNDEFINED;
+            }
+        }
+
+        /// <summary>
+        /// 每 tick 由引擎调用（<c>GameComponentUtility.GameComponentTick</c>），
+        /// 此处自行节流到每 <c>REFRESH_INTERVAL_TICKS</c>（1 游戏小时）执行一次内容校正。
         /// 关系质变、好感度累积变化、领袖更替、据点增减后，派系常识不会长期停留在开档快照。
         /// 异种人条目**不参与**定时刷新：其内容几乎不变，读档补齐即可。
         /// </summary>
@@ -78,15 +170,16 @@ namespace RimtalkAutoFactionInfo
         }
 
         /// <summary>
-        /// 同步全部有效派系常识（FR-2 筛选 / FR-3 内容 / FR-4 标签 / FR-5 幂等 / FR-11 校正 / FR-12 冷却）。
+        /// 同步全部有效派系常识（含我方派系）。
         /// 对每个派系：库内无条目 → 写入；内容一致 → 只校准基准；内容不同 → 判断下述三种情形。
-        /// **质变**（关系种类翻转）立即重写；**仅好感度小幅波动**（差值未达阈值）直接不写；
-        /// 其余**非质变**改动要等到覆写冷却结束才重写。
+        /// **质变**（指纹变化：普通派系看关系种类，我方派系看名 / 据点 / 飞船 / 殖民者数 / 奴隶数）立即重写；
+        /// **仅好感度小幅波动**（差值未达阈值）直接不写；其余**非质变**改动要等到覆写冷却结束才重写。
         /// 新档、读档、定时轮询**共用这一套逻辑**，因此天然幂等，也不存在「新档必须先删后写」的特殊路径。
         /// 单个派系失败不中断整体（逐个 try/catch）。
         /// </summary>
         /// <param name="isPeriodic">为真表示这是定时轮询：无变化时保持静默，避免日志刷屏。</param>
-        private void SyncFactionKnowledge(bool isPeriodic)
+        /// <returns>本次实际写入（含刷新）的条数，供调用方汇总合计。</returns>
+        private int SyncFactionKnowledge(bool isPeriodic)
         {
             int written = 0;
             int skippedConsistent = 0;
@@ -101,21 +194,34 @@ namespace RimtalkAutoFactionInfo
                 Faction faction = targets[i];
                 try
                 {
-                    string tag;
-                    string content;
-                    if (!FactionKnowledgeBuilder.TryBuild(faction, out tag, out content))
+                    FactionKnowledgeEntry entry;
+                    if (!FactionKnowledgeBuilder.TryBuild(faction, out entry))
                     {
                         skippedEmpty++;
                         KnowledgeLog.Detail("忽略（无派系名）：" + faction.def.defName);
                         continue;
                     }
 
-                    // 主键用稳定的派系名（tag 第一段），而非整串 tag：tag 尾段会随特征异种人变化（D17）
-                    string existingContent;
-                    List<string> managedIds = RimTalkMemoryBridge.FindManagedIds(
-                        faction.Name, FactionKnowledgeConfig.FACTION_CONTENT_PREFIX, out existingContent);
+                    string content = entry.Content;
+                    string qualitativeKey = entry.QualitativeKey;
 
-                    int currentGoodwill = faction.HasGoodwill ? faction.PlayerGoodwill : 0;
+                    // 查库口径按派系种类分流：
+                    // · 普通派系：主键 = 稳定的派系名（tag 第一段，已净化分隔符），与整串标签无关（尾段会随特征异种人变化）；
+                    // · 我方派系：主键会变（派系改名 / 飞船改名都会重拼标签），改用内容里的固定句识别——
+                    //   否则改名后按新名查不到旧条目，旧条目会残留成重复项、且提到旧名仍命中陈旧内容。
+                    string existingContent;
+                    List<string> managedIds = faction.IsPlayer
+                        ? RimTalkMemoryBridge.FindManagedIdsByContent(
+                            FactionKnowledgeConfig.PLAYER_SEG_IDENTITY_SUFFIX,
+                            FactionKnowledgeConfig.FACTION_CONTENT_PREFIX,
+                            out existingContent)
+                        : RimTalkMemoryBridge.FindManagedIds(
+                            entry.PrimaryKey, FactionKnowledgeConfig.FACTION_CONTENT_PREFIX, out existingContent);
+
+                    // ⚠ 玩家派系不能问「与自己的关系」：PlayerGoodwill → RelationWith(自己) 会先 Log.Error，
+                    //   接着 GoodwillSituationManager.GetMaxGoodwill 对空关系 NRE。玩家派系本就不写好感度段，取 0 即可。
+                    int currentGoodwill =
+                        (!faction.IsPlayer && faction.HasGoodwill) ? faction.PlayerGoodwill : 0;
                     bool hasEntry = managedIds.Count > 0;
 
                     if (hasEntry &&
@@ -124,28 +230,34 @@ namespace RimtalkAutoFactionInfo
                         // 内容逐字一致：无需任何写入，只校准各项基准
                         lastWrittenGoodwill[faction.loadID] = currentGoodwill;
                         lastWriteTick[faction.loadID] = CurrentTick;
-                        lastRelationKind[faction.loadID] = faction.PlayerRelationKind;
+                        lastQualitativeKey[faction.loadID] = qualitativeKey;
                         skippedConsistent++;
                         continue;
                     }
 
                     if (hasEntry)
                     {
-                        // 质变（关系种类翻转）不受冷却限制，立即重写；其余非质变改动才受冷却约束（FR-12）
-                        bool relationChanged = IsRelationKindChanged(faction);
+                        // 质变（指纹变化）不受冷却限制，立即重写；其余非质变改动才受冷却约束
+                        bool qualitativeChanged = IsQualitativeChanged(faction, qualitativeKey);
 
-                        // 差异仅来自好感度且未达阈值 → 直接不写（此判定独立于冷却）
-                        if (!relationChanged &&
+                        // 差异仅来自好感度且未达阈值 → 直接不写（此判定独立于冷却）；
+                        // 我方派系模板里没有好感度句，该判定不适用，直接跳过
+                        if (!qualitativeChanged && !faction.IsPlayer &&
                             ShouldSkipMinorGoodwillChange(faction, existingContent, content, currentGoodwill))
                         {
                             skippedMinorGoodwill++;
                             continue;
                         }
 
-                        if (!relationChanged && !IsRewriteCooldownElapsed(faction))
+                        if (!qualitativeChanged && !IsRewriteCooldownElapsed(faction))
                         {
                             skippedCooldown++;
-                            KnowledgeLog.Detail("跳过（非质变改动，覆写冷却中）：" + tag);
+                            // 我方派系的内容每小时都在变（财富、时长），若定时轮询也逐条输出，
+                            // 这一行会每小时刷一次屏；故轮询期静默，只在首次同步（新档 / 读档）时说明原因。
+                            if (!isPeriodic)
+                            {
+                                KnowledgeLog.Detail("跳过（非质变改动，覆写冷却中）：" + entry.Tag);
+                            }
                             continue;
                         }
                     }
@@ -157,16 +269,16 @@ namespace RimtalkAutoFactionInfo
                     }
 
                     string id = RimTalkMemoryBridge.AddLore(
-                        tag, content, FactionKnowledgeConfig.DEFAULT_IMPORTANCE);
+                        entry.Tag, content, FactionKnowledgeConfig.DEFAULT_IMPORTANCE);
                     if (string.IsNullOrEmpty(id))
                     {
-                        KnowledgeLog.Error("写入失败（上游未返回条目 id）：" + tag);
+                        KnowledgeLog.Error("写入失败（上游未返回条目 id）：" + entry.Tag);
                         continue;
                     }
 
                     lastWrittenGoodwill[faction.loadID] = currentGoodwill;
                     lastWriteTick[faction.loadID] = CurrentTick;
-                    lastRelationKind[faction.loadID] = faction.PlayerRelationKind;
+                    lastQualitativeKey[faction.loadID] = qualitativeKey;
                     written++;
                     KnowledgeLog.Detail((hasEntry ? "已刷新：" : "已写入：") + content);
                 }
@@ -182,9 +294,9 @@ namespace RimtalkAutoFactionInfo
                 // 轮询常态就是「什么都没变」，只在真的重写时才说话
                 if (written > 0)
                 {
-                    KnowledgeLog.Summary("派系常识已刷新 " + written + " 条（关系 / 好感度 / 领袖 / 据点有变）。");
+                    KnowledgeLog.Summary("派系常识已刷新 " + written + " 条（关系 / 好感度 / 领袖 / 据点 / 我方飞船等有变）。");
                 }
-                return;
+                return written;
             }
 
             KnowledgeLog.Summary(
@@ -194,10 +306,11 @@ namespace RimtalkAutoFactionInfo
                 "略过 " + skippedMinorGoodwill + " 条（仅好感度小幅波动），" +
                 "略过 " + skippedCooldown + " 条（非质变改动，覆写冷却中），" +
                 "忽略 " + skippedEmpty + " 个（无派系名）。");
+            return written;
         }
 
         /// <summary>
-        /// 判断「内容差异是否只源于好感度的小幅波动」，是则本次可以不重写（FR-11）。
+        /// 判断「内容差异是否只源于好感度的小幅波动」，是则本次可以不重写。
         /// </summary>
         /// <remarks>
         /// 判定手法：把库内内容里的「上次写入的好感度句」整句替换为「当前好感度句」——
@@ -246,22 +359,22 @@ namespace RimtalkAutoFactionInfo
         }
 
         /// <summary>
-        /// 该派系的关系种类（敌对 / 中立 / 盟友）相对**上次写入**是否发生了变化——即「质变」（FR-12）。
+        /// 该派系的质变指纹相对**上次写入**是否发生了变化——即「质变」。
         /// 质变意味着内容里的核心事实被推翻，必须立刻改写，因此**不受**覆写冷却约束。
         /// </summary>
         /// <remarks>无基准（首次校正或刚读档）时返回 <c>true</c>：既然内容已经不一致，就立即校正一次。</remarks>
-        private bool IsRelationKindChanged(Faction faction)
+        private bool IsQualitativeChanged(Faction faction, string qualitativeKey)
         {
-            FactionRelationKind lastKind;
-            if (!lastRelationKind.TryGetValue(faction.loadID, out lastKind))
+            string lastKey;
+            if (!lastQualitativeKey.TryGetValue(faction.loadID, out lastKey))
             {
                 return true;
             }
-            return lastKind != faction.PlayerRelationKind;
+            return !string.Equals(lastKey, qualitativeKey, StringComparison.Ordinal);
         }
 
         /// <summary>
-        /// 非质变覆写的冷却是否已结束（FR-12）。
+        /// 非质变覆写的冷却是否已结束。
         /// 冷却时长取 <see cref="KnowledgeDebug.CurrentRewriteCooldownTicks"/>：常态 3 天，调试「快速刷新」开启时 1 小时。
         /// </summary>
         /// <remarks>无记录（首次校正或刚读档）时返回 <c>true</c>：允许立即校正一次陈旧内容。</remarks>
@@ -276,16 +389,17 @@ namespace RimtalkAutoFactionInfo
         }
 
         /// <summary>
-        /// 同步异种人常识（FR-9）：缺失才补，不做定时刷新。
-        /// 未启用 Biotech DLC 时整体跳过且不报错（FR-9.0）；
+        /// 同步异种人常识：缺失才补，不做定时刷新。
+        /// 未启用 Biotech DLC 时整体跳过且不报错；
         /// 与派系同步互相独立：本方法自带外层 try/catch，自身失败不影响已完成的派系注入。
         /// </summary>
-        private static void SyncXenotypeKnowledge()
+        /// <returns>本次实际写入的条数（未启用 Biotech 时为 0），供调用方汇总合计。</returns>
+        private static int SyncXenotypeKnowledge()
         {
             if (!ModsConfig.BiotechActive)
             {
                 KnowledgeLog.Summary("异种人常识：未启用 Biotech DLC，本次跳过。");
-                return;
+                return 0;
             }
 
             int candidates = 0;
@@ -360,12 +474,14 @@ namespace RimtalkAutoFactionInfo
                 "写入 " + written + " 条，" +
                 "跳过 " + skippedExisting + " 条（已存在），" +
                 "忽略 " + skippedEmpty + " 个。");
+            return written;
         }
 
         /// <summary>
-        /// 建立「异种人 → 出没派系名」反向索引（FR-9.2 ③）。
-        /// 只统计显式声明的关系（<c>FactionDef.xenotypeSet</c> ∪ 主理念 <c>memes[].xenotypeSet</c>），
-        /// **不含基础异种人补差**：否则每个派系都会把智人种列进去，列表噪声极大。
+        /// 建立「异种人 → 出没派系名」反向索引。
+        /// 只统计**显式声明**的关系（<c>FactionDef.xenotypeSet</c> ∪ 主理念 <c>memes[].xenotypeSet</c>
+        /// ∪ 兵种级 <c>PawnKindDef.xenotypeSet</c>），**不含基础异种人补差**：
+        /// 否则每个派系都会把智人种列进去，列表噪声极大。
         /// </summary>
         private static Dictionary<XenotypeDef, List<string>> BuildXenotypeFactionIndex(List<Faction> factions)
         {
