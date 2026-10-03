@@ -14,17 +14,15 @@ namespace RimtalkAutoFactionInfo
         /// <summary>日志前缀别名，避免每行都写全限定名。</summary>
         private const string Prefix = FactionKnowledgeConfig.LOG_PREFIX;
 
-        /// <summary>明细日志开关，由设置界面写入。</summary>
-        private static bool verboseFlag;
-
         /// <summary>
         /// 是否输出明细日志。
-        /// 开发者模式（Prefs.DevMode）开启时强制为真，便于临时排查；否则取设置值。
+        /// 开发者模式（Prefs.DevMode）开启时强制为真，否则取设置项
+        /// <c>enableVerboseLog</c>（设置未载入时按默认「关」处理）。
+        /// 直接读设置而非缓存字段：设置页勾选后立即生效，无需额外同步。
         /// </summary>
         public static bool VerboseEnabled
         {
-            get { return verboseFlag || Prefs.DevMode; }
-            set { verboseFlag = value; }
+            get { return Prefs.DevMode || FactionInfoSettings.EnableVerboseLog; }
         }
 
         /// <summary>汇总级日志：单次注入的整体结果，无条件输出，每次注入只应调用一次。</summary>

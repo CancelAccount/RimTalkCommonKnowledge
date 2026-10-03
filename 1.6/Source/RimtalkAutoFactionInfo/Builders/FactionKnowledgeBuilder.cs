@@ -112,6 +112,13 @@ namespace RimtalkAutoFactionInfo
         /// </summary>
         private static string BuildTag(Faction faction, string primaryKey)
         {
+            // 关闭双向引用后，派系条目不再含成员构成段，标签也不应并列特征异种人名 / 成员种族名——
+            // 否则会出现「提到某异种人却带出不含该信息的条目」的错配。
+            if (!FactionInfoSettings.IncludeFactionXenotypeRefs)
+            {
+                return primaryKey;
+            }
+
             string featureLabel = null;
             ThingDef primaryRace = RaceKnowledgeBuilder.FindPrimaryMemberRace(faction);
             if (primaryRace != null)
@@ -182,6 +189,11 @@ namespace RimtalkAutoFactionInfo
         /// </summary>
         private static void AppendIdentitySection(StringBuilder builder, Faction faction, string name)
         {
+            if (!FactionInfoSettings.IncludeIdentity)
+            {
+                return;
+            }
+            
             string defLabel = faction.def.LabelCap;
             bool hasTechLevel = faction.def.techLevel != TechLevel.Undefined;
             string techLevel = hasTechLevel ? faction.def.techLevel.ToStringHuman() : null;
@@ -213,6 +225,11 @@ namespace RimtalkAutoFactionInfo
         /// <summary>② 意识形态：主理念名 + 其信条列表；无 Ideology DLC / 非人形派系 / 无主理念 → 整段跳过。</summary>
         private static void AppendIdeologySection(StringBuilder builder, Faction faction)
         {
+            if (!FactionInfoSettings.IncludeIdeology)
+            {
+                return;
+            }
+
             // faction.ideos 非人形派系为 null
             if (!ModsConfig.IdeologyActive || faction.ideos == null)
             {
@@ -265,6 +282,11 @@ namespace RimtalkAutoFactionInfo
         /// </summary>
         private static void AppendRelationSection(StringBuilder builder, Faction faction, string name)
         {
+            if (!FactionInfoSettings.IncludeRelation)
+            {
+                return;
+            }
+
             if (!faction.HasGoodwill)
             {
                 return;
@@ -282,6 +304,11 @@ namespace RimtalkAutoFactionInfo
         /// </summary>
         private static void AppendLeaderAndSettlementSection(StringBuilder builder, Faction faction, string name)
         {
+            if (!FactionInfoSettings.IncludeSettlements)
+            {
+                return;
+            }
+
             Pawn leader = faction.leader;
             if (leader != null)
             {
@@ -349,6 +376,12 @@ namespace RimtalkAutoFactionInfo
         /// </summary>
         private static void AppendMemberCompositionSection(StringBuilder builder, Faction faction, string name)
         {
+            // 「成员构成」段属于派系与异种人的双向引用（FR-7 / D13）：关闭后整段缺席。
+            if (!FactionInfoSettings.IncludeFactionXenotypeRefs)
+            {
+                return;
+            }
+
             // 种族优先：HAR / alien race 派系的成员在 Biotech 异种人体系里一律是智人种，
             // 写异种人构成只会得到「智人种 100%」这类误导内容。
             List<ThingDef> races = RaceKnowledgeBuilder.CollectMemberRaces(faction);

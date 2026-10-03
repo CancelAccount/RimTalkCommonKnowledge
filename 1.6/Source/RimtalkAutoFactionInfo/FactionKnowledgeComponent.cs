@@ -62,18 +62,54 @@ namespace RimtalkAutoFactionInfo
             RunInitialSync();
         }
 
-        /// <summary>读档：每次进入存档都调用；内容一致则完全不写，陈旧则自动校正。</summary>
+        /// <summary>
+        /// 读档：每次进入存档都调用；内容一致则完全不写，陈旧则自动校正。
+        /// 受设置项 <c>enableBackfillOnLoad</c> 控制（D4）：关闭后读档不做任何写入，
+        /// 此时仍可靠新开档与运行中定时校正在下次变化时补齐。
+        /// </summary>
         public override void LoadedGame()
         {
+            if (!FactionInfoSettings.EnableBackfillOnLoad)
+            {
+                KnowledgeLog.Summary(FactionKnowledgeConfig.LOG_BACKFILL_ON_LOAD_DISABLED);
+                return;
+            }
             RunInitialSync();
+        }
+
+        /// <summary>
+        /// 设置页「立即对当前存档重新注入」按钮的入口：对当前存档重跑一次注入与校正。
+        /// 供玩家改完设置后立即看效果、无需重开档；与读档校正开关无关，但**仍受总开关约束**。
+        /// 无存档或找不到本组件时静默返回（按钮在无存档时已置灰）。
+        /// </summary>
+        public static void ReinjectCurrentGame()
+        {
+            Game game = Current.Game;
+            if (game == null)
+            {
+                return;
+            }
+
+            FactionKnowledgeComponent component = game.GetComponent<FactionKnowledgeComponent>();
+            if (component != null)
+            {
+                component.RunInitialSync();
+            }
         }
 
         /// <summary>
         /// 新开档与读档共用的首次同步：先派系、后异种人，最后补一条合计。
         /// 两侧各自已有计数汇总，此处再给一行「总计」，便于一眼确认本次注入了多少条。
+        /// 总开关关闭时整体短路：只回报一句结论，不产生任何写入。
         /// </summary>
         private void RunInitialSync()
         {
+            if (!FactionInfoSettings.EnableInjection)
+            {
+                KnowledgeLog.Summary(FactionKnowledgeConfig.LOG_INJECTION_DISABLED);
+                return;
+            }
+
             int factionWritten = SyncFactionKnowledge(isPeriodic: false);
             int xenotypeWritten = SyncXenotypeKnowledge();
             KnowledgeLog.Summary(string.Format(
@@ -152,17 +188,25 @@ namespace RimtalkAutoFactionInfo
 
         /// <summary>
         /// 每 tick 由引擎调用（<c>GameComponentUtility.GameComponentTick</c>），
-        /// 此处自行节流到每 <c>REFRESH_INTERVAL_TICKS</c>（1 游戏小时）执行一次内容校正。
+        /// 此处自行节流到每 <see cref="FactionInfoSettings.RefreshIntervalTicks"/>
+        /// （默认 1 游戏小时，可由设置页调整）执行一次内容校正。
         /// 关系质变、好感度累积变化、领袖更替、据点增减后，派系常识不会长期停留在开档快照。
+        /// 总开关或「运行中定时校正」任一关闭时整体短路；
         /// 异种人条目**不参与**定时刷新：其内容几乎不变，读档补齐即可。
         /// </summary>
         public override void GameComponentTick()
         {
+            if (!FactionInfoSettings.EnableInjection || !FactionInfoSettings.EnablePeriodicRefresh)
+            {
+                return;
+            }
             if (!RimTalkMemoryBridge.IsLibraryAvailable || Find.TickManager == null)
             {
                 return;
             }
-            if (Find.TickManager.TicksGame % FactionKnowledgeConfig.REFRESH_INTERVAL_TICKS != 0)
+
+            int interval = FactionInfoSettings.RefreshIntervalTicks;
+            if (interval <= 0 || Find.TickManager.TicksGame % interval != 0)
             {
                 return;
             }
@@ -269,7 +313,7 @@ namespace RimtalkAutoFactionInfo
                     }
 
                     string id = RimTalkMemoryBridge.AddLore(
-                        entry.Tag, content, FactionKnowledgeConfig.DEFAULT_IMPORTANCE);
+                        entry.Tag, content, FactionInfoSettings.KnowledgeImportance);
                     if (string.IsNullOrEmpty(id))
                     {
                         KnowledgeLog.Error("写入失败（上游未返回条目 id）：" + entry.Tag);
@@ -349,7 +393,7 @@ namespace RimtalkAutoFactionInfo
             {
                 delta = -delta;
             }
-            return delta < FactionKnowledgeConfig.GOODWILL_REFRESH_THRESHOLD;
+            return delta < FactionInfoSettings.GoodwillRefreshThreshold;
         }
 
         /// <summary>当前游戏 tick；<c>TickManager</c> 不可用时返回 0。</summary>
@@ -396,6 +440,12 @@ namespace RimtalkAutoFactionInfo
         /// <returns>本次实际写入的条数（未启用 Biotech 时为 0），供调用方汇总合计。</returns>
         private static int SyncXenotypeKnowledge()
         {
+            if (!FactionInfoSettings.IncludeXenotypes)
+            {
+                KnowledgeLog.Summary(FactionKnowledgeConfig.LOG_XENOTYPE_INJECTION_DISABLED);
+                return 0;
+            }
+
             if (!ModsConfig.BiotechActive)
             {
                 KnowledgeLog.Summary("异种人常识：未启用 Biotech DLC，本次跳过。");
@@ -447,7 +497,7 @@ namespace RimtalkAutoFactionInfo
                         }
 
                         string id = RimTalkMemoryBridge.AddLore(
-                            tag, content, FactionKnowledgeConfig.DEFAULT_IMPORTANCE);
+                            tag, content, FactionInfoSettings.KnowledgeImportance);
                         if (string.IsNullOrEmpty(id))
                         {
                             KnowledgeLog.Error("写入失败（上游未返回条目 id）：" + tag);

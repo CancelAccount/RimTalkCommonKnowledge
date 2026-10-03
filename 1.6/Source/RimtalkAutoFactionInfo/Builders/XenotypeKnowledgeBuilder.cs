@@ -433,8 +433,9 @@ namespace RimtalkAutoFactionInfo
             // ② 标志性基因（无基因 → 固定文案；有基因 → 按游戏展示顺序取前 N）
             AppendGeneSection(builder, xenotype);
 
-            // ③ 出没派系
-            if (factionNames != null && factionNames.Count > 0)
+            // ③ 出没派系（属于双向引用，见 FR-7 / D13：关闭后本段与派系 ⑤ 段一并缺席）
+            if (FactionInfoSettings.IncludeFactionXenotypeRefs &&
+                factionNames != null && factionNames.Count > 0)
             {
                 builder.Append(string.Format(
                     FactionKnowledgeConfig.XENOTYPE_SEG_FACTIONS,
@@ -447,11 +448,11 @@ namespace RimtalkAutoFactionInfo
 
         /// <summary>
         /// 追加②「标志性基因」段：<c>genes</c> 为空 → 固定文案；否则按游戏自身展示顺序取前 N 个。
-        /// <c>DEFAULT_XENOTYPE_GENE_COUNT</c> 为 0 时整段跳过。
+        /// N 取设置项 <c>xenotypeGeneCount</c>（默认 4），为 0 时整段跳过。
         /// </summary>
         private static void AppendGeneSection(StringBuilder builder, XenotypeDef xenotype)
         {
-            int geneCount = FactionKnowledgeConfig.DEFAULT_XENOTYPE_GENE_COUNT;
+            int geneCount = FactionInfoSettings.XenotypeGeneCount;
             if (geneCount <= 0)
             {
                 return;

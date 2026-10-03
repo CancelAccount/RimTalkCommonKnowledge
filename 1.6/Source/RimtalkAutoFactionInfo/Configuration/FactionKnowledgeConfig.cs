@@ -1,12 +1,23 @@
 namespace RimtalkAutoFactionInfo
 {
     /// <summary>
-    /// 全局常量与默认值。
+    /// 全局常量与默认值（核心区）。
     /// 约定：业务代码中不得出现裸字面量（前缀、模板、默认值、日志 key 等），一律从此类取值。
     /// 文案类常量均为**单行**：上游 <c>ImportFromText</c> 按 <c>\n</c> 切行，内容含换行会破坏导入导出格式。
     /// </summary>
-    public static class FactionKnowledgeConfig
+    /// <remarks>
+    /// 本类按 partial 拆为三个文件，引用名不变，便于按用途查阅：
+    /// ① 本文件——前缀与标签、数值默认值与边界、刷新与冷却、日志与来源；
+    /// ② <c>FactionKnowledgeConfig.Templates.cs</c>——派系 / 我方派系 / 异种人的内容模板；
+    /// ③ <c>FactionKnowledgeConfig.Settings.cs</c>——设置分类名、持久化键、分组标题、控件文案与尺寸。
+    /// </remarks>
+    public static partial class FactionKnowledgeConfig
     {
+        // ---------- 本 mod 元信息 ----------
+
+        /// <summary>本 mod 的 Harmony 实例标识，用于区分补丁集、便于排查冲突。</summary>
+        public const string HARMONY_ID = "Cancelation.RimtalkAutoFactionInfo";
+
         // ---------- 前缀与标签 ----------
 
         /// <summary>日志统一前缀，所有日志行以此开头，便于按本 mod 过滤。</summary>
@@ -45,15 +56,34 @@ namespace RimtalkAutoFactionInfo
         /// <summary>异种人常识默认列出的「标志性基因」条数（0 表示不写该段）。</summary>
         public const int DEFAULT_XENOTYPE_GENE_COUNT = 4;
 
-        /// <summary>
-        /// 普通派系质变指纹在「与玩家无可谈关系」时的取值。
-        /// 隐藏 / 临时派系的 <c>Faction.HasGoodwill</c> 为假（= <c>!Hidden &amp;&amp; !temporary</c>），
-        /// 引擎里没有它们与玩家的关系条目；硬取 <c>PlayerRelationKind</c> 会落入
-        /// <c>RelationWith(other, allowNull: false)</c> 的「缺失关系」分支——先打一条引擎
-        /// <c>Log.Error</c>、再返回 dummy 关系（默认中立），写出去就是假数据。故改用本固定键，
-        /// 语义为「无关系可质变」：这类派系的条目只在内容变化且冷却到期时重写。
-        /// </summary>
-        public const string QUALITATIVE_KEY_NO_RELATION = "NoRelation";
+        // ---------- 设置项默认值与取值边界 ----------
+
+        /// <summary>定时校正的默认间隔（游戏小时）。</summary>
+        public const int DEFAULT_REFRESH_INTERVAL_HOURS = 1;
+
+        /// <summary>定时校正间隔的最小取值（游戏小时）：低于 1 小时没有意义。</summary>
+        public const int REFRESH_INTERVAL_HOURS_MIN = 1;
+
+        /// <summary>定时校正间隔的最大取值（游戏小时）：一天，再长不如关掉本开关。</summary>
+        public const int REFRESH_INTERVAL_HOURS_MAX = 24;
+
+        /// <summary>好感度重写阈值的最小取值。</summary>
+        public const int GOODWILL_THRESHOLD_MIN = 0;
+
+        /// <summary>好感度重写阈值的最大取值（好感度区间为 -100~100，取 100 即只在关系翻转时重写）。</summary>
+        public const int GOODWILL_THRESHOLD_MAX = 100;
+
+        /// <summary>异种人条目标志性基因条数的最小取值（0 = 不写基因段）。</summary>
+        public const int XENOTYPE_GENE_COUNT_MIN = 0;
+
+        /// <summary>异种人条目标志性基因条数的最大取值。</summary>
+        public const int XENOTYPE_GENE_COUNT_MAX = 10;
+
+        /// <summary>常识条目重要度的最小取值。</summary>
+        public const float IMPORTANCE_MIN = 0f;
+
+        /// <summary>常识条目重要度的最大取值（世界观级最高档）。</summary>
+        public const float IMPORTANCE_MAX = 1f;
 
         // ---------- 定时刷新与覆写冷却 ----------
 
@@ -90,195 +120,26 @@ namespace RimtalkAutoFactionInfo
         /// </summary>
         public const int GOODWILL_REFRESH_THRESHOLD = 10;
 
-        // ---------- 派系常识内容模板 ----------
-
-        /// <summary>① 基础身份：{0}=派系名，{1}=类型标签，{2}=科技水平。</summary>
-        public const string FACTION_SEG_IDENTITY = "{0}是一支{1}派系，科技水平为{2}。";
-
         /// <summary>
-        /// ① 基础身份（无科技水平时）：{0}=派系名，{1}=类型标签。
-        /// 用于 <c>FactionDef.techLevel</c> 为 <c>TechLevel.Undefined</c> 的派系
-        /// （Def 未声明科技水平，照原模板会写出「科技水平为Undefined」这种假数据）。
+        /// 普通派系质变指纹在「与玩家无可谈关系」时的取值。
+        /// 隐藏 / 临时派系的 <c>Faction.HasGoodwill</c> 为假（= <c>!Hidden &amp;&amp; !temporary</c>），
+        /// 引擎里没有它们与玩家的关系条目；硬取 <c>PlayerRelationKind</c> 会落入
+        /// <c>RelationWith(other, allowNull: false)</c> 的「缺失关系」分支——先打一条引擎
+        /// <c>Log.Error</c>、再返回 dummy 关系（默认中立），写出去就是假数据。故改用本固定键，
+        /// 语义为「无关系可质变」：这类派系的条目只在内容变化且冷却到期时重写。
         /// </summary>
-        public const string FACTION_SEG_IDENTITY_NO_TECH = "{0}是一支{1}派系。";
+        public const string QUALITATIVE_KEY_NO_RELATION = "NoRelation";
 
-        /// <summary>
-        /// ① 基础身份（名字与类型标签重复时）：{0}=名字，{1}=科技水平。
-        /// 隐藏派系（如原版机械族、虫族）<c>HasName</c> 为假、<c>Name</c> 回退为 <c>def.LabelCap</c>，
-        /// 与类型标签同字，故省去「是一支 X 派系」以免同义重复。
-        /// </summary>
-        public const string FACTION_SEG_IDENTITY_SAME = "{0}，科技水平为{1}。";
+        // ---------- 注入开关相关日志 ----------
 
-        /// <summary>① 基础身份（名字与类型标签重复、且无科技水平时）：{0}=名字。</summary>
-        public const string FACTION_SEG_IDENTITY_SAME_NO_TECH = "{0}。";
+        /// <summary>汇总结论：注入总开关关闭，本次不写入。</summary>
+        public const string LOG_INJECTION_DISABLED = "常识注入已关闭（总开关），本次未写入任何条目。";
 
-        /// <summary>① 追加定义原文：{0}=介绍文本。文本为空时整句省略。</summary>
-        public const string FACTION_SEG_DESCRIPTION = "{0}。";
+        /// <summary>汇总结论：读档校正开关关闭，本次读档不校正。</summary>
+        public const string LOG_BACKFILL_ON_LOAD_DISABLED = "读档校正已关闭，本次读档未做任何写入。";
 
-        /// <summary>② 意识形态（有信条）：{0}=理念名，{1}=信条列表。</summary>
-        public const string FACTION_SEG_IDEO = "他们信奉「{0}」，核心信条是{1}。";
-
-        /// <summary>② 意识形态（理念无信条）：{0}=理念名。</summary>
-        public const string FACTION_SEG_IDEO_NO_MEMES = "他们信奉「{0}」。";
-
-        /// <summary>③ 与我方关系：{0}=派系名，{1}=关系标签。</summary>
-        public const string FACTION_SEG_RELATION = "我们与{0}的关系是{1}。";
-
-        /// <summary>③ 好感度子句：{0}=数值。仅在 <c>Faction.HasGoodwill</c> 为真时追加。</summary>
-        public const string FACTION_SEG_GOODWILL = "其对我们好感度为{0}。";
-
-        /// <summary>④ 领袖：{0}=派系名，{1}=领袖名。</summary>
-        public const string FACTION_SEG_LEADER = "{0}的领袖是{1}。";
-
-        /// <summary>④ 无领袖：{0}=派系名。</summary>
-        public const string FACTION_SEG_LEADER_NONE = "{0}目前没有已知的领袖。";
-
-        /// <summary>④ 据点数量：{0}=数量。</summary>
-        public const string FACTION_SEG_SETTLEMENT_COUNT = "他们在世界地图上共有{0}处定居点。";
-
-        /// <summary>④ 最近据点距离：{0}=格数。</summary>
-        public const string FACTION_SEG_SETTLEMENT_NEAREST = "最近的一处距我们约{0}格。";
-
-        /// <summary>
-        /// ⑤ 成员种族（外星种族，如 HAR / alien race 派系）：{0}=种族名列表（顿号连接）。
-        /// 与 <see cref="FACTION_SEG_MEMBERS"/> **互斥**：这类派系的成员在 Biotech 异种人体系里
-        /// 一律登记为智人种（<c>Baseliner</c>），照异种人口径写会得到「智人种 100%」这类误导内容，
-        /// 故成员面貌改由本句表达。
-        /// </summary>
-        public const string FACTION_SEG_MEMBER_RACES = "他们的外星种族成员包括{0}。";
-
-        /// <summary>⑤ 成员异种人构成：{0}=「异种人名（约p%）」列表。</summary>
-        public const string FACTION_SEG_MEMBERS = "他们的成员主要是{0}。";
-
-        /// <summary>⑤ 单个异种人占比项：{0}=异种人名，{1}=百分比文本。</summary>
-        public const string FACTION_SEG_MEMBERS_ITEM = "{0}（约{1}）";
-
-        // ---------- 派系界面「实际成员」显示（可在 Mod 设置中开关） ----------
-
-        /// <summary>
-        /// Mod 设置页的分类名（引擎按 <c>Mod.SettingsCategory()</c> 非空把本 mod 列入设置列表，
-        /// 同时作为列表项与设置窗标题）。留空会使本 mod 从设置列表消失，故给固定名。
-        /// </summary>
-        public const string MOD_SETTINGS_CATEGORY = "Rimtalk Auto Faction Info";
-
-        /// <summary>本 mod 的 Harmony 实例标识，用于区分补丁集、便于排查冲突。</summary>
-        public const string HARMONY_ID = "Cancelation.RimtalkAutoFactionInfo";
-
-        /// <summary>设置项标题：在派系界面追加「实际成员」构成。</summary>
-        public const string MOD_SETTINGS_SHOW_UI_COMPOSITION = "在派系界面显示实际成员构成";
-
-        /// <summary>设置项说明（悬停提示）。</summary>
-        public const string MOD_SETTINGS_SHOW_UI_COMPOSITION_TIP =
-            "在派系列表的悬停提示与派系信息卡中追加一行「实际成员」。" +
-            "用于修正游戏自带的成员统计在 HAR 种族 / 兵种级异种人派系上误报「智人种 100%」的情况。";
-
-        /// <summary>设置持久化键：派系界面实际成员开关。改键名会丢失存量设置。</summary>
-        public const string SETTINGS_KEY_SHOW_UI_COMPOSITION = "showCompositionInFactionUi";
-
-        /// <summary>
-        /// 派系界面「实际成员」（派系级分布不可信、只能按兵种列举时）：{0}=异种人名列表（顿号连接）。
-        /// 与常识 ⑤ 段的 <see cref="FACTION_SEG_MEMBER_RACES"/> 口径一致，只是**不写占比**——
-        /// 兵种级集合是无条件并集，同一异种人可能只出现在个别特殊兵种上，写占比会误导。
-        /// </summary>
-        public const string UI_COMPOSITION_KIND_XENOTYPES = "他们的成员涉及以下异种人：{0}。";
-
-        /// <summary>
-        /// 派系界面「实际成员」中**外星种族**块的标题（对应原版 <c>MemberXenotypeChances</c> 段的标题位置）。
-        /// 种族在 Def 层没有概率声明（<c>PawnKindDef.race</c> 是单一确定值），故只列名称、不写占比。
-        /// </summary>
-        public const string UI_COMPOSITION_MEMBER_RACES_TITLE = "外星种族";
-
-        /// <summary>
-        /// 派系界面名称列表的每行前缀，对齐原版成员段 <c>ToLineList("  - ", false)</c> 的排版。
-        /// </summary>
-        public const string UI_LIST_ITEM_PREFIX = "  - ";
-
-        // ---------- 我方派系介绍内容模板 ----------
-
-        /// <summary>我方派系 ① 身份前半：{0}=派系名。</summary>
-        public const string PLAYER_SEG_IDENTITY_PREFIX = "「{0}」";
-
-        /// <summary>
-        /// 我方派系 ① 身份后半（固定句），与前半拼成「「{派系名}」是我们自己所属的派系。」。
-        /// ⚠ 本句同时充当「我方派系条目」的**无名字识别标记**：派系改名后 tag 已变，
-        ///   旧条目只能靠这句与名字无关的固定文案被找回并删除（见 <c>RimTalkMemoryBridge.FindManagedIdsByContent</c>）。
-        ///   **不要为了改文案而改动本句**，否则存量存档里的旧条目将失去识别依据。
-        /// </summary>
-        public const string PLAYER_SEG_IDENTITY_SUFFIX = "是我们自己所属的派系。";
-
-        /// <summary>
-        /// 我方派系 ① 身份段之后的开局剧本句：{0}=剧本名（如「迫降」「失落的部落」「赤裸的暴行」）。
-        /// 读不到剧本时整句省略。
-        /// </summary>
-        public const string PLAYER_SEG_SCENARIO = "我们的开局剧本是「{0}」。";
-
-        /// <summary>我方派系 ② 人口：{0}=殖民者数（不含奴隶 / 囚犯 / 临时成员），{1}=附加类别子句（无则空串）。</summary>
-        public const string PLAYER_SEG_POPULATION = "我们有{0}名殖民者{1}。";
-
-        /// <summary>我方派系 ② 人口附加类别的引导语。</summary>
-        public const string PLAYER_SEG_POPULATION_EXTRA_LEAD = "，另有";
-
-        /// <summary>我方派系 ② 人口附加类别项：{0}=人数，{1}=类别名。</summary>
-        public const string PLAYER_SEG_POPULATION_EXTRA_ITEM = "{0}名{1}";
-
-        /// <summary>人口类别名：临时成员（任务寄居者，如难民 / 来做客的）。</summary>
-        public const string PLAYER_POP_LABEL_TEMPORARY = "临时成员";
-
-        /// <summary>人口类别名：囚犯。</summary>
-        public const string PLAYER_POP_LABEL_PRISONER = "囚犯";
-
-        /// <summary>人口类别名：奴隶。</summary>
-        public const string PLAYER_POP_LABEL_SLAVE = "奴隶";
-
-        /// <summary>
-        /// 我方派系 ③ 友方机械族（需 Biotech）：{0}=型号构成列表（「N 台某型」，以顿号连接）。
-        /// 仅在启用 Biotech 时输出；未启用时整段跳过（此时不存在机械族，写了只是噪声）。
-        /// </summary>
-        public const string PLAYER_SEG_MECHS = "我们还有{0}。";
-
-        /// <summary>我方派系 ③ 未启用 Biotech / 尚未拥有机械族时的替代句（仅 Biotech 启用时输出）。</summary>
-        public const string PLAYER_SEG_MECHS_NONE = "我们目前没有友方机械族。";
-
-        /// <summary>我方派系 ③ 机械族型号项：{0}=台数，{1}=型号名（如「清扫机」）。</summary>
-        public const string PLAYER_SEG_MECHS_ITEM = "{0}台{1}";
-
-        /// <summary>我方派系 ④：{0}=据点名列表。</summary>
-        public const string PLAYER_SEG_SETTLEMENTS = "我们的据点是{0}。";
-
-        /// <summary>我方派系 ④ 无据点时的替代句。</summary>
-        public const string PLAYER_SEG_SETTLEMENTS_NONE = "我们目前还没有固定的据点。";
-
-        /// <summary>我方派系 ⑤ 气候：{0}=主基地所属生物群系名（如「温带森林」）。</summary>
-        public const string PLAYER_SEG_CLIMATE = "殖民地所在位置的气候是{0}。";
-
-        /// <summary>我方派系 ⑥ 可读停留时长：{0}=飞船名，{1}=停留时长。</summary>
-        public const string PLAYER_SEG_GRAVSHIP = "逆重飞船「{0}」已在此停留{1}。";
-
-        /// <summary>我方派系 ⑥ 读不到着陆时刻：{0}=飞船名。</summary>
-        public const string PLAYER_SEG_GRAVSHIP_BARE = "我们有一艘逆重飞船「{0}」。";
-
-        /// <summary>我方派系 ⑦：{0}=时长文本。</summary>
-        public const string PLAYER_SEG_AGE = "这个派系已经建立了{0}。";
-
-        /// <summary>我方派系 ⑧：{0}=财富值。</summary>
-        public const string PLAYER_SEG_WEALTH = "主基地的财富约为{0}。";
-
-        // ---------- 异种人常识内容模板 ----------
-
-        /// <summary>① 是什么：{0}=异种人名，{1}=描述。</summary>
-        public const string XENOTYPE_SEG_INTRO = XENOTYPE_CONTENT_PREFIX + "{0}：{1}";
-
-        /// <summary>① 是什么（无描述文本时）：{0}=异种人名。</summary>
-        public const string XENOTYPE_SEG_INTRO_BARE = XENOTYPE_CONTENT_PREFIX + "{0}";
-
-        /// <summary>② 标志性基因：{0}=基因列表。</summary>
-        public const string XENOTYPE_SEG_GENES = "标志性基因：{0}。";
-
-        /// <summary>② 无基因时的固定文案（基础异种人即此情况）。</summary>
-        public const string XENOTYPE_NO_GENES = "没有任何特殊基因，是自然演化的人类。";
-
-        /// <summary>③ 出没派系：{0}=派系列表。</summary>
-        public const string XENOTYPE_SEG_FACTIONS = "他们主要在{0}出没。";
+        /// <summary>汇总结论：异种人条目开关关闭，本次跳过异种人一遍。</summary>
+        public const string LOG_XENOTYPE_INJECTION_DISABLED = "异种人常识：已在设置中关闭，本次跳过。";
 
         // ---------- 启动包信息与注入合计日志 ----------
 

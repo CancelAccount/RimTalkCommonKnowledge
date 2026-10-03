@@ -50,11 +50,15 @@ namespace RimtalkAutoFactionInfo
                 return null;
             }
 
-            // AddKnowledgeEx 同样不设置分类，此处补设为「世界观」以让 UI 正确归类
-            CommonKnowledgeEntry entry = CommonKnowledgeAPI.FindKnowledgeById(id);
-            if (entry != null)
+            // AddKnowledgeEx 同样不设置分类；按设置补设为「世界观」以让 UI 正确归类。
+            // 关闭该设置则不写分类，退化为上游按 tag 自动猜分类（实测会落到「其它」，见证据 ⑦）。
+            if (FactionInfoSettings.CategoryAlwaysLore)
             {
-                entry.category = KnowledgeEntryCategory.Lore;
+                CommonKnowledgeEntry entry = CommonKnowledgeAPI.FindKnowledgeById(id);
+                if (entry != null)
+                {
+                    entry.category = KnowledgeEntryCategory.Lore;
+                }
             }
             return id;
         }

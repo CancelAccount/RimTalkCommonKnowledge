@@ -41,6 +41,11 @@
       <HintPath>$(ManagedDir)UnityEngine.CoreModule.dll</HintPath>
       <Private>false</Private>
     </Reference>
+    <!-- Widgets.ButtonText 的 1.6 重载含 TextAnchor? 可选参数，重载解析需要该类型信息 -->
+    <Reference Include="UnityEngine.TextRenderingModule">
+      <HintPath>$(ManagedDir)UnityEngine.TextRenderingModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
     <!-- 上游注入 API：编译期校验签名；Private=false 表示不把上游 dll 复制进本 mod 的 Assemblies -->
     <Reference Include="RimTalkMemoryPatch">
       <HintPath>$(RimTalkMemoryDir)RimTalkMemoryPatch.dll</HintPath>
