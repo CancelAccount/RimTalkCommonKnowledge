@@ -18,6 +18,16 @@ namespace RimtalkAutoFactionInfo
         /// <summary>本 mod 的 Harmony 实例标识，用于区分补丁集、便于排查冲突。</summary>
         public const string HARMONY_ID = "Cancelation.RimtalkAutoFactionInfo";
 
+        /// <summary>
+        /// 本次编译是否为 Debug 包：由 csproj 的 <c>DEBUG</c> 编译符号判定（Release 配置不定义它）。
+        /// 用途：① 启动日志输出包类型；② 明细日志的默认门控（与开发者模式无关）。
+        /// </summary>
+#if DEBUG
+        public const bool IS_DEBUG_BUILD = true;
+#else
+        public const bool IS_DEBUG_BUILD = false;
+#endif
+
         // ---------- 前缀与标签 ----------
 
         /// <summary>日志统一前缀，所有日志行以此开头，便于按本 mod 过滤。</summary>
@@ -43,10 +53,79 @@ namespace RimtalkAutoFactionInfo
         /// <summary>内容内部的列表连接符（与标签分隔符无关，内容不参与标签切分）。</summary>
         public const string LIST_SEPARATOR = "、";
 
+        // ---------- 随包预设库（KnowledgeBase）----------
+
+        /// <summary>随包社区常识库的目录名（位于本 mod 根目录下）。</summary>
+        public const string KNOWLEDGE_BASE_FOLDER = "KnowledgeBase";
+
+        /// <summary>导入包目录名前缀：真实目录名带版本戳（如「mod层导入包-1008-0543」），故只能按前缀扫描。</summary>
+        public const string KNOWLEDGE_BLOCK_PACK_PREFIX = "mod层导入包-";
+
+        /// <summary>条目文件扩展名。</summary>
+        public const string KNOWLEDGE_BLOCK_FILE_EXTENSION = ".txt";
+
+        /// <summary>
+        /// 块级通用面文件名（每个块目录一份）。
+        /// 内容为该块的中枢行 / 派生行 / 未命中行，门槛与块内模组文件联动（见 <c>KnowledgeBaseImporter</c>）。
+        /// </summary>
+        public const string KNOWLEDGE_COMMON_FILE_NAME = "_公共.txt";
+
+        /// <summary>游戏本体文件前缀：文件名形如 <c>本体-Core.txt</c> / <c>本体-Royalty.txt</c>，按 DLC 取用。</summary>
+        public const string KNOWLEDGE_BUILTIN_FILE_PREFIX = "本体-";
+
+        /// <summary>本体文件 DLC 名：Core（基础游戏，恒为持有）。</summary>
+        public const string KNOWLEDGE_DLC_CORE = "Core";
+
+        /// <summary>本体文件 DLC 名：Royalty（皇权）。</summary>
+        public const string KNOWLEDGE_DLC_ROYALTY = "Royalty";
+
+        /// <summary>本体文件 DLC 名：Ideology（文化）。</summary>
+        public const string KNOWLEDGE_DLC_IDEOLOGY = "Ideology";
+
+        /// <summary>本体文件 DLC 名：Biotech（生物科技）。</summary>
+        public const string KNOWLEDGE_DLC_BIOTECH = "Biotech";
+
+        /// <summary>本体文件 DLC 名：Anomaly（异象）。</summary>
+        public const string KNOWLEDGE_DLC_ANOMALY = "Anomaly";
+
+        /// <summary>本体文件 DLC 名：Odyssey（奥德赛）。</summary>
+        public const string KNOWLEDGE_DLC_ODYSSEY = "Odyssey";
+
+        /// <summary>「块名 / 模组名 / packageId」文件级索引文件名。</summary>
+        public const string KNOWLEDGE_SOURCE_MAP_FILE = "模组溯源映射.tsv";
+
+        /// <summary>索引文件的列分隔符（制表符）。</summary>
+        public const char KNOWLEDGE_SOURCE_MAP_SEPARATOR = '\t';
+
+        /// <summary>
+        /// 判重键（<c>tag</c> + 内容）的内部分隔符。
+        /// 取控制字符，避免与标签 / 正文里可能出现的可见字符冲突而误判为同一条。
+        /// </summary>
+        public const char KNOWLEDGE_KEY_SEPARATOR = '\u0001';
+
+        /// <summary>标签段整体缺失时的兜底标签，与上游 <c>ParseLine</c> 口径一致。</summary>
+        public const string KNOWLEDGE_DEFAULT_TAG = "通用";
+
+        /// <summary>标签框内的子字段分隔符（上游格式：标签|重要度|匹配模式|可提取|可匹配）。</summary>
+        public const char KNOWLEDGE_TAG_FIELD_SEPARATOR = '|';
+
+        /// <summary>Steam 版 <c>packageId</c> 后缀：比较前须去除，否则会漏块（见证据 ㊼）。</summary>
+        public const string PACKAGE_ID_STEAM_POSTFIX = "_steam";
+
         // ---------- 数值默认值 ----------
 
-        /// <summary>注入条目的默认重要度（世界观级最高档，0~1）。</summary>
-        public const float DEFAULT_IMPORTANCE = 1.0f;
+        /// <summary>
+        /// **我方派系**条目的默认重要度（0~1）。
+        /// 取 0.95：社区常识库把 0.96~1.0 整段留空（自我约束留给系统级），社区顶级条目（如种族）用 0.95；
+        /// 本 mod 单方占 1.0 既越过该保留带，又会在同派系上把社区条目挤出注入名额，故取 0.95 与之齐平。
+        /// </summary>
+        public const float DEFAULT_IMPORTANCE_PLAYER = 0.95f;
+
+        /// <summary>
+        /// **其它派系与异种人**条目的默认重要度（0~1）。
+        /// 取 0.80：与社区常识库的「派系本体」档一致，避免本 mod 条目压过同派系的社区条目。
+        /// </summary>
+        public const float DEFAULT_IMPORTANCE_OTHER = 0.80f;
 
         /// <summary>
         /// 常识条目「定向殖民者」的取值：<c>-1</c> 表示不限定，任何殖民者都可匹配。
@@ -141,19 +220,50 @@ namespace RimtalkAutoFactionInfo
         /// <summary>汇总结论：异种人条目开关关闭，本次跳过异种人一遍。</summary>
         public const string LOG_XENOTYPE_INJECTION_DISABLED = "异种人常识：已在设置中关闭，本次跳过。";
 
+        // ---------- 预设库导入日志与告警 ----------
+
+        /// <summary>
+        /// 汇总：预设库导入结果。{0}=实际导入的文件数，{1}=新增条数，{2}=跳过条数（已存在），{3}=跳过文件数（未启用 / 开关关闭）。
+        /// </summary>
+        public const string LOG_KNOWLEDGE_IMPORT_SUMMARY =
+            "预设库导入：导入 {0} 个文件，新增 {1} 条，跳过 {2} 条（已存在），跳过 {3} 个文件（对应 mod 未启用或开关关闭）。";
+
+        /// <summary>汇总：两个导入开关都关闭，本次跳过预设库导入。</summary>
+        public const string LOG_KNOWLEDGE_IMPORT_DISABLED = "预设库导入：两个导入开关均为关闭，本次跳过。";
+
+        /// <summary>告警：未找到随包预设库目录（不影响本 mod 自建条目注入）。{0}=预期路径。</summary>
+        public const string WARN_KNOWLEDGE_BASE_MISSING = "未找到随包预设库目录，本次跳过预设库导入：{0}";
+
+        /// <summary>告警：预设库下未找到导入包目录。{0}=目录名前缀。</summary>
+        public const string WARN_KNOWLEDGE_BLOCK_PACK_MISSING =
+            "预设库下未找到导入包目录（目录名前缀「{0}」），本次跳过预设库导入。";
+
+        /// <summary>告警：索引文件列出、但包内缺失的条目文件（可能因打包缺漏而未导入）。{0}=「块名/模组名」（「、」连接）。</summary>
+        public const string WARN_KNOWLEDGE_MAP_FILE_MISSING = "索引文件列出但包内缺失的条目文件：{0}";
+
+        /// <summary>告警：包内存在、但索引文件缺行的模组文件（会导致该文件静默不导入，是包更新时的主要风险点）。{0}=「块名/模组名」（「、」连接）。</summary>
+        public const string WARN_KNOWLEDGE_PACK_FILE_UNMAPPED = "包内存在但索引文件缺行的模组文件（将静默不导入）：{0}";
+
+        /// <summary>告警：一个 <c>packageId</c> 同时对应多个块（正常现象，仅提示以便排查）。{0}=packageId，{1}=块名（「、」连接）。</summary>
+        public const string WARN_KNOWLEDGE_PACKAGE_MULTI_BLOCK = "模组 {0} 对应的常识块有多个：{1}";
+
+        /// <summary>告警：同名派系（tag 相同）撞车（D21）——两条都写入、不消歧。{0}=先遇到的 defName，{1}=后遇到的 defName。</summary>
+        public const string WARN_DUPLICATE_FACTION_TAG =
+            "检测到同名派系（tag 相同），两条常识都会注入且不做消歧：{0} / {1}";
+
+        /// <summary>告警：单个条目文件读取失败。{0}=文件名，{1}=异常摘要。</summary>
+        public const string WARN_KNOWLEDGE_BLOCK_READ_FAILED = "读取常识条目文件失败：{0} —— {1}";
+
         // ---------- 启动包信息与注入合计日志 ----------
 
-        /// <summary>启动日志：本 mod 的包标识与加载来源。{0}=包标识，{1}=来源文案。</summary>
-        public const string LOG_MOD_ORIGIN = "本 mod 已加载：包标识 {0}，来源 {1}。";
+        /// <summary>启动日志：本次运行加载的是 Debug 包还是 Release 包。{0}=包类型文案。</summary>
+        public const string LOG_MOD_BUILD = "炒饭智能正在为边缘世界写入常识，当前版本：{0}。";
 
-        /// <summary>来源文案：Steam 创意工坊。</summary>
-        public const string MOD_SOURCE_STEAM_WORKSHOP = "创意工坊";
+        /// <summary>包类型文案：Debug 包（本地开发 / 调试用）。</summary>
+        public const string MOD_BUILD_DEBUG = "Debug（调试版）";
 
-        /// <summary>来源文案：本地 Mods 文件夹。</summary>
-        public const string MOD_SOURCE_MODS_FOLDER = "本地 Mods 文件夹";
-
-        /// <summary>来源文案：来源未知（元数据缺失）。</summary>
-        public const string MOD_SOURCE_UNDEFINED = "未知来源";
+        /// <summary>包类型文案：Release 包（发行版）。</summary>
+        public const string MOD_BUILD_RELEASE = "Release（发行版）";
 
         /// <summary>初始化完成日志：本次注入的合计条数。{0}=派系条数，{1}=异种人条数。</summary>
         public const string LOG_INJECTION_TOTAL = "常识注入完成：派系 {0} 条，异种人 {1} 条。";
@@ -171,5 +281,23 @@ namespace RimtalkAutoFactionInfo
 
         /// <summary>日志 key：派系界面「实际成员」构建失败。</summary>
         public const int LOG_KEY_UI_COMPOSITION_FAILED = 3;
+
+        /// <summary>日志 key：未找到随包预设库目录。</summary>
+        public const int LOG_KEY_KNOWLEDGE_BASE_MISSING = 4;
+
+        /// <summary>日志 key：未找到导入包目录。</summary>
+        public const int LOG_KEY_KNOWLEDGE_BLOCK_PACK_MISSING = 5;
+
+        /// <summary>日志 key：索引文件列出但包内缺失的条目文件。</summary>
+        public const int LOG_KEY_KNOWLEDGE_MAP_FILE_MISSING = 6;
+
+        /// <summary>日志 key：一个 <c>packageId</c> 对应多个块。</summary>
+        public const int LOG_KEY_KNOWLEDGE_PACKAGE_MULTI_BLOCK = 7;
+
+        /// <summary>日志 key：同名派系 tag 撞车（D21）。</summary>
+        public const int LOG_KEY_DUPLICATE_FACTION_TAG = 8;
+
+        /// <summary>日志 key：包内存在但索引文件缺行的模组文件。</summary>
+        public const int LOG_KEY_KNOWLEDGE_PACK_FILE_UNMAPPED = 9;
     }
 }

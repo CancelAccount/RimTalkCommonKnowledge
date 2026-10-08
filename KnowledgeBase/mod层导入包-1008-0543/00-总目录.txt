@@ -1,0 +1,419 @@
+# mod层导入包 · 总目录（生成=1008-0543；源叙事SHA=CA6E47BA；条目=25563；社区建议实现=按单mod分文件防「不存在的常识」）
+**用法**：①对照《模组源清单-社区版.md》找已订阅模组→取对应 块目录\模组名.txt 导入（多文件合并：copy /b A.txt+B.txt 选集.txt）②每块 _公共.txt=块级通用面（中枢行/派生行/未命中行）=**随块必导**③本体-*文件=按持有DLC取用④孪生行归属注记见本目录尾
+【fufu及相关】: mod文件4个/74行, 公共0行
+【V.O.I.D及相关】: mod文件2个/141行, 公共1行
+【WNA - 威灵诺德联合会及相关】: mod文件1个/202行, 公共0行
+【艾波娜及相关】: mod文件4个/527行, 公共20行
+【边缘雷霆及相关】: mod文件12个/72行, 公共3行
+【边缘战争空岛及相关】: mod文件3个/442行, 公共85行
+【虫娘及相关】: mod文件1个/77行, 公共2行
+【虫族2（寰宇虫灾）及相关】: mod文件5个/215行, 公共3行
+【黛莉娅及相关】: mod文件2个/131行, 公共4行
+【渡鸦族及相关】: mod文件1个/746行, 公共3行
+【腐蛟种及相关】: mod文件1个/26行, 公共0行
+【机械族全面战争及相关】: mod文件1个/120行, 公共1行
+【机制（游戏本体）】: mod文件6个/888行, 公共15行
+【基因（游戏本体）】: mod文件3个/156行, 公共0行
+【建筑（游戏本体）】: mod文件6个/541行, 公共0行
+【角色背景（游戏本体）】: mod文件5个/835行, 公共0行
+【角色种类（游戏本体）】: mod文件6个/168行, 公共0行
+【剧本（游戏本体）】: mod文件5个/13行, 公共0行
+【珂莉姆及相关】: mod文件2个/33行, 公共4行
+【联合重工及相关】: mod文件4个/493行, 公共29行
+【龙娘及相关】: mod文件2个/170行, 公共0行
+【玛鲁及相关】: mod文件1个/322行, 公共6行
+【美狐及相关】: mod文件7个/977行, 公共111行
+【魅狐HAR版及相关】: mod文件1个/201行, 公共2行
+【魅狐及相关】: mod文件1个/508行, 公共44行
+【萌螈及相关】: mod文件8个/802行, 公共21行
+【米莉拉及相关】: mod文件15个/1778行, 公共83行
+【珉巧及相关】: mod文件3个/218行, 公共26行
+【茉约及相关】: mod文件3个/380行, 公共25行
+【墨诺灵及相关】: mod文件7个/414行, 公共8行
+【能力（游戏本体）】: mod文件6个/90行, 公共0行
+【涅瓦莲及相关】: mod文件8个/734行, 公共128行
+【派系（游戏本体）】: mod文件6个/27行, 公共0行
+【绮罗及相关】: mod文件14个/694行, 公共67行
+【闪耀世界毁灭者及相关】: mod文件2个/299行, 公共62行
+【失能机关及相关】: mod文件20个/1238行, 公共54行
+【兽耳屋及相关】: mod文件3个/113行, 公共2行
+【鼠族及相关】: mod文件33个/3042行, 公共61行
+【特性（游戏本体）】: mod文件4个/52行, 公共22行
+【天工铸造及相关】: mod文件3个/322行, 公共22行
+【天气（游戏本体）】: mod文件4个/114行, 公共2行
+【头衔（游戏本体）】: mod文件1个/23行, 公共0行
+【驼鹿娘及相关】: mod文件1个/208行, 公共0行
+【薇薇及相关】: mod文件2个/181行, 公共6行
+【沃芬及相关】: mod文件11个/1169行, 公共81行
+【武器（游戏本体）】: mod文件5个/125行, 公共1行
+【物品（游戏本体）】: mod文件6个/488行, 公共1行
+【心情（游戏本体）】: mod文件6个/636行, 公共343行
+【锈蚀火种及相关】: mod文件1个/22行, 公共0行
+【叙事者（游戏本体）】: mod文件1个/2行, 公共1行
+【雪牛娘及相关】: mod文件1个/179行, 公共6行
+【烟烬及相关】: mod文件5个/440行, 公共11行
+【冶龍及相关】: mod文件1个/464行, 公共7行
+【蚁族及相关】: mod文件2个/252行, 公共25行
+【银科女仆及相关】: mod文件6个/233行, 公共4行
+【樱花圣姬魅魔恋及相关】: mod文件1个/48行, 公共1行
+【悠兰及相关】: mod文件2个/590行, 公共13行
+【月兔族及相关】: mod文件6个/413行, 公共5行
+【状态（游戏本体）】: mod文件6个/270行, 公共0行
+【自定义常识】: mod文件0个/0行, 公共4行
+## 孪生归属清单(356)
+[【烟烬及相关】|长梦渐醒] 归属多模组: Cinder Cocoon / Cinders of the Embergarden → 取首
+[【烟烬及相关】|扎根] 归属多模组: Cinders of the Embergarden / Cinders Eroded Weapons Extended (Forked) → 取首
+[【烟烬及相关】|轻量化] 归属多模组: Cinders of the Embergarden / Cinders Eroded Weapons Extended (Forked) → 取首
+[【烟烬及相关】|轻量化] 归属多模组: Cinders of the Embergarden / Cinders Eroded Weapons Extended (Forked) → 取首
+[【烟烬及相关】|短弹匣] 归属多模组: Cinders of the Embergarden / Cinders Eroded Weapons Extended (Forked) → 取首
+[【烟烬及相关】|扩容弹匣] 归属多模组: Cinders of the Embergarden / Cinders Eroded Weapons Extended (Forked) → 取首
+[【烟烬及相关】|短弹匣] 归属多模组: Cinders of the Embergarden / Cinders Eroded Weapons Extended (Forked) → 取首
+[【烟烬及相关】|扩容弹匣] 归属多模组: Cinders of the Embergarden / Cinders Eroded Weapons Extended (Forked) → 取首
+[【烟烬及相关】|长梦渐醒] 归属多模组: Cinder Cocoon / Cinders of the Embergarden → 取首
+[【绮罗及相关】|绮罗新家园] 归属多模组: Kiiro Race / Kiiro Story Events Expanded → 取首
+[【绮罗及相关】|绮罗 纸艺师] 归属多模组: Kiiro Race / Kiiro Story Events Expanded → 取首
+[【绮罗及相关】|绮罗 木匠] 归属多模组: Kiiro Race / Kiiro Story Events Expanded → 取首
+[【绮罗及相关】|绮罗 牧羊人] 归属多模组: Kiiro Race / Kiiro Story Events Expanded → 取首
+[【绮罗及相关】|绮罗 矿工] 归属多模组: Kiiro Race / Kiiro Story Events Expanded → 取首
+[【绮罗及相关】|绮罗 研究员] 归属多模组: Kiiro Race / Kiiro Story Events Expanded → 取首
+[【绮罗及相关】|绮罗 信使] 归属多模组: Kiiro Race / Kiiro Story Events Expanded → 取首
+[【绮罗及相关】|绮罗针织毛衣] 归属多模组: Kiiro Race / Kiiro Apparel Expanded Ported Apparel → 取首
+[【绮罗及相关】|绮罗针织毛衣] 归属多模组: Kiiro Race / Kiiro Apparel Expanded Ported Apparel → 取首
+[【绮罗及相关】|绮罗新家园] 归属多模组: Kiiro Race / Kiiro Story Events Expanded → 取首
+[【美狐及相关】|美狐警察] 归属多模组: Miho, the celestial fox / [SRC]Miho,Star Ring Corporation → 取首
+[【米莉拉及相关】|米莉拉] 归属多模组: Milira Race / Milira Race Gene Patch → 取首
+[【米莉拉及相关】|米莉拉 神秘观测者] 归属多模组: Milira Event Story Expand The Tale of Milira / Milira Faction Milira Imperium → 取首
+[【米莉拉及相关】|米莉拉 神秘观测者] 归属多模组: Milira Event Story Expand The Tale of Milira / Milira Faction Milira Imperium → 取首
+[【米莉拉及相关】|米莉拉 小军迷] 归属多模组: Milira Event Story Expand The Tale of Milira / Milira Faction Milira Imperium → 取首
+[【米莉拉及相关】|米莉拉 小天才] 归属多模组: Milira Event Story Expand The Tale of Milira / Milira Faction Milira Imperium → 取首
+[【米莉拉及相关】|投射护盾] 归属多模组: Milira Tech Milian Modification / Milira Expansion YaoYao → 取首
+[【米莉拉及相关】|飞行] 归属多模组: Milira Race / Milira Faction Milira Imperium / MiliraWings of Democracy → 取首
+[【米莉拉及相关】|投射护盾] 归属多模组: Milira Tech Milian Modification / Milira Expansion YaoYao → 取首
+[【米莉拉及相关】|离子震爆手雷] 归属多模组: Milira Tech Milian Modification / Milira Race → 取首
+[【米莉拉及相关】|离子震爆手雷] 归属多模组: Milira Tech Milian Modification / Milira Race → 取首
+[【米莉拉及相关】|要塞模式] 归属多模组: Milira Tech Milian Modification / Milira Race → 取首
+[【米莉拉及相关】|投射护盾] 归属多模组: Milira Tech Milian Modification / Milira Expansion YaoYao → 取首
+[【米莉拉及相关】|突击无人机·革夫拉] 归属多模组: 米莉安扩展-主教侧卫型简繁汉化补丁 Milira Addon Fianchetto Variation zh / Milira Addon Fianchetto Variation → 取首
+[【米莉拉及相关】|重型电浆炮] 归属多模组: Milira Tech Milian Modification / Milira Race → 取首
+[【米莉拉及相关】|四联装火箭发射器] 归属多模组: Milira Race / MiliraWings of Democracy → 取首
+[【米莉拉及相关】|突击无人机·革夫拉] 归属多模组: 米莉安扩展-主教侧卫型简繁汉化补丁 Milira Addon Fianchetto Variation zh / Milira Addon Fianchetto Variation → 取首
+[【米莉拉及相关】|小型近防机枪] 归属多模组: Milira Tech Milian Modification / MiliraWings of Democracy → 取首
+[【米莉拉及相关】|重型电浆炮] 归属多模组: Milira Tech Milian Modification / Milira Race → 取首
+[【米莉拉及相关】|不落要塞] 归属多模组: Milira Tech Milian Modification / Milira Race → 取首
+[【米莉拉及相关】|小型近防机枪] 归属多模组: Milira Tech Milian Modification / MiliraWings of Democracy → 取首
+[【米莉拉及相关】|高角立场护盾] 归属多模组: Milira Race / MiliraWings of Democracy → 取首
+[【米莉拉及相关】|高角立场护盾] 归属多模组: Milira Race / MiliraWings of Democracy → 取首
+[【米莉拉及相关】|四联装火箭发射器] 归属多模组: Milira Race / MiliraWings of Democracy → 取首
+[【米莉拉及相关】|不落要塞] 归属多模组: Milira Tech Milian Modification / Milira Race → 取首
+[【米莉拉及相关】|不落要塞] 归属多模组: Milira Tech Milian Modification / Milira Race → 取首
+[【米莉拉及相关】|卡利多之影] 归属多模组: Milira Race / MiliraWings of Democracy → 取首
+[【米莉拉及相关】|辉煌信标] 归属多模组: Milira Race / MiliraWings of Democracy → 取首
+[【米莉拉及相关】|米莉拉厨师帽] 归属多模组: Milira Faction Milira Imperium / 米莉拉轻工业扩展 → 取首
+[【米莉拉及相关】|米莉拉厨师帽] 归属多模组: Milira Faction Milira Imperium / 米莉拉轻工业扩展 → 取首
+[【萌螈及相关】|赤血府] 归属多模组: Dellin's Moelotl Crimson Blood Sect Expanded / MoeLotl Faction Expand → 取首
+[【萌螈及相关】|萌螈道士] 归属多模组: MoeLotl Race / MoeLotl Rigor Mortis → 取首
+[【萌螈及相关】|萌螈道士] 归属多模组: MoeLotl Race / MoeLotl Rigor Mortis → 取首
+[【萌螈及相关】|萌螈道士] 归属多模组: MoeLotl Race / MoeLotl Rigor Mortis → 取首
+[【萌螈及相关】|三花聚顶] 归属多模组: MoeLotl Style Expansion - 化龍 / MoeLotl Alchemy Expanded - 萌螈丹药拓展 → 取首
+[【萌螈及相关】|三花聚顶] 归属多模组: MoeLotl Style Expansion - 化龍 / MoeLotl Alchemy Expanded - 萌螈丹药拓展 → 取首
+[【萌螈及相关】|自愈因子] 归属多模组: MoeLotl Race / MoeLotl Rigor Mortis → 取首
+[【萌螈及相关】|黄粱一梦] 归属多模组: MoeLotl Style Expansion - 化龍 / MoeLotl Alchemy Expanded - 萌螈丹药拓展 → 取首
+[【萌螈及相关】|萌螈 墨镜] 归属多模组: MoeLotl Rigor Mortis / TAWM's MoeLotl → 取首
+[【萌螈及相关】|赤血府] 归属多模组: Dellin's Moelotl Crimson Blood Sect Expanded / MoeLotl Faction Expand → 取首
+[【茉约及相关】|深蓝物质产出量] 归属多模组: Moyo2.0-Blood stained business_zh / Moyo2.0-Blood stained business → 取首
+[【茉约及相关】|深蓝物质产出速度] 归属多模组: Moyo2.0-Blood stained business_zh / Moyo2.0-Blood stained business → 取首
+[【茉约及相关】|欢愉珍珠灵亢奋] 归属多模组: Moyo2.0-Blood stained business_zh / Moyo2.0-Blood stained business → 取首
+[【茉约及相关】|九头蛇强化剂亢奋] 归属多模组: Moyo2.0-Blood stained business_zh / Moyo2.0-Blood stained business → 取首
+[【茉约及相关】|迷情珍珠灵亢奋] 归属多模组: Moyo2.0-Blood stained business_zh / Moyo2.0-Blood stained business → 取首
+[【茉约及相关】|医愈强化剂效果] 归属多模组: Moyo2.0-Blood stained business_zh / Moyo2.0-Blood stained business → 取首
+[【茉约及相关】|思悟珍珠灵亢奋] 归属多模组: Moyo2.0-Blood stained business_zh / Moyo2.0-Blood stained business → 取首
+[【茉约及相关】|医愈强化剂效果] 归属多模组: Moyo2.0-Blood stained business_zh / Moyo2.0-Blood stained business → 取首
+[【茉约及相关】|浑心珍珠灵亢奋] 归属多模组: Moyo2.0-Blood stained business_zh / Moyo2.0-Blood stained business → 取首
+[【茉约及相关】|水晶珍珠灵亢奋] 归属多模组: Moyo2.0-Blood stained business_zh / Moyo2.0-Blood stained business → 取首
+[【茉约及相关】|虎鲸强化剂亢奋] 归属多模组: Moyo2.0-Blood stained business_zh / Moyo2.0-Blood stained business → 取首
+[【茉约及相关】|欢愉珍珠灵亢奋（满足）] 归属多模组: Moyo2.0-Blood stained business_zh / Moyo2.0-Blood stained business → 取首
+[【茉约及相关】|摄入茉约血袋] 归属多模组: Moyo2.0-Blood stained business_zh / Moyo2.0-Blood stained business → 取首
+[【茉约及相关】|深渊科技养殖箱] 归属多模组: Moyo2.0-Blood stained business_zh / Moyo2.0-Blood stained business → 取首
+[【茉约及相关】|浑心珍珠灵] 归属多模组: Moyo2.0-Blood stained business_zh / Moyo2.0-Blood stained business → 取首
+[【茉约及相关】|深蓝血清] 归属多模组: Moyo2.0-Blood stained business_zh / Moyo2.0-Blood stained business → 取首
+[【茉约及相关】|虎鲸强化剂] 归属多模组: Moyo2.0-Blood stained business_zh / Moyo2.0-Blood stained business → 取首
+[【茉约及相关】|思悟珍珠灵] 归属多模组: Moyo2.0-Blood stained business_zh / Moyo2.0-Blood stained business → 取首
+[【茉约及相关】|迷情珍珠灵] 归属多模组: Moyo2.0-Blood stained business_zh / Moyo2.0-Blood stained business → 取首
+[【茉约及相关】|水晶珍珠灵] 归属多模组: Moyo2.0-Blood stained business_zh / Moyo2.0-Blood stained business → 取首
+[【茉约及相关】|欢愉珍珠灵] 归属多模组: Moyo2.0-Blood stained business_zh / Moyo2.0-Blood stained business → 取首
+[【茉约及相关】|九头蛇强化剂] 归属多模组: Moyo2.0-Blood stained business_zh / Moyo2.0-Blood stained business → 取首
+[【茉约及相关】|深蓝血袋] 归属多模组: Moyo2.0-Blood stained business_zh / Moyo2.0-Blood stained business → 取首
+[【茉约及相关】|深蓝物质] 归属多模组: Moyo2.0-Blood stained business_zh / Moyo2.0-Blood stained business → 取首
+[【沃芬及相关】|沃芬] 归属多模组: Wolfein Race / Wolfein AIPT Expand → 取首
+[【沃芬及相关】|沃芬族 军企斥候] 归属多模组: Wolfein Race / Wolfein Race Extra Backstories → 取首
+[【沃芬及相关】|沃芬族 留学生] 归属多模组: Wolfein Race / Wolfein Race Extra Backstories → 取首
+[【沃芬及相关】|沃芬族 军企区域主管] 归属多模组: Wolfein Race / Wolfein Race Extra Backstories → 取首
+[【沃芬及相关】|沃芬族 留学生] 归属多模组: Wolfein Race / Wolfein Race Extra Backstories → 取首
+[【沃芬及相关】|沃芬族 军企斥候] 归属多模组: Wolfein Race / Wolfein Race Extra Backstories → 取首
+[【沃芬及相关】|沃芬族 军企区域主管] 归属多模组: Wolfein Race / Wolfein Race Extra Backstories → 取首
+[【沃芬及相关】|沃芬族 军企护卫] 归属多模组: Wolfein Race / Wolfein Race Extra Backstories → 取首
+[【沃芬及相关】|集群战术] 归属多模组: Wolfein Race Extra Genes / Wolfein Race MegaCorp Edition → 取首
+[【沃芬及相关】|容易屈服] 归属多模组: Wolfein Race Extra Genes / Wolfein Race MegaCorp Edition → 取首
+[【沃芬及相关】|容易屈服] 归属多模组: Wolfein Race Extra Genes / Wolfein Race MegaCorp Edition → 取首
+[【沃芬及相关】|集群战术] 归属多模组: Wolfein Race Extra Genes / Wolfein Race MegaCorp Edition → 取首
+[【沃芬及相关】|天性直率] 归属多模组: Wolfein Race Extra Genes / Wolfein Race MegaCorp Edition → 取首
+[【沃芬及相关】|天性直率] 归属多模组: Wolfein Race Extra Genes / Wolfein Race MegaCorp Edition → 取首
+[【沃芬及相关】|沃芬高性能合金] 归属多模组: Wolfein AIPT Expand / Wolfein Race → 取首
+[【悠兰及相关】|化狸式神] 归属多模组: Yuran race / Yuran race_zh → 取首
+[【悠兰及相关】|式神契约（化狸式神）] 归属多模组: Yuran race / Yuran race_zh → 取首
+[【联合重工及相关】|「低空支援」AX-飞鹅攻击机支援] 归属多模组: 联合重工-UF Heavy Industries / 联合重工派系拓展-UFPC → 取首
+[【联合重工及相关】|脊背龙弹射] 归属多模组: 联合重工-UF Heavy Industries / 联合重工派系拓展-UFPC → 取首
+[【联合重工及相关】|「低空支援」AX-飞鹅攻击机支援] 归属多模组: 联合重工-UF Heavy Industries / 联合重工派系拓展-UFPC → 取首
+[【闪耀世界毁灭者及相关】|心灵推动] 归属多模组: Glitterworld Destroyer 5 - Mechanoid Addon / Glitterworld Destroyer 5 Expansion → 取首
+[【闪耀世界毁灭者及相关】|精密火控元件] 归属多模组: Glitterworld Destroyer 5 Expansion / Glitterworld Destroyer 5 - Mechanoid Addon → 取首
+[【闪耀世界毁灭者及相关】|便携式反应装甲] 归属多模组: Glitterworld Destroyer 5 Expansion / Glitterworld Destroyer 5 - Mechanoid Addon → 取首
+[【闪耀世界毁灭者及相关】|武装对策芯片] 归属多模组: Glitterworld Destroyer 5 Expansion / Glitterworld Destroyer 5 - Mechanoid Addon → 取首
+[【闪耀世界毁灭者及相关】|辅助瞄准元件] 归属多模组: Glitterworld Destroyer 5 Expansion / Glitterworld Destroyer 5 - Mechanoid Addon → 取首
+[【闪耀世界毁灭者及相关】|监视雷达] 归属多模组: Glitterworld Destroyer 5 Expansion / Glitterworld Destroyer 5 - Mechanoid Addon → 取首
+[【闪耀世界毁灭者及相关】|黑衣机械盾螳] 归属多模组: Glitterworld Destroyer 5 - Mechanoid Addon / Glitterworld Destroyer 5 Expansion → 取首
+[【闪耀世界毁灭者及相关】|黑衣机械耀螳] 归属多模组: Glitterworld Destroyer 5 - Mechanoid Addon / Glitterworld Destroyer 5 Expansion → 取首
+[【闪耀世界毁灭者及相关】|黑衣机械飞螳] 归属多模组: Glitterworld Destroyer 5 - Mechanoid Addon / Glitterworld Destroyer 5 Expansion → 取首
+[【闪耀世界毁灭者及相关】|机械巨黾] 归属多模组: Glitterworld Destroyer 5 - Mechanoid Addon / Glitterworld Destroyer 5 Expansion → 取首
+[【闪耀世界毁灭者及相关】|黑衣机械静螳] 归属多模组: Glitterworld Destroyer 5 - Mechanoid Addon / Glitterworld Destroyer 5 Expansion → 取首
+[【闪耀世界毁灭者及相关】|高能电荷标枪] 归属多模组: Glitterworld Destroyer 5 - Mechanoid Addon / Glitterworld Destroyer 5 Expansion → 取首
+[【闪耀世界毁灭者及相关】|“地狱之门”超重型火炮] 归属多模组: Glitterworld Destroyer 5 - Mechanoid Addon / Glitterworld Destroyer 5 Expansion → 取首
+[【闪耀世界毁灭者及相关】|“冥河星光”速射炮] 归属多模组: Glitterworld Destroyer 5 - Mechanoid Addon / Glitterworld Destroyer 5 Expansion → 取首
+[【边缘战争空岛及相关】|叶小羊的玩偶] 归属多模组: RimSkyBlock - Vassal Outposts, Establish Empire / Gravship Conquest- RimSkyBlockDLC → 取首
+[【失能机关及相关】|生存专家] 归属多模组: The Dead Man's Switch / Ascension Megacorp → 取首
+[【失能机关及相关】|低重力调整者] 归属多模组: The Dead Man's Switch / Ascension Megacorp → 取首
+[【失能机关及相关】|低重力调整者] 归属多模组: The Dead Man's Switch / Ascension Megacorp → 取首
+[【失能机关及相关】|生存专家] 归属多模组: The Dead Man's Switch / Ascension Megacorp → 取首
+[【失能机关及相关】|二等兵] 归属多模组: The Dead Man's Switch / Ascension Megacorp → 取首
+[【失能机关及相关】|下士] 归属多模组: The Dead Man's Switch / Ascension Megacorp → 取首
+[【失能机关及相关】|下士] 归属多模组: The Dead Man's Switch / Ascension Megacorp → 取首
+[【失能机关及相关】|二等兵] 归属多模组: The Dead Man's Switch / Ascension Megacorp → 取首
+[【失能机关及相关】|次声波屏障] 归属多模组: The Dead Man's Switch-more dozer / The Dead Man's Switch → 取首
+[【失能机关及相关】|维修锁定] 归属多模组: The Dead Man's Switch - More Synthetics / The Dead Man's Switch - Joint Operations → 取首
+[【失能机关及相关】|维修锁定] 归属多模组: The Dead Man's Switch - More Synthetics / The Dead Man's Switch - Joint Operations → 取首
+[【失能机关及相关】|火箭弹幕] 归属多模组: The Dead Man's Switch - AncientCorps / The Dead Man's Switch - AssemblyMaster → 取首
+[【失能机关及相关】|火箭弹幕] 归属多模组: The Dead Man's Switch - AncientCorps / The Dead Man's Switch - AssemblyMaster → 取首
+[【失能机关及相关】|主动防御系统] 归属多模组: The Dead Man's Switch - AncientCorps / Ascension Megacorp → 取首
+[【失能机关及相关】|精确射手] 归属多模组: The Dead Man's Switch / The Dead Man's Switch - Legion → 取首
+[【失能机关及相关】|机兵重机枪] 归属多模组: The Dead Man's Switch / The Dead Man's Switch - Module MechWeapons → 取首
+[【失能机关及相关】|机兵重机枪] 归属多模组: The Dead Man's Switch / The Dead Man's Switch - Module MechWeapons → 取首
+[【失能机关及相关】|狙击手] 归属多模组: The Dead Man's Switch / Ascension Megacorp → 取首
+[【失能机关及相关】|近卫] 归属多模组: The Dead Man's Switch / The Dead Man's Switch - Legion → 取首
+[【失能机关及相关】|GAU-8 "复仇者"] 归属多模组: The Dead Man's Switch / The Dead Man's Switch - Module MechWeapons → 取首
+[【失能机关及相关】|无後坐力炮] 归属多模组: The Dead Man's Switch / The Dead Man's Switch - Module MechWeapons → 取首
+[【失能机关及相关】|弗拉基米罗夫重机枪] 归属多模组: The Dead Man's Switch - AncientCorps / The Dead Man's Switch - Module MechWeapons → 取首
+[【失能机关及相关】|龙骑兵重型步枪] 归属多模组: The Dead Man's Switch / The Dead Man's Switch - Module MechWeapons → 取首
+[【失能机关及相关】|龙骑兵榴弹枪] 归属多模组: The Dead Man's Switch / The Dead Man's Switch - Module MechWeapons → 取首
+[【失能机关及相关】|撕裂者] 归属多模组: The Dead Man's Switch - Joint Operations / The Dead Man's Switch - Module MechWeapons → 取首
+[【失能机关及相关】|GAU-8 "复仇者"] 归属多模组: The Dead Man's Switch / The Dead Man's Switch - Module MechWeapons → 取首
+[【失能机关及相关】|龙骑兵霰弹枪] 归属多模组: The Dead Man's Switch - MobileDragoon / The Dead Man's Switch - Module MechWeapons → 取首
+[【失能机关及相关】|真理之剑] 归属多模组: The Dead Man's Switch - Joint Operations / The Dead Man's Switch - Module MechWeapons → 取首
+[【失能机关及相关】|大毒蛇机炮] 归属多模组: The Dead Man's Switch / The Dead Man's Switch - AssemblyMaster → 取首
+[【失能机关及相关】|无後坐力炮] 归属多模组: The Dead Man's Switch / The Dead Man's Switch - Module MechWeapons → 取首
+[【失能机关及相关】|审判之杖] 归属多模组: The Dead Man's Switch - Joint Operations / The Dead Man's Switch - Module MechWeapons → 取首
+[【失能机关及相关】|金属风暴] 归属多模组: The Dead Man's Switch - Joint Operations / The Dead Man's Switch - Module MechWeapons → 取首
+[【失能机关及相关】|航空机砲] 归属多模组: The Dead Man's Switch - AncientCorps / The Dead Man's Switch - Module MechWeapons → 取首
+[【失能机关及相关】|龙骑兵战斧] 归属多模组: The Dead Man's Switch - MobileDragoon / The Dead Man's Switch - Module MechWeapons → 取首
+[【失能机关及相关】|破城锤] 归属多模组: The Dead Man's Switch - Joint Operations / The Dead Man's Switch - Module MechWeapons → 取首
+[【失能机关及相关】|龙骑兵重型步枪] 归属多模组: The Dead Man's Switch / The Dead Man's Switch - Module MechWeapons → 取首
+[【失能机关及相关】|猎手] 归属多模组: The Dead Man's Switch - Motorized / The Dead Man's Switch → 取首
+[【失能机关及相关】|烟雾发射器] 归属多模组: The Dead Man's Switch - MobileDragoon / The Dead Man's Switch - Motorized → 取首
+[【失能机关及相关】|猎手] 归属多模组: The Dead Man's Switch - Motorized / The Dead Man's Switch → 取首
+[【失能机关及相关】|眼镜蛇突击炮] 归属多模组: The Dead Man's Switch - Module MechWeapons / Ascension Megacorp → 取首
+[【失能机关及相关】|GAU-4 "火山"] 归属多模组: The Dead Man's Switch / The Dead Man's Switch - Module MechWeapons → 取首
+[【失能机关及相关】|GAU-4 "火山"] 归属多模组: The Dead Man's Switch / The Dead Man's Switch - Module MechWeapons → 取首
+[【失能机关及相关】|中央司令核心] 归属多模组: The Dead Man's Switch / The Dead Man's Switch - AncientCorps → 取首
+[【失能机关及相关】|中央司令核心] 归属多模组: The Dead Man's Switch / The Dead Man's Switch - AncientCorps → 取首
+[【失能机关及相关】|湿件计算机] 归属多模组: The Dead Man's Switch / The Dead Man's Switch - Legion → 取首
+[【失能机关及相关】|冲压零件] 归属多模组: The Dead Man's Switch / The Dead Man's Switch - Legion → 取首
+[【失能机关及相关】|聚酯纤维] 归属多模组: The Dead Man's Switch / The Dead Man's Switch - Legion → 取首
+[【失能机关及相关】|人工肌肉] 归属多模组: The Dead Man's Switch / The Dead Man's Switch - Legion → 取首
+[【失能机关及相关】|钨钢] 归属多模组: The Dead Man's Switch - Legion / The Dead Man's Switch → 取首
+[【鼠族及相关】|鼠族] 归属多模组: [OA]Ratkin Gene Expand / NewRatkinPlus / Ratkin Faction+ → 取首
+[【鼠族及相关】|鼠族私生子] 归属多模组: NewRatkinPlus / Ratkin BackStory Expanded → 取首
+[【鼠族及相关】|鼠族卫花使] 归属多模组: NewRatkinPlus / Ratkin Faction+ → 取首
+[【鼠族及相关】|鼠族御医] 归属多模组: NewRatkinPlus / Ratkin BackStory Expanded → 取首
+[【鼠族及相关】|鼠族乡村教师] 归属多模组: Ratkin Anomaly+ / NewRatkinPlus → 取首
+[【鼠族及相关】|鼠族士兵] 归属多模组: NewRatkinPlus / Ratkin Faction+ → 取首
+[【鼠族及相关】|鼠族漂泊者] 归属多模组: NewRatkinPlus / Ratkin BackStory Expanded → 取首
+[【鼠族及相关】|鼠族乡村教师] 归属多模组: Ratkin Anomaly+ / NewRatkinPlus → 取首
+[【鼠族及相关】|鼠族狙击手] 归属多模组: Ratkin BackStory Expanded / Ratkin Underground+ → 取首
+[【鼠族及相关】|鼠族修女] 归属多模组: NewRatkinPlus / Ratkin Alchemy+ → 取首
+[【鼠族及相关】|鼠族漂泊者] 归属多模组: NewRatkinPlus / Ratkin BackStory Expanded → 取首
+[【鼠族及相关】|鼠族耳朵] 归属多模组: [OA]Ratkin Gene Expand / Ratkin Gene Expanded → 取首
+[【鼠族及相关】|鼠族尾巴] 归属多模组: [Bendan]RatkinPsycast / [OA]Ratkin Gene Expand / Ratkin Gene Expanded / NewRatkinPlus → 取首
+[【鼠族及相关】|松鼠尾巴] 归属多模组: Ratkin Gene Expanded / 松鼠基因 → 取首
+[【鼠族及相关】|家鼠] 归属多模组: Ratkin Gene Expanded / NewRatkinPlus → 取首
+[【鼠族及相关】|圣光祝福] 归属多模组: Ratkin clothes维多利亚的港湾 / Ratkin Knights+ → 取首
+[【鼠族及相关】|再生] 归属多模组: Ratkin Anomaly+ / Ratkin Alchemy+ → 取首
+[【鼠族及相关】|火把] 归属多模组: [OA]Ratkin Gene Expand / Ratkin Knights+ → 取首
+[【鼠族及相关】|撕裂] 归属多模组: [Bendan]RatkinPsycast / NewRatkinPlus → 取首
+[【鼠族及相关】|极端暴风雪] 归属多模组: [OA]Ratkin Scenario Snowstorm Orphan / [OA]Ratkin Gene Expand → 取首
+[【鼠族及相关】|极端暴风雪] 归属多模组: [OA]Ratkin Scenario Snowstorm Orphan / [OA]Ratkin Gene Expand → 取首
+[【鼠族及相关】|骑枪冲锋] 归属多模组: Cursed Ratkin Expanded / NewRatkinPlus → 取首
+[【鼠族及相关】|鼠族钻探机] 归属多模组: Ratkin Anomaly+ / NewRatkinPlus / Ratkin Faction+ → 取首
+[【鼠族及相关】|十字架] 归属多模组: Ratkin Anomaly+ / Ratkin Lifestyle+ → 取首
+[【鼠族及相关】|十字架] 归属多模组: Ratkin Anomaly+ / Ratkin Lifestyle+ → 取首
+[【鼠族及相关】|十字架] 归属多模组: Ratkin Anomaly+ / Ratkin Lifestyle+ → 取首
+[【鼠族及相关】|“木棉”半自动步枪] 归属多模组: Ratkin GreatWar / Ratkin Ranged Weapon Expanded New → 取首
+[【鼠族及相关】|鼠族弩炮] 归属多模组: NewRatkinPlus / Ratkin Vehicles+ (1.6) → 取首
+[【鼠族及相关】|鼠族弩炮] 归属多模组: NewRatkinPlus / Ratkin Vehicles+ (1.6) → 取首
+[【鼠族及相关】|鼠族弩炮] 归属多模组: NewRatkinPlus / Ratkin Vehicles+ (1.6) → 取首
+[【鼠族及相关】|鼠族钻探机] 归属多模组: Ratkin Anomaly+ / NewRatkinPlus / Ratkin Faction+ → 取首
+[【鼠族及相关】|酒桶堆] 归属多模组: Ratkin Knights+ / Ratkin Lifestyle+ → 取首
+[【鼠族及相关】|十字架] 归属多模组: Ratkin Anomaly+ / Ratkin Lifestyle+ → 取首
+[【鼠族及相关】|酒桶堆] 归属多模组: Ratkin Knights+ / Ratkin Lifestyle+ → 取首
+[【鼠族及相关】|家鼠] 归属多模组: Ratkin Gene Expanded / NewRatkinPlus → 取首
+[【鼠族及相关】|鼠族隧道游击队] 归属多模组: NewRatkinPlus / Ratkin Underground+ → 取首
+[【鼠族及相关】|极端暴风雪] 归属多模组: [OA]Ratkin Scenario Snowstorm Orphan / [OA]Ratkin Gene Expand → 取首
+[【鼠族及相关】|极端暴风雪] 归属多模组: [OA]Ratkin Scenario Snowstorm Orphan / [OA]Ratkin Gene Expand → 取首
+[【角色背景（游戏本体）】|少年犯] 归属多模组: 本体-Royalty / 本体-Core → 取首
+[【角色背景（游戏本体）】|拾荒者] 归属多模组: 本体-Biotech / 本体-Core → 取首
+[【角色背景（游戏本体）】|战斗工兵] 归属多模组: 本体-Core / 本体-Royalty → 取首
+[【角色背景（游戏本体）】|猎人] 归属多模组: 本体-Ideology / 本体-Core / 本体-Biotech → 取首
+[【角色背景（游戏本体）】|战斗工兵] 归属多模组: 本体-Core / 本体-Royalty → 取首
+[【角色背景（游戏本体）】|猎人] 归属多模组: 本体-Ideology / 本体-Core / 本体-Biotech → 取首
+[【角色背景（游戏本体）】|少年犯] 归属多模组: 本体-Royalty / 本体-Core → 取首
+[【角色背景（游戏本体）】|战斗工兵] 归属多模组: 本体-Core / 本体-Royalty → 取首
+[【派系（游戏本体）】|机械主巢] 归属多模组: 本体-Core / 本体-Odyssey → 取首
+[【特性（游戏本体）】|裸体主义] 归属多模组: 本体-Ideology / 本体-Core → 取首
+[【特性（游戏本体）】|慢性子] 归属多模组: 本体-Biotech / 本体-Core → 取首
+[【特性（游戏本体）】|懦弱] 归属多模组: 本体-Biotech / 本体-Core → 取首
+[【特性（游戏本体）】|坚韧] 归属多模组: 本体-Ideology / 本体-Core → 取首
+[【特性（游戏本体）】|善良] 归属多模组: 本体-Core / 本体-Biotech → 取首
+[【武器（游戏本体）】|EMP弹] 归属多模组: 本体-Core / 本体-Odyssey → 取首
+[【武器（游戏本体）】|燃烧弹] 归属多模组: 本体-Core / 本体-Odyssey / 本体-Royalty → 取首
+[【武器（游戏本体）】|火焰喷射（活铁）] 归属多模组: 本体-Odyssey / 本体-Anomaly → 取首
+[【状态（游戏本体）】|心脏] 归属多模组: 本体-Ideology / 本体-Core → 取首
+[【状态（游戏本体）】|器官衰竭] 归属多模组: 本体-Core / 本体-Anomaly → 取首
+[【状态（游戏本体）】|怀孕] 归属多模组: 本体-Core / 本体-Biotech → 取首
+[【状态（游戏本体）】|怀孕] 归属多模组: 本体-Core / 本体-Biotech → 取首
+[【角色种类（游戏本体）】|人类] 归属多模组: 本体-Anomaly / 本体-Core → 取首
+[【角色种类（游戏本体）】|幼虫] 归属多模组: 本体-Core / 本体-Odyssey → 取首
+[【角色种类（游戏本体）】|机械师] 归属多模组: 本体-Royalty / 本体-Biotech → 取首
+[【机制（游戏本体）】|帝国穿梭机] 归属多模组: 本体-Core / 本体-Royalty → 取首
+[【机制（游戏本体）】|猎杀人类] 归属多模组: 本体-Core / 本体-Anomaly → 取首
+[【机制（游戏本体）】|机械主巢] 归属多模组: 本体-Core / 本体-Odyssey → 取首
+[【机制（游戏本体）】|裸体主义] 归属多模组: 本体-Ideology / 本体-Core → 取首
+[【机制（游戏本体）】|必需] 归属多模组: 本体-Ideology / 本体-Anomaly → 取首
+[【机制（游戏本体）】|敌视] 归属多模组: 本体-Ideology / 本体-Biotech → 取首
+[【机制（游戏本体）】|敌视] 归属多模组: 本体-Ideology / 本体-Biotech → 取首
+[【机制（游戏本体）】|反感] 归属多模组: 本体-Ideology / 本体-Odyssey / 本体-Anomaly → 取首
+[【机制（游戏本体）】|反感] 归属多模组: 本体-Ideology / 本体-Odyssey / 本体-Anomaly → 取首
+[【机制（游戏本体）】|反感] 归属多模组: 本体-Ideology / 本体-Odyssey / 本体-Anomaly → 取首
+[【机制（游戏本体）】|反感] 归属多模组: 本体-Ideology / 本体-Odyssey / 本体-Anomaly → 取首
+[【机制（游戏本体）】|高效] 归属多模组: 本体-Ideology / 本体-Anomaly → 取首
+[【机制（游戏本体）】|高效] 归属多模组: 本体-Ideology / 本体-Anomaly → 取首
+[【机制（游戏本体）】|坚韧] 归属多模组: 本体-Ideology / 本体-Core → 取首
+[【机制（游戏本体）】|禁忌] 归属多模组: 本体-Ideology / 本体-Odyssey / 本体-Biotech → 取首
+[【机制（游戏本体）】|禁忌] 归属多模组: 本体-Ideology / 本体-Odyssey / 本体-Biotech → 取首
+[【机制（游戏本体）】|禁忌] 归属多模组: 本体-Ideology / 本体-Odyssey / 本体-Biotech → 取首
+[【机制（游戏本体）】|禁忌] 归属多模组: 本体-Ideology / 本体-Odyssey / 本体-Biotech → 取首
+[【机制（游戏本体）】|禁忌] 归属多模组: 本体-Ideology / 本体-Odyssey / 本体-Biotech → 取首
+[【机制（游戏本体）】|渴望] 归属多模组: 本体-Ideology / 本体-Odyssey → 取首
+[【机制（游戏本体）】|渴望] 归属多模组: 本体-Ideology / 本体-Odyssey → 取首
+[【机制（游戏本体）】|贪婪] 归属多模组: 本体-Ideology / 本体-Anomaly → 取首
+[【机制（游戏本体）】|推崇] 归属多模组: 本体-Biotech / 本体-Ideology / 本体-Anomaly / 本体-Odyssey → 取首
+[【机制（游戏本体）】|推崇] 归属多模组: 本体-Biotech / 本体-Ideology / 本体-Anomaly / 本体-Odyssey → 取首
+[【机制（游戏本体）】|推崇] 归属多模组: 本体-Biotech / 本体-Ideology / 本体-Anomaly / 本体-Odyssey → 取首
+[【机制（游戏本体）】|厌恶] 归属多模组: 本体-Ideology / 本体-Anomaly → 取首
+[【机制（游戏本体）】|厌恶] 归属多模组: 本体-Ideology / 本体-Anomaly → 取首
+[【机制（游戏本体）】|厌恶] 归属多模组: 本体-Ideology / 本体-Anomaly → 取首
+[【机制（游戏本体）】|主要] 归属多模组: 本体-Core / 本体-Ideology → 取首
+[【机制（游戏本体）】|反感] 归属多模组: 本体-Ideology / 本体-Odyssey / 本体-Anomaly → 取首
+[【机制（游戏本体）】|反感] 归属多模组: 本体-Ideology / 本体-Odyssey / 本体-Anomaly → 取首
+[【机制（游戏本体）】|反感] 归属多模组: 本体-Ideology / 本体-Odyssey / 本体-Anomaly → 取首
+[【机制（游戏本体）】|反感] 归属多模组: 本体-Ideology / 本体-Odyssey / 本体-Anomaly → 取首
+[【机制（游戏本体）】|反感] 归属多模组: 本体-Ideology / 本体-Odyssey / 本体-Anomaly → 取首
+[【机制（游戏本体）】|反感] 归属多模组: 本体-Ideology / 本体-Odyssey / 本体-Anomaly → 取首
+[【机制（游戏本体）】|反感] 归属多模组: 本体-Ideology / 本体-Odyssey / 本体-Anomaly → 取首
+[【机制（游戏本体）】|反感] 归属多模组: 本体-Ideology / 本体-Odyssey / 本体-Anomaly → 取首
+[【机制（游戏本体）】|禁忌] 归属多模组: 本体-Ideology / 本体-Odyssey / 本体-Biotech → 取首
+[【机制（游戏本体）】|禁忌] 归属多模组: 本体-Ideology / 本体-Odyssey / 本体-Biotech → 取首
+[【机制（游戏本体）】|渴望] 归属多模组: 本体-Ideology / 本体-Odyssey → 取首
+[【机制（游戏本体）】|推崇] 归属多模组: 本体-Biotech / 本体-Ideology / 本体-Anomaly / 本体-Odyssey → 取首
+[【机制（游戏本体）】|推崇] 归属多模组: 本体-Biotech / 本体-Ideology / 本体-Anomaly / 本体-Odyssey → 取首
+[【机制（游戏本体）】|无限制] 归属多模组: 本体-Ideology / 本体-Core → 取首
+[【机制（游戏本体）】|厌恶] 归属多模组: 本体-Ideology / 本体-Anomaly → 取首
+[【机制（游戏本体）】|厌恶] 归属多模组: 本体-Ideology / 本体-Anomaly → 取首
+[【机制（游戏本体）】|厌恶] 归属多模组: 本体-Ideology / 本体-Anomaly → 取首
+[【机制（游戏本体）】|厌恶] 归属多模组: 本体-Ideology / 本体-Anomaly → 取首
+[【机制（游戏本体）】|圣物] 归属多模组: 本体-Ideology / 本体-Core → 取首
+[【机制（游戏本体）】|推崇] 归属多模组: 本体-Biotech / 本体-Ideology / 本体-Anomaly / 本体-Odyssey → 取首
+[【机制（游戏本体）】|厌恶] 归属多模组: 本体-Ideology / 本体-Anomaly → 取首
+[【机制（游戏本体）】|必要] 归属多模组: 本体-Biotech / 本体-Ideology → 取首
+[【机制（游戏本体）】|反感] 归属多模组: 本体-Ideology / 本体-Odyssey / 本体-Anomaly → 取首
+[【机制（游戏本体）】|必需] 归属多模组: 本体-Ideology / 本体-Anomaly → 取首
+[【机制（游戏本体）】|必要] 归属多模组: 本体-Biotech / 本体-Ideology → 取首
+[【机制（游戏本体）】|推崇] 归属多模组: 本体-Biotech / 本体-Ideology / 本体-Anomaly / 本体-Odyssey → 取首
+[【机制（游戏本体）】|处决] 归属多模组: 本体-Ideology / 本体-Core → 取首
+[【机制（游戏本体）】|工作] 归属多模组: 本体-Core / 本体-Biotech → 取首
+[【机制（游戏本体）】|器官衰竭] 归属多模组: 本体-Core / 本体-Anomaly → 取首
+[【机制（游戏本体）】|释放] 归属多模组: 本体-Ideology / 本体-Core → 取首
+[【机制（游戏本体）】|释放] 归属多模组: 本体-Ideology / 本体-Core → 取首
+[【机制（游戏本体）】|处决] 归属多模组: 本体-Ideology / 本体-Core → 取首
+[【机制（游戏本体）】|能量] 归属多模组: 本体-Ideology / 本体-Biotech → 取首
+[【机制（游戏本体）】|机械师] 归属多模组: 本体-Royalty / 本体-Biotech → 取首
+[【机制（游戏本体）】|工作速度系数] 归属多模组: 本体-Biotech / 本体-Core → 取首
+[【机制（游戏本体）】|魅力] 归属多模组: 本体-Biotech / 本体-Core → 取首
+[【机制（游戏本体）】|毒素抗性] 归属多模组: 本体-Core / 本体-Biotech → 取首
+[【机制（游戏本体）】|穿梭机] 归属多模组: 本体-Royalty / 本体-Odyssey → 取首
+[【机制（游戏本体）】|流浪者加入] 归属多模组: 本体-Core / 本体-Royalty → 取首
+[【机制（游戏本体）】|流浪者] 归属多模组: 本体-Anomaly / 本体-Core / 本体-Biotech / 本体-Ideology → 取首
+[【机制（游戏本体）】|日蚀] 归属多模组: 本体-Core / 本体-Ideology → 取首
+[【物品（游戏本体）】|EMP弹] 归属多模组: 本体-Core / 本体-Odyssey → 取首
+[【物品（游戏本体）】|燃烧弹] 归属多模组: 本体-Core / 本体-Odyssey / 本体-Royalty → 取首
+[【物品（游戏本体）】|砍断的树桩] 归属多模组: 本体-Core / 本体-Biotech → 取首
+[【物品（游戏本体）】|粉碎的树桩] 归属多模组: 本体-Core / 本体-Biotech → 取首
+[【物品（游戏本体）】|虫胶] 归属多模组: 本体-Ideology / 本体-Core → 取首
+[【物品（游戏本体）】|野山莓] 归属多模组: 本体-Core / 本体-Odyssey → 取首
+[【物品（游戏本体）】|荆棘] 归属多模组: 本体-Core / 本体-Odyssey → 取首
+[【物品（游戏本体）】|灌木] 归属多模组: 本体-Core / 本体-Odyssey → 取首
+[【建筑（游戏本体）】|帝国穿梭机] 归属多模组: 本体-Core / 本体-Royalty → 取首
+[【建筑（游戏本体）】|门] 归属多模组: 本体-Core / 本体-Anomaly → 取首
+[【建筑（游戏本体）】|墙] 归属多模组: 本体-Anomaly / 本体-Core → 取首
+[【建筑（游戏本体）】|远古集装箱] 归属多模组: 本体-Core / 本体-Odyssey → 取首
+[【建筑（游戏本体）】|远古集装箱] 归属多模组: 本体-Core / 本体-Odyssey → 取首
+[【建筑（游戏本体）】|离洞绳] 归属多模组: 本体-Core / 本体-Anomaly → 取首
+[【建筑（游戏本体）】|门] 归属多模组: 本体-Core / 本体-Anomaly → 取首
+[【建筑（游戏本体）】|墙] 归属多模组: 本体-Anomaly / 本体-Core → 取首
+[【心情（游戏本体）】|处决] 归属多模组: 本体-Ideology / 本体-Core → 取首
+[【心情（游戏本体）】|处决囚犯] 归属多模组: 本体-Core / 本体-Ideology → 取首
+[【心情（游戏本体）】|处决囚犯] 归属多模组: 本体-Core / 本体-Ideology → 取首
+[【心情（游戏本体）】|处决无辜的囚犯] 归属多模组: 本体-Core / 本体-Ideology → 取首
+[【心情（游戏本体）】|处决有罪的囚犯] 归属多模组: 本体-Core / 本体-Ideology → 取首
+[【心情（游戏本体）】|合理的死刑] 归属多模组: 本体-Ideology / 本体-Core → 取首
+[【心情（游戏本体）】|合理的死刑（殖民者）] 归属多模组: 本体-Ideology / 本体-Core → 取首
+[【心情（游戏本体）】|器官被摘取] 归属多模组: 本体-Ideology / 本体-Core → 取首
+[【心情（游戏本体）】|器官被摘取] 归属多模组: 本体-Ideology / 本体-Core → 取首
+[【心情（游戏本体）】|衣物束缚] 归属多模组: 本体-Ideology / 本体-Core → 取首
+[【心情（游戏本体）】|衣物束缚] 归属多模组: 本体-Ideology / 本体-Core → 取首
+[【心情（游戏本体）】|有人被屠宰了] 归属多模组: 本体-Ideology / 本体-Core → 取首
+[【心情（游戏本体）】|饥饿] 归属多模组: 本体-Anomaly / 本体-Core → 取首
+[【心情（游戏本体）】|人皮{0}] 归属多模组: 本体-Ideology / 本体-Core → 取首
+[【心情（游戏本体）】|人皮{0}] 归属多模组: 本体-Ideology / 本体-Core → 取首
+[【心情（游戏本体）】|人皮{0}] 归属多模组: 本体-Ideology / 本体-Core → 取首
+[【心情（游戏本体）】|人皮{0}] 归属多模组: 本体-Ideology / 本体-Core → 取首
+[【心情（游戏本体）】|衣物束缚] 归属多模组: 本体-Ideology / 本体-Core → 取首
+[【基因（游戏本体）】|短发] 归属多模组: 本体-Biotech / 本体-Anomaly → 取首
+[【基因（游戏本体）】|慢性子] 归属多模组: 本体-Biotech / 本体-Core → 取首
+[【基因（游戏本体）】|长发] 归属多模组: 本体-Biotech / 本体-Core → 取首
+[【基因（游戏本体）】|好斗] 归属多模组: 本体-Biotech / 本体-Anomaly → 取首
+[【基因（游戏本体）】|懦弱] 归属多模组: 本体-Biotech / 本体-Core → 取首
+[【基因（游戏本体）】|毒素抗性] 归属多模组: 本体-Core / 本体-Biotech → 取首
+[【基因（游戏本体）】|善良] 归属多模组: 本体-Core / 本体-Biotech → 取首
+[【基因（游戏本体）】|脊刺] 归属多模组: 本体-Biotech / 本体-Anomaly → 取首
+[【基因（游戏本体）】|酸液喷吐] 归属多模组: 本体-Biotech / 本体-Anomaly → 取首
+[【能力（游戏本体）】|狂暴] 归属多模组: 本体-Core / 本体-Anomaly → 取首
+[【能力（游戏本体）】|阻燃泡沫] 归属多模组: 本体-Core / 本体-Biotech → 取首
+[【能力（游戏本体）】|酸液喷吐] 归属多模组: 本体-Biotech / 本体-Anomaly → 取首
+[【能力（游戏本体）】|威严演讲] 归属多模组: 本体-Core / 本体-Royalty → 取首
+[【能力（游戏本体）】|火焰喷射（活铁）] 归属多模组: 本体-Odyssey / 本体-Anomaly → 取首
+[【剧本（游戏本体）】|机械师] 归属多模组: 本体-Royalty / 本体-Biotech → 取首
+[【天气（游戏本体）】|地下洞穴] 归属多模组: 本体-Anomaly / 本体-Core → 取首
+[【天气（游戏本体）】|沙地] 归属多模组: 本体-Core / 本体-Odyssey → 取首
+[【天气（游戏本体）】|遗迹] 归属多模组: 本体-Core / 本体-Odyssey → 取首
+[【虫族2（寰宇虫灾）及相关】|休眠] 归属多模组: Vanilla Factions Expanded - Insectoids 2 - Swarm Disaster / Insectoids 2 - More and stronger insectoids → 取首
+[【虫族2（寰宇虫灾）及相关】|碾压] 归属多模组: Insectoids 2 - More and stronger insectoids / Vanilla Factions Expanded - Insectoids 2 - Swarm Disaster → 取首
+[【虫族2（寰宇虫灾）及相关】|休眠] 归属多模组: Vanilla Factions Expanded - Insectoids 2 - Swarm Disaster / Insectoids 2 - More and stronger insectoids → 取首
+[【虫族2（寰宇虫灾）及相关】|碾压] 归属多模组: Insectoids 2 - More and stronger insectoids / Vanilla Factions Expanded - Insectoids 2 - Swarm Disaster → 取首
+[【虫族2（寰宇虫灾）及相关】|突破冲撞] 归属多模组: Vanilla Factions Expanded - Insectoids 2 / Insectoids 2 - Isopoda geneline → 取首

@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Reflection;
 using RimWorld;
 using Verse;
 
@@ -46,16 +45,6 @@ namespace RimtalkAutoFactionInfo
         {
         }
 
-        /// <summary>
-        /// 引擎初始化完毕（<c>Game.FinalizeInit()</c> → <c>GameComponentUtility.FinalizeInit()</c>）。
-        /// 新开档与读档两条路径都在本回调**之后**才调用 <c>StartedNewGame()</c> / <c>LoadedGame()</c>，
-        /// 因此这里输出的是「本次运行跑的是哪个包」这一环境头信息，先于注入日志出现。
-        /// </summary>
-        public override void FinalizeInit()
-        {
-            LogModOrigin();
-        }
-
         /// <summary>新开档：地图生成完毕、玩家派系与初始关系均已就绪后调用。</summary>
         public override void StartedNewGame()
         {
@@ -98,8 +87,8 @@ namespace RimtalkAutoFactionInfo
         }
 
         /// <summary>
-        /// 新开档与读档共用的首次同步：先派系、后异种人，最后补一条合计。
-        /// 两侧各自已有计数汇总，此处再给一行「总计」，便于一眼确认本次注入了多少条。
+        /// 新开档与读档共用的首次同步：先导入随包预设库（FR-6 / D44），再派系、后异种人，最后补一条合计。
+        /// 各路各自已有计数汇总，此处再给一行「总计」，便于一眼确认本次注入了多少条。
         /// 总开关关闭时整体短路：只回报一句结论，不产生任何写入。
         /// </summary>
         private void RunInitialSync()
@@ -110,80 +99,14 @@ namespace RimtalkAutoFactionInfo
                 return;
             }
 
+            // 预设库导入（FR-6 / D44）走在前：D43 的「定义原文让位」查重依赖社区条目已入库，
+            // 否则本 mod 会先写全、随后社区条目才到，导致让位口径首次不生效。
+            KnowledgeBaseImporter.Run();
+
             int factionWritten = SyncFactionKnowledge(isPeriodic: false);
             int xenotypeWritten = SyncXenotypeKnowledge();
             KnowledgeLog.Summary(string.Format(
                 FactionKnowledgeConfig.LOG_INJECTION_TOTAL, factionWritten, xenotypeWritten));
-        }
-
-        /// <summary>
-        /// 输出本 mod 的包标识与加载来源，便于确认本次运行加载的是创意工坊版还是本地版。
-        /// </summary>
-        private static void LogModOrigin()
-        {
-            ModContentPack owner = FindOwningMod();
-            if (owner == null)
-            {
-                KnowledgeLog.Warn("未能从已加载 mod 列表中定位本 mod，跳过包信息输出（不影响注入）。");
-                return;
-            }
-
-            ModMetaData meta = owner.ModMetaData;
-            ContentSource source = meta != null ? meta.Source : ContentSource.Undefined;
-            KnowledgeLog.Summary(string.Format(
-                FactionKnowledgeConfig.LOG_MOD_ORIGIN, owner.PackageId, DescribeSource(source)));
-        }
-
-        /// <summary>
-        /// 反查本 mod 所属的 <see cref="ModContentPack"/>：遍历运行时 mod 列表，
-        /// 取「已加载程序集中含本类所在程序集」的那一个。
-        /// </summary>
-        /// <remarks>
-        /// 用程序集**全名**比较而非引用比较：<c>loadedAssemblies</c> 是 <c>List&lt;Assembly&gt;</c>，
-        /// 其 <c>Contains</c> 走引用相等，而 mod 程序集由 <c>Assembly.LoadFrom</c> 载入，
-        /// 依赖引用身份不够稳；全名比较在程序集重载后依然成立。
-        /// </remarks>
-        private static ModContentPack FindOwningMod()
-        {
-            string selfName = typeof(FactionKnowledgeComponent).Assembly.FullName;
-            List<ModContentPack> mods = LoadedModManager.RunningModsListForReading;
-
-            for (int i = 0; i < mods.Count; i++)
-            {
-                ModContentPack mod = mods[i];
-                if (mod == null || mod.assemblies == null)
-                {
-                    continue;
-                }
-
-                List<Assembly> loaded = mod.assemblies.loadedAssemblies;
-                for (int j = 0; j < loaded.Count; j++)
-                {
-                    if (string.Equals(loaded[j].FullName, selfName, StringComparison.Ordinal))
-                    {
-                        return mod;
-                    }
-                }
-            }
-            return null;
-        }
-
-        /// <summary>
-        /// 把加载来源枚举转成可读文案，用于启动日志。
-        /// 本 mod 只会从创意工坊或本地 Mods 文件夹加载，故不映射官方目录（<c>OfficialModsFolder</c>，
-        /// 那是 Core 等官方内容包所在位置）；其余取值一律按「未知来源」兜底。
-        /// </summary>
-        private static string DescribeSource(ContentSource source)
-        {
-            switch (source)
-            {
-                case ContentSource.SteamWorkshop:
-                    return FactionKnowledgeConfig.MOD_SOURCE_STEAM_WORKSHOP;
-                case ContentSource.ModsFolder:
-                    return FactionKnowledgeConfig.MOD_SOURCE_MODS_FOLDER;
-                default:
-                    return FactionKnowledgeConfig.MOD_SOURCE_UNDEFINED;
-            }
         }
 
         /// <summary>
@@ -233,13 +156,22 @@ namespace RimtalkAutoFactionInfo
 
             List<Faction> targets = FactionKnowledgeBuilder.CollectTargets();
 
+            // D21：同名派系（tag 主键相同）不消歧、只告警一次；键 = tag 主键，值 = 先登记的 defName。
+            Dictionary<string, string> tagOwnerDefNames = new Dictionary<string, string>(StringComparer.Ordinal);
+
             for (int i = 0; i < targets.Count; i++)
             {
                 Faction faction = targets[i];
                 try
                 {
+                    // 定义原文让位（D43）：查重键取 def 名（LabelCap），与社区条目首段标签同口径。
+                    // 我方派系为全自建运行时内容，不参与查重，固定不让位。
+                    bool suppressDescription =
+                        !faction.IsPlayer &&
+                        RimTalkMemoryBridge.HasExternalEntryForTag(faction.def.LabelCap);
+
                     FactionKnowledgeEntry entry;
-                    if (!FactionKnowledgeBuilder.TryBuild(faction, out entry))
+                    if (!FactionKnowledgeBuilder.TryBuild(faction, suppressDescription, out entry))
                     {
                         skippedEmpty++;
                         KnowledgeLog.Detail("忽略（无派系名）：" + faction.def.defName);
@@ -248,6 +180,9 @@ namespace RimtalkAutoFactionInfo
 
                     string content = entry.Content;
                     string qualitativeKey = entry.QualitativeKey;
+
+                    // D21：同名派系只告警、不消歧（不阻塞写入）。
+                    WarnDuplicateFactionTag(tagOwnerDefNames, faction, entry.PrimaryKey);
 
                     // 查库口径按派系种类分流：
                     // · 普通派系：主键 = 稳定的派系名（tag 第一段，已净化分隔符），与整串标签无关（尾段会随特征异种人变化）；
@@ -312,8 +247,11 @@ namespace RimtalkAutoFactionInfo
                         RimTalkMemoryBridge.Remove(managedIds[j]);
                     }
 
-                    string id = RimTalkMemoryBridge.AddLore(
-                        entry.Tag, content, FactionInfoSettings.KnowledgeImportance);
+                    // 重要度分档（D43）：我方派系对标社区顶级档，其它派系对齐社区「派系本体」档
+                    float importance = faction.IsPlayer
+                        ? FactionInfoSettings.KnowledgeImportancePlayer
+                        : FactionInfoSettings.KnowledgeImportanceOther;
+                    string id = RimTalkMemoryBridge.AddLore(entry.Tag, content, importance);
                     if (string.IsNullOrEmpty(id))
                     {
                         KnowledgeLog.Error("写入失败（上游未返回条目 id）：" + entry.Tag);
@@ -351,6 +289,39 @@ namespace RimtalkAutoFactionInfo
                 "略过 " + skippedCooldown + " 条（非质变改动，覆写冷却中），" +
                 "忽略 " + skippedEmpty + " 个（无派系名）。");
             return written;
+        }
+
+        /// <summary>
+        /// D21：登记 tag 主键的归属。若同一主键已被**另一个**派系占用（同名派系），
+        /// 经 <see cref="KnowledgeLog.WarnOnce"/> 输出一次中文告警（带两个 <c>defName</c>）；
+        /// 两条都照常写入、不消歧、不阻塞。
+        /// </summary>
+        /// <param name="tagOwnerDefNames">本次同步内「tag 主键 → defName」登记表。</param>
+        /// <param name="faction">当前派系。</param>
+        /// <param name="primaryKey">当前条目的 tag 主键（派系名）。</param>
+        private static void WarnDuplicateFactionTag(
+            Dictionary<string, string> tagOwnerDefNames, Faction faction, string primaryKey)
+        {
+            if (string.IsNullOrEmpty(primaryKey))
+            {
+                return;
+            }
+
+            string defName = faction.def != null ? faction.def.defName : faction.Name;
+            string previousDefName;
+            if (!tagOwnerDefNames.TryGetValue(primaryKey, out previousDefName))
+            {
+                tagOwnerDefNames[primaryKey] = defName;
+                return;
+            }
+
+            if (!string.Equals(previousDefName, defName, StringComparison.Ordinal))
+            {
+                KnowledgeLog.WarnOnce(
+                    FactionKnowledgeConfig.LOG_KEY_DUPLICATE_FACTION_TAG,
+                    string.Format(
+                        FactionKnowledgeConfig.WARN_DUPLICATE_FACTION_TAG, previousDefName, defName));
+            }
         }
 
         /// <summary>
@@ -478,9 +449,14 @@ namespace RimtalkAutoFactionInfo
                             factionNames = new List<string>();
                         }
 
+                        // 定义原文让位（D43）：查重键取异种人 LabelCap，与社区条目首段标签同口径
+                        bool suppressDescription =
+                            RimTalkMemoryBridge.HasExternalEntryForTag(xenotype.LabelCap);
+
                         string tag;
                         string content;
-                        if (!XenotypeKnowledgeBuilder.TryBuild(xenotype, factionNames, out tag, out content))
+                        if (!XenotypeKnowledgeBuilder.TryBuild(
+                            xenotype, factionNames, suppressDescription, out tag, out content))
                         {
                             skippedEmpty++;
                             KnowledgeLog.Detail("忽略（无名称）：" + (xenotype != null ? xenotype.defName : "null"));
@@ -496,8 +472,9 @@ namespace RimtalkAutoFactionInfo
                             continue;
                         }
 
+                        // 重要度分档（D43）：异种人归入「其它」档，对齐社区「派系本体」档
                         string id = RimTalkMemoryBridge.AddLore(
-                            tag, content, FactionInfoSettings.KnowledgeImportance);
+                            tag, content, FactionInfoSettings.KnowledgeImportanceOther);
                         if (string.IsNullOrEmpty(id))
                         {
                             KnowledgeLog.Error("写入失败（上游未返回条目 id）：" + tag);

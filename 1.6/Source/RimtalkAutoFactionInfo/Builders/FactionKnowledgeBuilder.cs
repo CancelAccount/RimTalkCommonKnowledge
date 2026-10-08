@@ -45,8 +45,13 @@ namespace RimtalkAutoFactionInfo
         /// 派系名不可读时返回 <c>false</c>：不写入无主键的条目，避免白占注入名额。
         /// </summary>
         /// <param name="faction">目标派系。</param>
+        /// <param name="suppressDescription">
+        /// 为真时**省略「定义原文」句**：用于社区常识库已覆盖该 Def（社区条目已是定义原文的改写）的情形，
+        /// 避免同一段介绍被写两遍。只影响定义原文，动态段照常输出。我方派系条目不受此参数影响
+        /// （玩家侧模板里本就没有定义原文段）。
+        /// </param>
         /// <param name="entry">输出：本次构建的全部字段。</param>
-        public static bool TryBuild(Faction faction, out FactionKnowledgeEntry entry)
+        public static bool TryBuild(Faction faction, bool suppressDescription, out FactionKnowledgeEntry entry)
         {
             entry = null;
 
@@ -81,7 +86,7 @@ namespace RimtalkAutoFactionInfo
             }
             else
             {
-                AppendIdentitySection(builder, faction, name);
+                AppendIdentitySection(builder, faction, name, suppressDescription);
                 AppendIdeologySection(builder, faction);
                 AppendRelationSection(builder, faction, name);
                 AppendLeaderAndSettlementSection(builder, faction, name);
@@ -186,14 +191,17 @@ namespace RimtalkAutoFactionInfo
         /// ① 基础身份：派系名 + 类型标签 + 科技水平，随后追加定义原文（原文为空则省略该句）。
         /// 两处判缺降级：① <c>FactionDef.techLevel</c> 为 <c>TechLevel.Undefined</c>（Def 未声明）→ 省略科技水平；
         /// ② 名字与类型标签同字（隐藏派系 <c>Name</c> 回退为 <c>def.LabelCap</c>）→ 省去「是一支 X 派系」。
+        /// <paramref name="suppressDescription"/> 为真时也不写定义原文句（社区常识库已覆盖该 Def，避免重复介绍）。
         /// </summary>
-        private static void AppendIdentitySection(StringBuilder builder, Faction faction, string name)
+        private static void AppendIdentitySection(
+            StringBuilder builder, Faction faction, string name, bool suppressDescription)
         {
             if (!FactionInfoSettings.IncludeIdentity)
             {
                 return;
             }
-            
+
+            // 名称，科技以及类型标签是否和 Def 标签同字
             string defLabel = faction.def.LabelCap;
             bool hasTechLevel = faction.def.techLevel != TechLevel.Undefined;
             string techLevel = hasTechLevel ? faction.def.techLevel.ToStringHuman() : null;
@@ -213,7 +221,14 @@ namespace RimtalkAutoFactionInfo
                     : string.Format(FactionKnowledgeConfig.FACTION_SEG_IDENTITY_NO_TECH, name, defLabel));
             }
 
-            // ⚠ 取 description **字段**（Def 继承来的原始介绍），不要取 FactionDef.Description 属性：
+            // 社区常识库已覆盖该 Def 时让位：社区条目本就是这段描述的改写（更详细 / 更个性化），
+            // 再写一遍只是重复；只省略这一句，关系 / 好感度 / 领袖 / 据点 / 成员等动态段照常注入。
+            if (suppressDescription)
+            {
+                return;
+            }
+
+            // 取 description **字段**（Def 继承来的原始介绍），不要取 FactionDef.Description 属性：
             // 后者会追加「成员异种人概率」段且用 \n 换行，会破坏上游导入导出格式
             string description = ToSingleLine(faction.def.description);
             if (!string.IsNullOrEmpty(description))
@@ -241,7 +256,7 @@ namespace RimtalkAutoFactionInfo
                 return;
             }
 
-            // Ideo 的名称是公有字段 name（小写），不存在 Ideo.Name 属性
+            // Ideo 的名称是公有字段 name（小写）
             string ideoName = ideo.name;
             if (string.IsNullOrEmpty(ideoName))
             {

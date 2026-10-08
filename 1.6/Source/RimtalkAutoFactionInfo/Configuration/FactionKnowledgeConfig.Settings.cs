@@ -44,6 +44,12 @@ namespace RimtalkAutoFactionInfo
         /// <summary>设置持久化键：好感度重写阈值。</summary>
         public const string SETTINGS_KEY_GOODWILL_REFRESH_THRESHOLD = "goodwillRefreshThreshold";
 
+        /// <summary>设置持久化键：预设库（mod 块）导入开关。</summary>
+        public const string SETTINGS_KEY_ENABLE_KNOWLEDGE_BASE_IMPORT = "enableKnowledgeBaseImport";
+
+        /// <summary>设置持久化键：本体块导入开关。</summary>
+        public const string SETTINGS_KEY_ENABLE_BUILTIN_KNOWLEDGE_IMPORT = "enableBuiltinKnowledgeImport";
+
         /// <summary>设置持久化键：写入「基础身份」段。</summary>
         public const string SETTINGS_KEY_INCLUDE_IDENTITY = "includeIdentity";
 
@@ -56,8 +62,11 @@ namespace RimtalkAutoFactionInfo
         /// <summary>设置持久化键：写入「领袖与据点」段。</summary>
         public const string SETTINGS_KEY_INCLUDE_SETTLEMENTS = "includeSettlements";
 
-        /// <summary>设置持久化键：常识条目重要度。</summary>
-        public const string SETTINGS_KEY_KNOWLEDGE_IMPORTANCE = "knowledgeImportance";
+        /// <summary>设置持久化键：我方派系条目重要度。</summary>
+        public const string SETTINGS_KEY_KNOWLEDGE_IMPORTANCE_PLAYER = "knowledgeImportancePlayer";
+
+        /// <summary>设置持久化键：其它派系与异种人条目重要度。</summary>
+        public const string SETTINGS_KEY_KNOWLEDGE_IMPORTANCE_OTHER = "knowledgeImportanceOther";
 
         /// <summary>设置持久化键：分类固定为「世界观」。</summary>
         public const string SETTINGS_KEY_CATEGORY_ALWAYS_LORE = "categoryAlwaysLore";
@@ -131,6 +140,23 @@ namespace RimtalkAutoFactionInfo
         public const string MOD_SETTINGS_GOODWILL_REFRESH_THRESHOLD_TIP =
             "好感度变化未达此值、且其它内容都没变时，不为纯数值波动重写条目。默认 10。";
 
+        /// <summary>设置项标题：预设库（mod 块）导入开关。</summary>
+        public const string MOD_SETTINGS_ENABLE_KNOWLEDGE_BASE_IMPORT = "导入随包预设库（已启用 mod）";
+
+        /// <summary>设置项说明：预设库（mod 块）导入开关。</summary>
+        public const string MOD_SETTINGS_ENABLE_KNOWLEDGE_BASE_IMPORT_TIP =
+            "新开档 / 读档时，把随包社区常识库中与「当前已启用 mod」对应的条目文件（连同该块的公共面）导入常识库：" +
+            "按「标签 + 内容」判重、缺失即补、沿用社区原始重要度。只订阅了本体、未订阅扩展的玩家不会被塞入扩展内容。" +
+            "玩家手动删除的条目会在下次新档 / 读档被补回。关闭后本路径不写入。";
+
+        /// <summary>设置项标题：本体块导入开关。</summary>
+        public const string MOD_SETTINGS_ENABLE_BUILTIN_KNOWLEDGE_IMPORT = "同时导入游戏本体与通用常识";
+
+        /// <summary>设置项说明：本体块导入开关。</summary>
+        public const string MOD_SETTINGS_ENABLE_BUILTIN_KNOWLEDGE_IMPORT_TIP =
+            "额外导入预设库中的游戏本体条目（只取你已持有 DLC 对应的部分）与不依赖任何 mod 的公共块（如「自定义常识」）。" +
+            "体量较大。默认关闭。";
+
         /// <summary>设置项标题：写入「基础身份」段。</summary>
         public const string MOD_SETTINGS_INCLUDE_IDENTITY = "写入「基础身份」段";
 
@@ -159,12 +185,21 @@ namespace RimtalkAutoFactionInfo
         public const string MOD_SETTINGS_INCLUDE_SETTLEMENTS_TIP =
             "领袖姓名、定居点数量与最近距离。关闭后该段缺席。";
 
-        /// <summary>设置项标题：常识条目重要度。</summary>
-        public const string MOD_SETTINGS_KNOWLEDGE_IMPORTANCE = "常识条目重要度";
+        /// <summary>设置项标题：我方派系条目重要度。</summary>
+        public const string MOD_SETTINGS_KNOWLEDGE_IMPORTANCE_PLAYER = "我方派系条目重要度";
 
-        /// <summary>设置项说明：常识条目重要度。</summary>
-        public const string MOD_SETTINGS_KNOWLEDGE_IMPORTANCE_TIP =
-            "0~1，默认 1.0（世界观级最高档）。调低会让条目在触发排序中被其它常识挤到后面。";
+        /// <summary>设置项说明：我方派系条目重要度。</summary>
+        public const string MOD_SETTINGS_KNOWLEDGE_IMPORTANCE_PLAYER_TIP =
+            "0~1，默认 0.95。对齐社区常识库顶级档（社区把 0.96~1.0 留给系统级）。" +
+            "调低会让我方派系条目在触发排序中被其它常识挤到后面。";
+
+        /// <summary>设置项标题：其它派系与异种人条目重要度。</summary>
+        public const string MOD_SETTINGS_KNOWLEDGE_IMPORTANCE_OTHER = "其它派系 / 异种人条目重要度";
+
+        /// <summary>设置项说明：其它派系与异种人条目重要度。</summary>
+        public const string MOD_SETTINGS_KNOWLEDGE_IMPORTANCE_OTHER_TIP =
+            "0~1，默认 0.80。对齐社区常识库的「派系本体」档，避免压过同派系的社区条目。" +
+            "调低会让条目在触发排序中被其它常识挤到后面。";
 
         /// <summary>设置项标题：分类固定为「世界观」。</summary>
         public const string MOD_SETTINGS_CATEGORY_ALWAYS_LORE = "条目分类固定为「世界观」";
@@ -200,7 +235,7 @@ namespace RimtalkAutoFactionInfo
 
         /// <summary>设置项说明：明细日志开关。</summary>
         public const string MOD_SETTINGS_ENABLE_VERBOSE_LOG_TIP =
-            "默认只输出汇总。开启后输出每个派系 / 异种人的完整内容；开发者模式下始终输出。";
+            "默认只输出汇总与计数。开启后输出每个派系 / 异种人的完整内容。Debug 包默认开启，与本项无关。";
 
         /// <summary>设置项标题：立即重新注入按钮。</summary>
         public const string MOD_SETTINGS_REINJECT = "立即对当前存档重新注入";
@@ -227,7 +262,7 @@ namespace RimtalkAutoFactionInfo
         /// 设置页滚动内容的总高度：本 mod 设置项较多，一屏放不下，故整体放入滚动视图。
         /// 数值按「控件行数 × 行高 + 分组标题」估算并留有余量；新增设置项时须同步调大。
         /// </summary>
-        public const float MOD_SETTINGS_CONTENT_HEIGHT = 980f;
+        public const float MOD_SETTINGS_CONTENT_HEIGHT = 1100f;
 
         /// <summary>设置页滚动视图预留的滚动条宽度。</summary>
         public const float MOD_SETTINGS_SCROLLBAR_WIDTH = 20f;

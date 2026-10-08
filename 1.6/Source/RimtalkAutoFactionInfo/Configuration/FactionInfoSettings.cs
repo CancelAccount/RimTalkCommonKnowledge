@@ -31,6 +31,18 @@ namespace RimtalkAutoFactionInfo
         /// <summary>好感度重写阈值：差异仅来自好感度且未达此值时不为纯数值波动重写（FR-11）。</summary>
         public int goodwillRefreshThreshold = FactionKnowledgeConfig.GOODWILL_REFRESH_THRESHOLD;
 
+        /// <summary>
+        /// 预设库导入开关（FR-6 / D44）：在新档 / 读档把**已启用 mod** 对应的随包社区常识块导入上游常识库。
+        /// 关闭后本路径不写入，但不影响本 mod 自建条目的注入。
+        /// </summary>
+        public bool enableKnowledgeBaseImport = true;
+
+        /// <summary>
+        /// 本体块导入开关（D45）：是否一并导入包内**无 <c>packageId</c>** 的 17 块
+        /// （16 个「游戏本体」块 + 自定义常识）。体量较大，默认关；与 mod 块开关各自独立。
+        /// </summary>
+        public bool enableBuiltinKnowledgeImport;
+
         // ==================== 派系常识内容段 ====================
 
         /// <summary>是否写入「基础身份」段。</summary>
@@ -47,8 +59,11 @@ namespace RimtalkAutoFactionInfo
 
         // ==================== 重要度与分类 ====================
 
-        /// <summary>注入条目的重要度（0~1，默认取满 —— 世界观级，D11）。</summary>
-        public float knowledgeImportance = FactionKnowledgeConfig.DEFAULT_IMPORTANCE;
+        /// <summary>我方派系条目的重要度（0~1，默认 0.95 —— 对齐社区常识库顶级档）。</summary>
+        public float knowledgeImportancePlayer = FactionKnowledgeConfig.DEFAULT_IMPORTANCE_PLAYER;
+
+        /// <summary>其它派系与异种人条目的重要度（0~1，默认 0.80 —— 对齐社区常识库「派系本体」档）。</summary>
+        public float knowledgeImportanceOther = FactionKnowledgeConfig.DEFAULT_IMPORTANCE_OTHER;
 
         /// <summary>是否强制 <c>category = KnowledgeEntryCategory.Lore</c>（世界观）。</summary>
         public bool categoryAlwaysLore = true;
@@ -89,14 +104,22 @@ namespace RimtalkAutoFactionInfo
                 FactionKnowledgeConfig.DEFAULT_REFRESH_INTERVAL_HOURS);
             Scribe_Values.Look(ref goodwillRefreshThreshold, FactionKnowledgeConfig.SETTINGS_KEY_GOODWILL_REFRESH_THRESHOLD,
                 FactionKnowledgeConfig.GOODWILL_REFRESH_THRESHOLD);
+            Scribe_Values.Look(ref enableKnowledgeBaseImport,
+                FactionKnowledgeConfig.SETTINGS_KEY_ENABLE_KNOWLEDGE_BASE_IMPORT, true);
+            Scribe_Values.Look(ref enableBuiltinKnowledgeImport,
+                FactionKnowledgeConfig.SETTINGS_KEY_ENABLE_BUILTIN_KNOWLEDGE_IMPORT, false);
 
             Scribe_Values.Look(ref includeIdentity, FactionKnowledgeConfig.SETTINGS_KEY_INCLUDE_IDENTITY, true);
             Scribe_Values.Look(ref includeIdeology, FactionKnowledgeConfig.SETTINGS_KEY_INCLUDE_IDEOLOGY, true);
             Scribe_Values.Look(ref includeRelation, FactionKnowledgeConfig.SETTINGS_KEY_INCLUDE_RELATION, true);
             Scribe_Values.Look(ref includeSettlements, FactionKnowledgeConfig.SETTINGS_KEY_INCLUDE_SETTLEMENTS, true);
 
-            Scribe_Values.Look(ref knowledgeImportance, FactionKnowledgeConfig.SETTINGS_KEY_KNOWLEDGE_IMPORTANCE,
-                FactionKnowledgeConfig.DEFAULT_IMPORTANCE);
+            Scribe_Values.Look(ref knowledgeImportancePlayer,
+                FactionKnowledgeConfig.SETTINGS_KEY_KNOWLEDGE_IMPORTANCE_PLAYER,
+                FactionKnowledgeConfig.DEFAULT_IMPORTANCE_PLAYER);
+            Scribe_Values.Look(ref knowledgeImportanceOther,
+                FactionKnowledgeConfig.SETTINGS_KEY_KNOWLEDGE_IMPORTANCE_OTHER,
+                FactionKnowledgeConfig.DEFAULT_IMPORTANCE_OTHER);
             Scribe_Values.Look(ref categoryAlwaysLore, FactionKnowledgeConfig.SETTINGS_KEY_CATEGORY_ALWAYS_LORE, true);
 
             Scribe_Values.Look(ref includeXenotypes, FactionKnowledgeConfig.SETTINGS_KEY_INCLUDE_XENOTYPES, true);
@@ -186,6 +209,26 @@ namespace RimtalkAutoFactionInfo
             }
         }
 
+        /// <summary>生效的预设库（mod 块）导入开关（未载入时按默认「开」处理）。</summary>
+        public static bool EnableKnowledgeBaseImport
+        {
+            get
+            {
+                FactionInfoSettings s = Instance;
+                return s == null || s.enableKnowledgeBaseImport;
+            }
+        }
+
+        /// <summary>生效的本体块导入开关（未载入时按默认「关」处理）。</summary>
+        public static bool EnableBuiltinKnowledgeImport
+        {
+            get
+            {
+                FactionInfoSettings s = Instance;
+                return s != null && s.enableBuiltinKnowledgeImport;
+            }
+        }
+
         /// <summary>生效的「基础身份」段开关。</summary>
         public static bool IncludeIdentity
         {
@@ -226,22 +269,27 @@ namespace RimtalkAutoFactionInfo
             }
         }
 
-        /// <summary>生效的常识条目重要度（已钳制到 0~1）。</summary>
-        public static float KnowledgeImportance
+        /// <summary>生效的**我方派系**条目重要度（已钳制到 0~1）。</summary>
+        public static float KnowledgeImportancePlayer
         {
             get
             {
                 FactionInfoSettings s = Instance;
-                float value = s == null
-                    ? FactionKnowledgeConfig.DEFAULT_IMPORTANCE
-                    : s.knowledgeImportance;
-                if (value < FactionKnowledgeConfig.IMPORTANCE_MIN)
-                {
-                    return FactionKnowledgeConfig.IMPORTANCE_MIN;
-                }
-                return value > FactionKnowledgeConfig.IMPORTANCE_MAX
-                    ? FactionKnowledgeConfig.IMPORTANCE_MAX
-                    : value;
+                return ClampImportance(s == null
+                    ? FactionKnowledgeConfig.DEFAULT_IMPORTANCE_PLAYER
+                    : s.knowledgeImportancePlayer);
+            }
+        }
+
+        /// <summary>生效的**其它派系与异种人**条目重要度（已钳制到 0~1）。</summary>
+        public static float KnowledgeImportanceOther
+        {
+            get
+            {
+                FactionInfoSettings s = Instance;
+                return ClampImportance(s == null
+                    ? FactionKnowledgeConfig.DEFAULT_IMPORTANCE_OTHER
+                    : s.knowledgeImportanceOther);
             }
         }
 
@@ -309,6 +357,18 @@ namespace RimtalkAutoFactionInfo
                 return min;
             }
             return value > max ? max : value;
+        }
+
+        /// <summary>把条目重要度钳制到 <see cref="FactionKnowledgeConfig.IMPORTANCE_MIN"/>~<see cref="FactionKnowledgeConfig.IMPORTANCE_MAX"/>。</summary>
+        private static float ClampImportance(float value)
+        {
+            if (value < FactionKnowledgeConfig.IMPORTANCE_MIN)
+            {
+                return FactionKnowledgeConfig.IMPORTANCE_MIN;
+            }
+            return value > FactionKnowledgeConfig.IMPORTANCE_MAX
+                ? FactionKnowledgeConfig.IMPORTANCE_MAX
+                : value;
         }
     }
 }

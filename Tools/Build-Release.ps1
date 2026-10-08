@@ -39,8 +39,8 @@ $ErrorActionPreference = 'Stop'
 $PackageName    = 'RimtalkAutoFactionInfo'              # 发布包顶层文件夹名（zip 解压后的目录名，通常等于 mod 文件夹名）
 $AssemblyName   = 'RimtalkAutoFactionInfo'              # 编译产物 dll 名（取自 csproj 项目名，不含 .dll）
 $GameVersionDir = '1.6'                                 # 游戏版本目录
-$RequiredDirs   = @('About')                            # 发布包必需目录（缺失即报错）
-$IncludeDirs    = @('About')                            # 进入发布包的目录白名单；本 mod 无 Defs/Languages 等数据目录，有则在此追加
+$RequiredDirs   = @('About', 'KnowledgeBase')           # 发布包必需目录（缺失即报错）
+$IncludeDirs    = @('About', 'KnowledgeBase')           # 进入发布包的目录白名单；KnowledgeBase=常识库数据（按 modid 注入的资产，必须随包）
 $OptionalDirs   = @()                                   # 白名单中缺失时跳过而非报错的目录（本 mod 暂无需选目录）
 
 # 根级必需文件：LoadFolders.xml 声明「根 + 1.6」布局，必须带上，否则包内容缺失

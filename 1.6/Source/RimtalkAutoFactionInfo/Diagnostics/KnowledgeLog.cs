@@ -15,20 +15,34 @@ namespace RimtalkAutoFactionInfo
         private const string Prefix = FactionKnowledgeConfig.LOG_PREFIX;
 
         /// <summary>
-        /// 是否输出明细日志。
-        /// 开发者模式（Prefs.DevMode）开启时强制为真，否则取设置项
-        /// <c>enableVerboseLog</c>（设置未载入时按默认「关」处理）。
+        /// 是否输出明细日志。门控只看**包类型**与**设置项**，与开发者模式（Prefs.DevMode）**无关**：
+        /// Debug 包默认输出明细；Release 包仅在设置项 <c>enableVerboseLog</c> 开启时才输出，
+        /// 否则 Release 下只保留汇总级（条目总量与计数），不写具体内容。
         /// 直接读设置而非缓存字段：设置页勾选后立即生效，无需额外同步。
         /// </summary>
         public static bool VerboseEnabled
         {
-            get { return Prefs.DevMode || FactionInfoSettings.EnableVerboseLog; }
+            get { return FactionKnowledgeConfig.IS_DEBUG_BUILD || FactionInfoSettings.EnableVerboseLog; }
         }
 
         /// <summary>汇总级日志：单次注入的整体结果，无条件输出，每次注入只应调用一次。</summary>
         public static void Summary(string message)
         {
             Log.Message(Prefix + " " + message);
+        }
+
+        /// <summary>
+        /// 启动横幅：由 <see cref="FactionInfoMod"/> 在构造期（主菜单阶段）调用一次，
+        /// 表明本 mod 已被引擎加载，并报出本次运行是 Debug 包还是 Release 包（FR-8）。
+        /// 与「进档后才有的注入汇总」分开，便于一眼确认 mod 是否真的被加载。
+        /// </summary>
+        public static void Startup()
+        {
+            Summary(string.Format(
+                FactionKnowledgeConfig.LOG_MOD_BUILD,
+                FactionKnowledgeConfig.IS_DEBUG_BUILD
+                    ? FactionKnowledgeConfig.MOD_BUILD_DEBUG
+                    : FactionKnowledgeConfig.MOD_BUILD_RELEASE));
         }
 
         /// <summary>明细级日志：逐派系 / 逐异种人的细节，仅调试时输出。</summary>

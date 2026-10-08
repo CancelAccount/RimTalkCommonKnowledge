@@ -9,7 +9,8 @@ namespace RimtalkAutoFactionInfo
     /// 本 mod 的入口：<see cref="Verse.Mod"/> 子类由引擎在启动期反射实例化
     /// （<c>LoadedModManager.CreateModClasses</c>，构造签名必须为 <c>(ModContentPack)</c>）。
     /// 职责：① 载入可持久化设置（FR-7）；② 应用 Harmony 补丁，把「实际成员构成」追加到派系界面（FR-14）；
-    /// ③ 提供设置页：注入开关、内容段开关、重要度与异种人选项、明细日志、界面增强，以及「立即重注入」按钮。
+    /// ③ 提供设置页：注入开关、内容段开关、重要度与异种人选项、明细日志、界面增强，以及「立即重注入」按钮；
+    /// ④ 启动横幅：构造期输出一次，表明本 mod 已被引擎加载（FR-8）。
     /// 与 <see cref="FactionKnowledgeComponent"/>（常识注入）分工明确：本类只管设置与界面增强，注入逻辑不在此。
     /// </summary>
     public class FactionInfoMod : Mod
@@ -20,6 +21,12 @@ namespace RimtalkAutoFactionInfo
         /// （见 <see cref="FactionInfoSettings"/> 的静态生效值属性）。
         /// </summary>
         public static FactionInfoSettings Settings;
+
+        /// <summary>
+        /// 本 mod 内容根目录（= <c>ModContentPack.RootDir</c>）：随包预设库 <c>KnowledgeBase/</c> 即坐落于此。
+        /// 构造期立即赋值，供 <see cref="KnowledgeBaseImporter"/> 定位随包数据。
+        /// </summary>
+        public static string ContentRootDir;
 
         /// <summary>本 mod 的 Harmony 实例，持有补丁集以便排查冲突。</summary>
         private readonly Harmony harmony;
@@ -32,6 +39,11 @@ namespace RimtalkAutoFactionInfo
         public FactionInfoMod(ModContentPack content) : base(content)
         {
             Settings = GetSettings<FactionInfoSettings>();
+            ContentRootDir = content != null ? content.RootDir : null;
+
+            // 启动日志：主菜单阶段即输出，确认本 mod 已被引擎加载（FR-8）；
+            // 置于 PatchAll 之前，即便补丁失败也能证明 mod 类已被反射实例化。
+            KnowledgeLog.Startup();
 
             harmony = new Harmony(FactionKnowledgeConfig.HARMONY_ID);
             harmony.PatchAll(Assembly.GetExecutingAssembly());
@@ -76,7 +88,7 @@ namespace RimtalkAutoFactionInfo
             Widgets.EndScrollView();
         }
 
-        /// <summary>「注入时机」分组：总开关、读档校正、定时校正与两个数值滑块。</summary>
+        /// <summary>「注入时机」分组：总开关、读档校正、定时校正、两个数值滑块，以及预设库导入两个开关（FR-6）。</summary>
         /// <param name="listing">设置页列表。</param>
         private void AppendInjectionSection(Listing_Standard listing)
         {
@@ -111,6 +123,16 @@ namespace RimtalkAutoFactionInfo
                 FactionKnowledgeConfig.GOODWILL_THRESHOLD_MAX,
                 FactionKnowledgeConfig.MOD_SETTINGS_GOODWILL_REFRESH_THRESHOLD_TIP,
                 FactionKnowledgeConfig.MOD_SETTINGS_UNIT_NONE);
+
+            // 预设库导入（FR-6 / D44 / D45）：mod 块开关默认开、本体块开关默认关，各自独立。
+            listing.CheckboxLabeled(
+                FactionKnowledgeConfig.MOD_SETTINGS_ENABLE_KNOWLEDGE_BASE_IMPORT,
+                ref Settings.enableKnowledgeBaseImport,
+                FactionKnowledgeConfig.MOD_SETTINGS_ENABLE_KNOWLEDGE_BASE_IMPORT_TIP);
+            listing.CheckboxLabeled(
+                FactionKnowledgeConfig.MOD_SETTINGS_ENABLE_BUILTIN_KNOWLEDGE_IMPORT,
+                ref Settings.enableBuiltinKnowledgeImport,
+                FactionKnowledgeConfig.MOD_SETTINGS_ENABLE_BUILTIN_KNOWLEDGE_IMPORT_TIP);
         }
 
         /// <summary>「派系常识内容段」分组：四个段开关（普通派系；我方派系条目固定写全）。</summary>
@@ -136,24 +158,32 @@ namespace RimtalkAutoFactionInfo
                 FactionKnowledgeConfig.MOD_SETTINGS_INCLUDE_SETTLEMENTS_TIP);
         }
 
-        /// <summary>「重要度与分类」分组：重要度滑块 + 分类固定开关。</summary>
+        /// <summary>
+        /// 「重要度与分类」分组：我方派系 / 其它派系与异种人 两个重要度滑块 + 分类固定开关。
+        /// 分两档是为了对齐社区常识库的档位（0.95 顶级 / 0.80 派系本体），见 D43。
+        /// </summary>
         /// <param name="listing">设置页列表。</param>
         private void AppendImportanceSection(Listing_Standard listing)
         {
             AppendSectionHeader(listing, FactionKnowledgeConfig.MOD_SETTINGS_SECTION_IMPORTANCE);
 
-            string label = string.Format(
-                FactionKnowledgeConfig.MOD_SETTINGS_SLIDER_LABEL_FORMAT,
-                FactionKnowledgeConfig.MOD_SETTINGS_KNOWLEDGE_IMPORTANCE,
-                Settings.knowledgeImportance.ToStringPercent(),
-                FactionKnowledgeConfig.MOD_SETTINGS_UNIT_NONE);
-            Settings.knowledgeImportance = listing.SliderLabeled(
-                label,
-                Settings.knowledgeImportance,
+            Settings.knowledgeImportancePlayer = AppendFloatSlider(
+                listing,
+                FactionKnowledgeConfig.MOD_SETTINGS_KNOWLEDGE_IMPORTANCE_PLAYER,
+                Settings.knowledgeImportancePlayer,
                 FactionKnowledgeConfig.IMPORTANCE_MIN,
                 FactionKnowledgeConfig.IMPORTANCE_MAX,
-                FactionKnowledgeConfig.MOD_SETTINGS_SLIDER_LABEL_PCT,
-                FactionKnowledgeConfig.MOD_SETTINGS_KNOWLEDGE_IMPORTANCE_TIP);
+                FactionKnowledgeConfig.MOD_SETTINGS_KNOWLEDGE_IMPORTANCE_PLAYER_TIP,
+                FactionKnowledgeConfig.MOD_SETTINGS_UNIT_NONE);
+
+            Settings.knowledgeImportanceOther = AppendFloatSlider(
+                listing,
+                FactionKnowledgeConfig.MOD_SETTINGS_KNOWLEDGE_IMPORTANCE_OTHER,
+                Settings.knowledgeImportanceOther,
+                FactionKnowledgeConfig.IMPORTANCE_MIN,
+                FactionKnowledgeConfig.IMPORTANCE_MAX,
+                FactionKnowledgeConfig.MOD_SETTINGS_KNOWLEDGE_IMPORTANCE_OTHER_TIP,
+                FactionKnowledgeConfig.MOD_SETTINGS_UNIT_NONE);
 
             listing.CheckboxLabeled(
                 FactionKnowledgeConfig.MOD_SETTINGS_CATEGORY_ALWAYS_LORE,
@@ -259,6 +289,30 @@ namespace RimtalkAutoFactionInfo
             float result = listing.SliderLabeled(
                 labeled, value, min, max, FactionKnowledgeConfig.MOD_SETTINGS_SLIDER_LABEL_PCT, tip);
             return Mathf.RoundToInt(result);
+        }
+
+        /// <summary>
+        /// 百分比滑块行：标题里带上当前值，返回值按百分位取整。
+        /// 上游 <c>SliderLabeled</c> 返回的是连续浮点值，而标题按百分比显示，
+        /// 故取整到 1% 粒度，避免出现「显示 95%、实际存 0.9537」这类表里不一。
+        /// </summary>
+        /// <param name="listing">设置页列表。</param>
+        /// <param name="label">设置项标题。</param>
+        /// <param name="value">当前值（0~1）。</param>
+        /// <param name="min">最小值。</param>
+        /// <param name="max">最大值。</param>
+        /// <param name="tip">悬停说明。</param>
+        /// <param name="unit">单位后缀。</param>
+        /// <returns>用户调整后的新值（0~1，百分位取整）。</returns>
+        private static float AppendFloatSlider(
+            Listing_Standard listing, string label, float value, float min, float max, string tip, string unit)
+        {
+            string labeled = string.Format(
+                FactionKnowledgeConfig.MOD_SETTINGS_SLIDER_LABEL_FORMAT,
+                label, value.ToStringPercent(), unit);
+            float result = listing.SliderLabeled(
+                labeled, value, min, max, FactionKnowledgeConfig.MOD_SETTINGS_SLIDER_LABEL_PCT, tip);
+            return Mathf.Round(result * 100f) / 100f;
         }
     }
 }

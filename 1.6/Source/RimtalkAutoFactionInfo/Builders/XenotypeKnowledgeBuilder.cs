@@ -399,9 +399,15 @@ namespace RimtalkAutoFactionInfo
         /// </summary>
         /// <param name="xenotype">目标异种人。</param>
         /// <param name="factionNames">该异种人出没的派系名（反向索引结果），可为空。</param>
+        /// <param name="suppressDescription">
+        /// 为真时**省略 ① 段的定义原文**、退用只留异种人名的模板
+        /// （社区常识库已覆盖该异种人，社区条目已是其描述的改写；避免重复介绍）。
+        /// </param>
         /// <param name="tag">输出：触发标签。</param>
         /// <param name="content">输出：单行注入内容。</param>
-        public static bool TryBuild(XenotypeDef xenotype, List<string> factionNames, out string tag, out string content)
+        public static bool TryBuild(
+            XenotypeDef xenotype, List<string> factionNames, bool suppressDescription,
+            out string tag, out string content)
         {
             tag = null;
             content = null;
@@ -421,11 +427,12 @@ namespace RimtalkAutoFactionInfo
             tag = label;
             StringBuilder builder = new StringBuilder();
 
-            // ① 是什么（description 优先，为空则退用 descriptionShort）
-            string description = !string.IsNullOrEmpty(xenotype.description)
-                ? xenotype.description
-                : xenotype.descriptionShort;
-            description = ToSingleLine(description);
+            // ① 是什么（description 优先，为空则退用 descriptionShort；社区已覆盖该 Def 时整段退为只留名字）
+            string description = suppressDescription
+                ? null
+                : ToSingleLine(!string.IsNullOrEmpty(xenotype.description)
+                    ? xenotype.description
+                    : xenotype.descriptionShort);
             builder.Append(string.IsNullOrEmpty(description)
                 ? string.Format(FactionKnowledgeConfig.XENOTYPE_SEG_INTRO_BARE, label)
                 : string.Format(FactionKnowledgeConfig.XENOTYPE_SEG_INTRO, label, description));

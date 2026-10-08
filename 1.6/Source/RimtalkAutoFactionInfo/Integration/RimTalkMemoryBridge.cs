@@ -194,10 +194,125 @@ namespace RimtalkAutoFactionInfo
             return result;
         }
 
+        /// <summary>
+        /// 上游常识库里是否存在**非本 mod 注入**的、以 <paramref name="defLabel"/> 为**首段标签**的条目
+        /// ——即「社区常识库是否已覆盖该 Def」。
+        /// </summary>
+        /// <param name="defLabel">目标 Def 的名称（<c>FactionDef.LabelCap</c> / <c>XenotypeDef.LabelCap</c>）。</param>
+        /// <returns>命中社区条目返回 <c>true</c>；库不可用 / 无命中返回 <c>false</c>（此时本 mod 照常写全）。</returns>
+        /// <remarks>
+        /// 用途：社区条目通常已写入该 Def 的定义原文（甚至是更详细、更个性化的改写），
+        /// 命中时本 mod 的「定义原文」段应让位，只保留社区写不出的运行时动态段。
+        /// <para>
+        /// 必须排除本 mod 自己的条目：隐藏派系的实例名与 <c>def.LabelCap</c> 同字，
+        /// 本 mod 自己写下的条目会以同一标签命中，若不过滤会误判为「社区已覆盖」，
+        /// 导致内容在「含 / 不含定义原文」之间来回抖动。
+        /// </para>
+        /// </remarks>
+        public static bool HasExternalEntryForTag(string defLabel)
+        {
+            if (!IsLibraryAvailable || string.IsNullOrEmpty(defLabel))
+            {
+                return false;
+            }
+
+            // 上游这是**子串**匹配（且匹配的是整串 tag 字段），故下面还要用首段全等再判一次
+            List<CommonKnowledgeEntry> found = CommonKnowledgeAPI.FindKnowledge(defLabel);
+            if (found == null)
+            {
+                return false;
+            }
+
+            for (int i = 0; i < found.Count; i++)
+            {
+                CommonKnowledgeEntry entry = found[i];
+                if (entry == null || string.IsNullOrEmpty(entry.content) || IsOwnContent(entry.content))
+                {
+                    continue;
+                }
+
+                List<string> entryTags = entry.GetTags();
+                if (entryTags == null || entryTags.Count == 0)
+                {
+                    continue;
+                }
+                if (string.Equals(entryTags[0], defLabel, StringComparison.Ordinal))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        /// <summary>内容是否由本 mod 注入（以任一本 mod 内容前缀开头）。</summary>
+        private static bool IsOwnContent(string content)
+        {
+            return content.StartsWith(FactionKnowledgeConfig.FACTION_CONTENT_PREFIX, StringComparison.Ordinal)
+                || content.StartsWith(FactionKnowledgeConfig.XENOTYPE_CONTENT_PREFIX, StringComparison.Ordinal);
+        }
+
         /// <summary>按条目 id 删除一条常识。</summary>
         public static bool Remove(string id)
         {
             return CommonKnowledgeAPI.RemoveKnowledge(id);
+        }
+
+        /// <summary>
+        /// 生成「标签 + 内容」判重键（D45）。
+        /// 用控制字符 <see cref="FactionKnowledgeConfig.KNOWLEDGE_KEY_SEPARATOR"/> 分隔两部分，
+        /// 避免标签或正文里出现相同拼接串而被误判为同一条。
+        /// </summary>
+        /// <param name="tag">条目标签（整串原样，不切分）。</param>
+        /// <param name="content">条目内容。</param>
+        public static string MakeTagContentKey(string tag, string content)
+        {
+            return (tag ?? string.Empty)
+                + FactionKnowledgeConfig.KNOWLEDGE_KEY_SEPARATOR
+                + (content ?? string.Empty);
+        }
+
+        /// <summary>
+        /// 取上游常识库**现有全部条目**的「标签 + 内容」键集合，供预设库导入做差集（D45）。
+        /// 上游 <c>ImportFromText</c> 为纯追加、零去重，故差集必须由本 mod 自己算。
+        /// </summary>
+        /// <returns>键集合；库不可用时为空集合（调用方应据此整体跳过导入）。</returns>
+        public static HashSet<string> GetExistingTagContentKeys()
+        {
+            HashSet<string> keys = new HashSet<string>(StringComparer.Ordinal);
+            List<CommonKnowledgeEntry> all = CommonKnowledgeAPI.GetAllKnowledge();
+            if (all == null)
+            {
+                return keys;
+            }
+
+            for (int i = 0; i < all.Count; i++)
+            {
+                CommonKnowledgeEntry entry = all[i];
+                if (entry == null)
+                {
+                    continue;
+                }
+                keys.Add(MakeTagContentKey(entry.tag, entry.content));
+            }
+            return keys;
+        }
+
+        /// <summary>
+        /// 把块文件原文导入上游常识库。
+        /// </summary>
+        /// <param name="text">块文件内容：每行一条，保持上游原格式。</param>
+        /// <returns>上游实际写入的条数。</returns>
+        /// <remarks>
+        /// <c>clearExisting</c> 恒为 <c>false</c>：传 <c>true</c> 会清空玩家整个常识库（证据 ㊼）。
+        /// 该 API **零去重**，差集须由调用方在导入前自行完成。
+        /// </remarks>
+        public static int ImportKnowledgeText(string text)
+        {
+            if (string.IsNullOrEmpty(text))
+            {
+                return 0;
+            }
+            return CommonKnowledgeAPI.ImportFromText(text, false);
         }
     }
 }
