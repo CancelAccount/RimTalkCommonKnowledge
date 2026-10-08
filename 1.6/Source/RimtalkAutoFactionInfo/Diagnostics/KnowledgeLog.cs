@@ -11,8 +11,8 @@ namespace RimtalkAutoFactionInfo
     /// </summary>
     public static class KnowledgeLog
     {
-        /// <summary>日志前缀别名，避免每行都写全限定名。</summary>
-        private const string Prefix = FactionKnowledgeConfig.LOG_PREFIX;
+        /// <summary>日志前缀别名（含淡黄染色），避免每行都写全限定名。</summary>
+        private const string Prefix = FactionKnowledgeConfig.LOG_PREFIX_COLORED;
 
         /// <summary>
         /// 是否输出明细日志。门控只看**包类型**与**设置项**，与开发者模式（Prefs.DevMode）**无关**：

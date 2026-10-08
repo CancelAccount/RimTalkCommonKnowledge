@@ -47,6 +47,13 @@ namespace RimtalkAutoFactionInfo
 
             harmony = new Harmony(FactionKnowledgeConfig.HARMONY_ID);
             harmony.PatchAll(Assembly.GetExecutingAssembly());
+
+            // 上游常识库界面的绘制裁剪补丁（D48）：目标位于上游程序集，不能靠 PatchAll 的静态标注，
+            // 且必须在目标缺失时安全跳过，故在此手动、运行期应用。
+            CommonKnowledgeUiOptimization.TryApply(harmony);
+
+            // 上游常识库界面的「常识管理」入口按钮（FR-17）：同上，目标在上游程序集，运行期安全应用。
+            CommonKnowledgeManagerEntryPatch.TryApply(harmony);
         }
 
         /// <summary>Mod 设置页的分类名（返回空串会使本 mod 从设置列表消失）。</summary>
@@ -226,7 +233,10 @@ namespace RimtalkAutoFactionInfo
                 FactionKnowledgeConfig.MOD_SETTINGS_ENABLE_VERBOSE_LOG_TIP);
         }
 
-        /// <summary>「界面增强」分组：派系界面实际成员构成开关（FR-14）。</summary>
+        /// <summary>
+        /// 「界面增强」分组：派系界面实际成员构成开关（FR-14）、上游常识库界面滚动优化开关（D48），
+        /// 以及常识管理页面入口按钮（FR-16 / D49）。
+        /// </summary>
         /// <param name="listing">设置页列表。</param>
         private void AppendUiSection(Listing_Standard listing)
         {
@@ -235,6 +245,37 @@ namespace RimtalkAutoFactionInfo
                 FactionKnowledgeConfig.MOD_SETTINGS_SHOW_UI_COMPOSITION,
                 ref Settings.showCompositionInFactionUi,
                 FactionKnowledgeConfig.MOD_SETTINGS_SHOW_UI_COMPOSITION_TIP);
+            listing.CheckboxLabeled(
+                FactionKnowledgeConfig.MOD_SETTINGS_ENABLE_KNOWLEDGE_UI_OPTIMIZATION,
+                ref Settings.enableKnowledgeUiOptimization,
+                FactionKnowledgeConfig.MOD_SETTINGS_ENABLE_KNOWLEDGE_UI_OPTIMIZATION_TIP);
+            AppendKnowledgeManagerButton(listing);
+        }
+
+        /// <summary>
+        /// 「打开常识管理页面」按钮（FR-16 / D49）：唤出本 mod 自建的常识管理窗口。
+        /// 无存档时按钮置灰（上游常识库在无存档时不可用），并在悬停提示里说明原因。
+        /// </summary>
+        /// <param name="listing">设置页列表。</param>
+        private static void AppendKnowledgeManagerButton(Listing_Standard listing)
+        {
+            Rect rect = listing.GetRect(FactionKnowledgeConfig.MOD_SETTINGS_BUTTON_HEIGHT);
+            bool available = RimTalkMemoryBridge.IsLibraryAvailable;
+
+            if (Widgets.ButtonText(
+                rect, FactionKnowledgeConfig.MOD_SETTINGS_OPEN_MANAGER, true, true, available, null))
+            {
+                Find.WindowStack.Add(new Dialog_KnowledgeManager());
+            }
+
+            TooltipHandler.TipRegion(
+                rect,
+                available
+                    ? FactionKnowledgeConfig.MOD_SETTINGS_OPEN_MANAGER_TIP
+                    : FactionKnowledgeConfig.MOD_SETTINGS_OPEN_MANAGER_TIP
+                        + FactionKnowledgeConfig.MANAGER_TIP_BLOCK_SEPARATOR
+                        + FactionKnowledgeConfig.MANAGER_NO_GAME);
+            listing.Gap();
         }
 
         /// <summary>

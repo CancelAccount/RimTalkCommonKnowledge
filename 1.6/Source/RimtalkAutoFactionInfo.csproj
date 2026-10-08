@@ -46,6 +46,11 @@
       <HintPath>$(ManagedDir)UnityEngine.TextRenderingModule.dll</HintPath>
       <Private>false</Private>
     </Reference>
+    <!-- 自建窗口（FR-16）直接用 GUI.color 染色，且 Widgets 的 Label 重载涉及 GUIContent，需 IMGUI 模块 -->
+    <Reference Include="UnityEngine.IMGUIModule">
+      <HintPath>$(ManagedDir)UnityEngine.IMGUIModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
     <!-- 上游注入 API：编译期校验签名；Private=false 表示不把上游 dll 复制进本 mod 的 Assemblies -->
     <Reference Include="RimTalkMemoryPatch">
       <HintPath>$(RimTalkMemoryDir)RimTalkMemoryPatch.dll</HintPath>

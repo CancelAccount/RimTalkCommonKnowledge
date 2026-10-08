@@ -23,6 +23,13 @@ namespace RimtalkAutoFactionInfo
             "在派系列表的悬停提示与派系信息卡中追加一行「实际成员」。" +
             "用于修正游戏自带的成员统计在 HAR 种族 / 兵种级异种人派系上误报「智人种 100%」的情况。";
 
+        /// <summary>设置项标题：常识库界面滚动优化。</summary>
+        public const string MOD_SETTINGS_ENABLE_KNOWLEDGE_UI_OPTIMIZATION = "优化常识库界面滚动";
+
+        /// <summary>设置项说明（悬停提示）。</summary>
+        public const string MOD_SETTINGS_ENABLE_KNOWLEDGE_UI_OPTIMIZATION_TIP =
+            "隐藏不可见的常识条目，优化界面滚动性能。";
+
         /// <summary>设置持久化键：派系界面实际成员开关。改键名会丢失存量设置。</summary>
         public const string SETTINGS_KEY_SHOW_UI_COMPOSITION = "showCompositionInFactionUi";
 
@@ -82,6 +89,12 @@ namespace RimtalkAutoFactionInfo
 
         /// <summary>设置持久化键：明细日志开关。</summary>
         public const string SETTINGS_KEY_ENABLE_VERBOSE_LOG = "enableVerboseLog";
+
+        /// <summary>设置持久化键：常识库界面滚动优化开关。</summary>
+        public const string SETTINGS_KEY_ENABLE_KNOWLEDGE_UI_OPTIMIZATION = "enableKnowledgeUiOptimization";
+
+        /// <summary>设置持久化键：玩家自建的自定义子页列表（FR-16 / D49）。</summary>
+        public const string SETTINGS_KEY_CUSTOM_KNOWLEDGE_PAGES = "customKnowledgePages";
 
         // ---------- 设置项：设置页分组标题 ----------
 
@@ -190,16 +203,14 @@ namespace RimtalkAutoFactionInfo
 
         /// <summary>设置项说明：我方派系条目重要度。</summary>
         public const string MOD_SETTINGS_KNOWLEDGE_IMPORTANCE_PLAYER_TIP =
-            "0~1，默认 0.95。对齐社区常识库顶级档（社区把 0.96~1.0 留给系统级）。" +
-            "调低会让我方派系条目在触发排序中被其它常识挤到后面。";
+            "0~1，默认 0.95。";
 
         /// <summary>设置项标题：其它派系与异种人条目重要度。</summary>
         public const string MOD_SETTINGS_KNOWLEDGE_IMPORTANCE_OTHER = "其它派系 / 异种人条目重要度";
 
         /// <summary>设置项说明：其它派系与异种人条目重要度。</summary>
         public const string MOD_SETTINGS_KNOWLEDGE_IMPORTANCE_OTHER_TIP =
-            "0~1，默认 0.80。对齐社区常识库的「派系本体」档，避免压过同派系的社区条目。" +
-            "调低会让条目在触发排序中被其它常识挤到后面。";
+            "0~1，默认 0.80。";
 
         /// <summary>设置项标题：分类固定为「世界观」。</summary>
         public const string MOD_SETTINGS_CATEGORY_ALWAYS_LORE = "条目分类固定为「世界观」";
@@ -235,7 +246,7 @@ namespace RimtalkAutoFactionInfo
 
         /// <summary>设置项说明：明细日志开关。</summary>
         public const string MOD_SETTINGS_ENABLE_VERBOSE_LOG_TIP =
-            "默认只输出汇总与计数。开启后输出每个派系 / 异种人的完整内容。Debug 包默认开启，与本项无关。";
+            "默认只输出汇总与计数。开启后输出每个派系 / 异种人的完整内容。";
 
         /// <summary>设置项标题：立即重新注入按钮。</summary>
         public const string MOD_SETTINGS_REINJECT = "立即对当前存档重新注入";
@@ -262,7 +273,7 @@ namespace RimtalkAutoFactionInfo
         /// 设置页滚动内容的总高度：本 mod 设置项较多，一屏放不下，故整体放入滚动视图。
         /// 数值按「控件行数 × 行高 + 分组标题」估算并留有余量；新增设置项时须同步调大。
         /// </summary>
-        public const float MOD_SETTINGS_CONTENT_HEIGHT = 1100f;
+        public const float MOD_SETTINGS_CONTENT_HEIGHT = 1200f;
 
         /// <summary>设置页滚动视图预留的滚动条宽度。</summary>
         public const float MOD_SETTINGS_SCROLLBAR_WIDTH = 20f;

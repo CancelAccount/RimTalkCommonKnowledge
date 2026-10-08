@@ -321,7 +321,38 @@ namespace RimtalkAutoFactionInfo
                     FactionKnowledgeConfig.LOG_KEY_DUPLICATE_FACTION_TAG,
                     string.Format(
                         FactionKnowledgeConfig.WARN_DUPLICATE_FACTION_TAG, previousDefName, defName));
+
+                // 原版「古代人」固定生成 Ancients / AncientsHostile 这对同名派系（派系名相同、defName 不同），
+                // 属原版预期行为；单独吐一句槽，省得玩家把这条重复当成 bug。
+                // 用独立 key：WarnOnce 按 key 只放行一次，若被其它同名派系先占掉名额，这句就再也没机会出现。
+                if (IsVanillaAncientsPair(previousDefName, defName))
+                {
+                    KnowledgeLog.WarnOnce(
+                        FactionKnowledgeConfig.LOG_KEY_ANCIENTS_NAMESAKE_BANTER,
+                        FactionKnowledgeConfig.WARN_ANCIENTS_NAMESAKE_BANTER);
+                }
             }
+        }
+
+        /// <summary>
+        /// 该对 <c>defName</c>（顺序无关）是否为原版「中立古代人 / 敌对古代人」这对同名派系。
+        /// </summary>
+        /// <param name="firstDefName">先遇到的派系 defName。</param>
+        /// <param name="secondDefName">后遇到的派系 defName。</param>
+        private static bool IsVanillaAncientsPair(string firstDefName, string secondDefName)
+        {
+            if (string.Equals(
+                    firstDefName, FactionKnowledgeConfig.FACTION_DEFNAME_ANCIENTS, StringComparison.Ordinal)
+                && string.Equals(
+                    secondDefName, FactionKnowledgeConfig.FACTION_DEFNAME_ANCIENTS_HOSTILE, StringComparison.Ordinal))
+            {
+                return true;
+            }
+
+            return string.Equals(
+                       firstDefName, FactionKnowledgeConfig.FACTION_DEFNAME_ANCIENTS_HOSTILE, StringComparison.Ordinal)
+                   && string.Equals(
+                       secondDefName, FactionKnowledgeConfig.FACTION_DEFNAME_ANCIENTS, StringComparison.Ordinal);
         }
 
         /// <summary>

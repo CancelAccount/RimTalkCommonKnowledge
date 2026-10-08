@@ -298,6 +298,40 @@ namespace RimtalkAutoFactionInfo
         }
 
         /// <summary>
+        /// 取库内**全部条目**的中立快照，供本 mod 自建界面（FR-16）读取。
+        /// 上游类型只在本类内部流转，不外泄。
+        /// </summary>
+        /// <returns>快照列表；库不可用或为空时返回空列表（不返回 <c>null</c>）。</returns>
+        public static List<KnowledgeEntrySnapshot> GetAllSnapshots()
+        {
+            List<KnowledgeEntrySnapshot> result = new List<KnowledgeEntrySnapshot>();
+            List<CommonKnowledgeEntry> all = CommonKnowledgeAPI.GetAllKnowledge();
+            if (all == null)
+            {
+                return result;
+            }
+
+            for (int i = 0; i < all.Count; i++)
+            {
+                CommonKnowledgeEntry entry = all[i];
+                if (entry == null)
+                {
+                    continue;
+                }
+
+                result.Add(new KnowledgeEntrySnapshot
+                {
+                    Id = entry.id,
+                    Tag = entry.tag,
+                    Content = entry.content,
+                    Importance = entry.importance,
+                    IsEnabled = entry.isEnabled
+                });
+            }
+            return result;
+        }
+
+        /// <summary>
         /// 把块文件原文导入上游常识库。
         /// </summary>
         /// <param name="text">块文件内容：每行一条，保持上游原格式。</param>

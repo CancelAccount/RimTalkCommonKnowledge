@@ -200,7 +200,7 @@ namespace RimtalkAutoFactionInfo
         /// 定位随包预设库目录 <c>&lt;mod 根目录&gt;/KnowledgeBase</c>。
         /// 未找到时输出一次性告警并返回 <c>null</c>。
         /// </summary>
-        private static string ResolveKnowledgeBaseDir()
+        internal static string ResolveKnowledgeBaseDir()
         {
             string root = FactionInfoMod.ContentRootDir;
             string baseDir = string.IsNullOrEmpty(root)
@@ -223,7 +223,7 @@ namespace RimtalkAutoFactionInfo
         /// 在预设库目录下按前缀找导入包目录（真实目录名带版本戳，如「mod层导入包-1008-0543」）。
         /// 多个共存时取字典序最大者（版本戳升序 → 最新）。
         /// </summary>
-        private static string FindBlockPackDir(string baseDir)
+        internal static string FindBlockPackDir(string baseDir)
         {
             string[] dirs = Directory.GetDirectories(
                 baseDir, FactionKnowledgeConfig.KNOWLEDGE_BLOCK_PACK_PREFIX + "*");
@@ -639,7 +639,7 @@ namespace RimtalkAutoFactionInfo
         /// <param name="tag">输出：标签（第 1 个子字段；整段缺失时取兜底标签）。</param>
         /// <param name="content">输出：标签框之后的全部内容（含展示层分类提示）。</param>
         /// <returns>解析出可导入条目返回 <c>true</c>；内容为空返回 <c>false</c>（上游会弃行）。</returns>
-        private static bool TryParseLine(string line, out string tag, out string content)
+        internal static bool TryParseLine(string line, out string tag, out string content)
         {
             tag = null;
             content = null;

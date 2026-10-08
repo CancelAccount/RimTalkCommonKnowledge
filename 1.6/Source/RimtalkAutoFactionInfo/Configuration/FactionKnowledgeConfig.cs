@@ -30,8 +30,19 @@ namespace RimtalkAutoFactionInfo
 
         // ---------- 前缀与标签 ----------
 
-        /// <summary>日志统一前缀，所有日志行以此开头，便于按本 mod 过滤。</summary>
+        /// <summary>日志统一前缀（纯文本），所有日志行以此开头，便于按本 mod 过滤。</summary>
         public const string LOG_PREFIX = "[派系常识]";
+
+        /// <summary>日志前缀的染色值（RGB 255,255,198，淡黄），供日志窗口按富文本解析。</summary>
+        public const string LOG_PREFIX_COLOR = "#FFFFC6";
+
+        /// <summary>
+        /// 实际输出的日志前缀：给 <see cref="LOG_PREFIX"/> 套一层淡黄染色。
+        /// 日志窗口按富文本渲染即显示为淡黄；写入 Player.log 等纯文本文件时会保留标签本身，
+        /// 过滤时搜 <see cref="LOG_PREFIX"/> 仍可命中（标签不隔断其中的文本）。
+        /// </summary>
+        public const string LOG_PREFIX_COLORED =
+            "<color=" + LOG_PREFIX_COLOR + ">" + LOG_PREFIX + "</color>";
 
         /// <summary>派系常识的内容前缀，同时作为「本 mod 注入」的幂等判定标记。</summary>
         public const string FACTION_CONTENT_PREFIX = "【派系】";
@@ -251,8 +262,24 @@ namespace RimtalkAutoFactionInfo
         public const string WARN_DUPLICATE_FACTION_TAG =
             "检测到同名派系（tag 相同），两条常识都会注入且不做消歧：{0} / {1}";
 
+        /// <summary>原版「古代人」派系（中立）的 defName。</summary>
+        public const string FACTION_DEFNAME_ANCIENTS = "Ancients";
+
+        /// <summary>原版「敌对古代人」派系的 defName（与 <see cref="FACTION_DEFNAME_ANCIENTS"/> 派系名相同，原版固定如此）。</summary>
+        public const string FACTION_DEFNAME_ANCIENTS_HOSTILE = "AncientsHostile";
+
+        /// <summary>
+        /// 原版这对同名古代人撞车时的吐槽（D21 特例）：两个 defName 不同、派系名却相同，
+        /// 属原版预期行为、无需处理，单独补一句让玩家知道这条重复不用管。
+        /// </summary>
+        public const string WARN_ANCIENTS_NAMESAKE_BANTER = "泰南你做古代人给我做好了口牙！";
+
         /// <summary>告警：单个条目文件读取失败。{0}=文件名，{1}=异常摘要。</summary>
         public const string WARN_KNOWLEDGE_BLOCK_READ_FAILED = "读取常识条目文件失败：{0} —— {1}";
+
+        /// <summary>告警：常识库界面优化补丁未能应用（上游界面结构可能已变）。{0}=异常摘要。</summary>
+        public const string WARN_COMMON_KNOWLEDGE_UI_PATCH_FAILED =
+            "常识库界面优化补丁未生效（上游界面结构可能已变），本次回退为上游默认行为：{0}";
 
         // ---------- 启动包信息与注入合计日志 ----------
 
@@ -270,6 +297,65 @@ namespace RimtalkAutoFactionInfo
 
         /// <summary>告警：读取主基地财富失败（触发全图重算时越界），本次省略财富段。{0}=异常摘要。</summary>
         public const string WARN_PLAYER_WEALTH_UNAVAILABLE = "读取主基地财富失败，本次省略我方派系的财富段：{0}";
+
+        // ---------- 上游常识库界面补丁（D48）----------
+        // 上游 Dialog_CommonKnowledge 的中心列表把 VirtualListView 建好却未调用其 Draw，
+        // 改成手写 foreach 全量绘制，条目一多就每帧拖垮界面。本 mod 只补一层「跳过不可见行」，
+        // 不改上游逻辑、不动其控件顺序。方法名与字段名是上游私有实现，改名即补丁自动跳过（见 WARN 常量）。
+
+        /// <summary>上游「中心列表」方法名（补丁在此记录滚动视口）。</summary>
+        public const string UPSTREAM_UI_METHOD_DRAW_CENTER_LIST = "DrawCenterList";
+
+        /// <summary>上游「单行绘制」方法名（补丁在此按可见性裁剪）。</summary>
+        public const string UPSTREAM_UI_METHOD_DRAW_ENTRY_ROW = "DrawEntryRow";
+
+        /// <summary>上游中心列表的滚动位置私有字段名。</summary>
+        public const string UPSTREAM_UI_FIELD_LIST_SCROLL_POSITION = "listScrollPosition";
+
+        /// <summary>告警占位：上游目标方法 / 字段未找到（拼进 WARN_COMMON_KNOWLEDGE_UI_PATCH_FAILED 的 {0}）。</summary>
+        public const string UPSTREAM_UI_PATCH_TARGET_MISSING = "上游方法或字段未找到";
+
+        /// <summary>
+        /// 上游中心列表外框与滚动视口之间的边距合计：上游用 <c>GenUI.ContractedBy(rect, 5f)</c>，上下各 5。
+        /// 视口高度 = 外框高度 − 本值。
+        /// </summary>
+        public const float UPSTREAM_UI_VIEWPORT_PADDING = 10f;
+
+        /// <summary>
+        /// 可见性裁剪的额外余量（内容坐标）：视口外再多绘一行的厚度，避免行在视口边缘反复进出时闪烁。
+        /// 取值等于上游行高（70）。
+        /// </summary>
+        public const float UPSTREAM_UI_CULL_MARGIN = 70f;
+
+        // ---------- 上游常识库界面入口按钮（FR-17）----------
+        // 在 Dialog_CommonKnowledge 的工具栏里追加一个「常识管理」按钮，点击打开本 mod 的管理窗口。
+        // 横向位置取上游搜索框（宽 300、左内边距 5）右侧的空白处，避开其右对齐的按钮组。
+
+        /// <summary>上游「工具栏」方法名（补丁在其绘制完成后追加入口按钮）。</summary>
+        public const string UPSTREAM_UI_METHOD_DRAW_TOOLBAR = "DrawToolbar";
+
+        /// <summary>入口按钮文案。</summary>
+        public const string UPSTREAM_UI_MANAGER_BUTTON_LABEL = "自动注入常识管理";
+
+        /// <summary>入口按钮的悬停说明。</summary>
+        public const string UPSTREAM_UI_MANAGER_BUTTON_TIP =
+            "打开自动注入常识mod的管理页面，可查看常识条目来源";
+
+        /// <summary>入口按钮在工具栏内的横向偏移（左内边距 5 + 上游搜索框 300 + 间距 10）。</summary>
+        public const float UPSTREAM_UI_MANAGER_BUTTON_OFFSET_X = 315f;
+
+        /// <summary>入口按钮在工具栏内的纵向偏移（上游工具栏内边距 5 + 控件内边距 5）。</summary>
+        public const float UPSTREAM_UI_MANAGER_BUTTON_OFFSET_Y = 10f;
+
+        /// <summary>入口按钮宽度。</summary>
+        public const float UPSTREAM_UI_MANAGER_BUTTON_WIDTH = 200f;
+
+        /// <summary>入口按钮高度（与上游工具栏按钮一致）。</summary>
+        public const float UPSTREAM_UI_MANAGER_BUTTON_HEIGHT = 32f;
+
+        /// <summary>告警：上游常识库界面入口按钮补丁未生效。{0}=异常摘要或目标缺失说明。</summary>
+        public const string WARN_COMMON_KNOWLEDGE_MANAGER_BUTTON_PATCH_FAILED =
+            "常识库界面「常识管理」入口按钮补丁未生效，界面不显示该按钮：{0}";
 
         // ---------- 日志 key（供 KnowledgeLog.WarnOnce 去重）----------
 
@@ -299,5 +385,14 @@ namespace RimtalkAutoFactionInfo
 
         /// <summary>日志 key：包内存在但索引文件缺行的模组文件。</summary>
         public const int LOG_KEY_KNOWLEDGE_PACK_FILE_UNMAPPED = 9;
+
+        /// <summary>日志 key：常识库界面优化补丁未生效。</summary>
+        public const int LOG_KEY_COMMON_KNOWLEDGE_UI_PATCH_FAILED = 10;
+
+        /// <summary>日志 key：常识库界面入口按钮补丁未生效。</summary>
+        public const int LOG_KEY_COMMON_KNOWLEDGE_MANAGER_BUTTON_PATCH_FAILED = 11;
+
+        /// <summary>日志 key：原版 Ancients / AncientsHostile 同名派系撞车（D21 特例吐槽）。</summary>
+        public const int LOG_KEY_ANCIENTS_NAMESAKE_BANTER = 12;
     }
 }
