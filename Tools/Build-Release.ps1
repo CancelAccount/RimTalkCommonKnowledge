@@ -1,6 +1,6 @@
 ﻿<#
 .SYNOPSIS
-    Rimtalk Auto Faction Info 打包脚本：一次运行同时产出 Release 包与 Debug 包。
+    RimTalk 常识+ 打包脚本：一次运行同时产出 Release 包与 Debug 包。
 
 .DESCRIPTION
     版本号唯一来源为 About/About.xml 的 <modVersion>，脚本负责：
@@ -11,7 +11,7 @@
          开发目录（Source / AssembliesDebug 等）在复制阶段即排除；
       4. Debug 包把包内 <modVersion> 改写为 "<版本>-debug"，仓库原文件不动；
       5. 压缩为 dist/ 下的两个 zip（UTF-8 条目名，兼容中文文件名）。
-    前置要求（已在 1.6\Source\RimtalkAutoFactionInfo.csproj 中配置）：
+    前置要求（已在 1.6\Source\RimTalkCommonKnowledge.csproj 中配置）：
       - Debug/Release 输出目录隔离（AssembliesDebug / Assemblies）
       - <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
       - <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
@@ -36,8 +36,8 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
 # ==== 可配置项（按目标 mod 修改）====
-$PackageName    = 'RimtalkAutoFactionInfo'              # 发布包顶层文件夹名（zip 解压后的目录名，通常等于 mod 文件夹名）
-$AssemblyName   = 'RimtalkAutoFactionInfo'              # 编译产物 dll 名（取自 csproj 项目名，不含 .dll）
+$PackageName    = 'RimTalkCommonKnowledge'              # 发布包顶层文件夹名（zip 解压后的目录名，通常等于 mod 文件夹名）
+$AssemblyName   = 'RimTalkCommonKnowledge'              # 编译产物 dll 名（取自 csproj 项目名，不含 .dll）
 $GameVersionDir = '1.6'                                 # 游戏版本目录
 $RequiredDirs   = @('About', 'KnowledgeBase')           # 发布包必需目录（缺失即报错）
 $IncludeDirs    = @('About', 'KnowledgeBase')           # 进入发布包的目录白名单；KnowledgeBase=常识库数据（按 modid 注入的资产，必须随包）

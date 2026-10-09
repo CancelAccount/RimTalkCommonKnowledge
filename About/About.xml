@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ModMetaData>
-  <name>Rimtalk Auto Faction Info</name>
+  <name>RimTalk 常识+ Rimtalk Common Knowledge+</name>
   <author>Cancelation</author>
-  <packageId>Cancelation.RimtalkAutoFactionInfo</packageId>
-  <modVersion>2026.10.03</modVersion>
+  <packageId>Cancelation.RimTalkCommonKnowledge</packageId>
+  <modVersion>2026.10.10</modVersion>
   <supportedVersions>
     <li>1.6</li>
   </supportedVersions>
   <description>
-    Rimtalk自动注入派系常识：
-    需要依赖Rimtalk记忆扩展。
-    创建存档时，自动获取派系的相关信息并注入到常识库中。
+    需要依赖 RimTalk 记忆扩展。
+    自动把世界各派系的身份、意识形态、与我方关系、领袖与据点，我方派系概况，以及异种人设定整理为常识写入常识库并定期更新；
+    按订阅的模组动态导入社区常识库，并提供本 mod 自建的常识管理页面。
 
-    Rimtalk Auto Faction Info:
-    Need Rimtalk-Expand Memory.
-    Inject faction info into Rimtalk memory when creating a new save.
+    Requires RimTalk-Expand Memory.
+    Injects faction, xenotype and player-colony knowledge into the RimTalk common knowledge library, and updates it periodically.
+       dynamically imports community knowledge based on subscribed mods, and ships a knowledge manager.
   </description>
   <loadAfter>
     <li>brrainz.harmony</li>
