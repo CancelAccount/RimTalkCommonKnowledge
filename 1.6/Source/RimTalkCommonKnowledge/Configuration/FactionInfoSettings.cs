@@ -101,12 +101,6 @@ namespace RimTalkCommonKnowledge
         /// </summary>
         public bool enableKnowledgeUiOptimization = true;
 
-        /// <summary>
-        /// 玩家自建的自定义子页（FR-16 / D49）：每个子页是一个有名字的条目集合，
-        /// 由常识管理页面手工挑选条目组成。随设置文件持久化，不写入上游常识库。
-        /// </summary>
-        public List<KnowledgeSubPage> customKnowledgePages = new List<KnowledgeSubPage>();
-
         /// <summary>读写设置文件（引擎在载入与关闭设置窗时调用）。</summary>
         public override void ExposeData()
         {
@@ -147,19 +141,6 @@ namespace RimTalkCommonKnowledge
             Scribe_Values.Look(ref showCompositionInFactionUi, FactionKnowledgeConfig.SETTINGS_KEY_SHOW_UI_COMPOSITION, true);
             Scribe_Values.Look(ref enableKnowledgeUiOptimization,
                 FactionKnowledgeConfig.SETTINGS_KEY_ENABLE_KNOWLEDGE_UI_OPTIMIZATION, true);
-
-            Scribe_Collections.Look(ref customKnowledgePages,
-                FactionKnowledgeConfig.SETTINGS_KEY_CUSTOM_KNOWLEDGE_PAGES, LookMode.Deep);
-            if (customKnowledgePages == null)
-            {
-                customKnowledgePages = new List<KnowledgeSubPage>();
-            }
-            else if (Scribe.mode == LoadSaveMode.PostLoadInit)
-            {
-                // 清理脏数据：空项、成员表为空的项、名称为空的项（老存档 / 手改文件都可能出现）。
-                customKnowledgePages.RemoveAll(page =>
-                    page == null || string.IsNullOrEmpty(page.name) || page.entryIds == null);
-            }
         }
 
         // ==================== 静态生效值 ====================
@@ -390,24 +371,13 @@ namespace RimTalkCommonKnowledge
         }
 
         /// <summary>
-        /// 生效的自定义子页列表（FR-16 / D49）。
-        /// 设置尚未载入时返回 <c>null</c>，调用方须判空；返回的是设置内的活列表，可直接增删。
+        /// 生效的自定义子页列表（FR-16 / D49 / D66）。
+        /// 自 D66 起子页迁入存档内 <see cref="FactionKnowledgeComponent"/>（成员是上游按存档分配的条目 id，
+        /// 跨存档持久化必然失配）；本属性仅为转发访问口，无存档时返回 <c>null</c>，调用方须判空。
         /// </summary>
         public static List<KnowledgeSubPage> CustomKnowledgePages
         {
-            get
-            {
-                FactionInfoSettings s = Instance;
-                if (s == null)
-                {
-                    return null;
-                }
-                if (s.customKnowledgePages == null)
-                {
-                    s.customKnowledgePages = new List<KnowledgeSubPage>();
-                }
-                return s.customKnowledgePages;
-            }
+            get { return FactionKnowledgeComponent.CurrentPages; }
         }
 
         /// <summary>把整数钳制到 <paramref name="min"/>~<paramref name="max"/>（含端点）。</summary>

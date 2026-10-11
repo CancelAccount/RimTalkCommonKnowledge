@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using LudeonTK;
 using Verse;
 
 namespace RimTalkCommonKnowledge
@@ -35,6 +36,9 @@ namespace RimTalkCommonKnowledge
 
         /// <summary>重要度输入缓冲（按文本解析，允许玩家直接填数字）。</summary>
         private string importanceBuffer;
+
+        /// <summary>正文多行文本域的滚动位置（D68：TextAreaScrollable 需要外挂滚动状态）。</summary>
+        private Vector2 contentScrollPos = Vector2.zero;
 
         /// <summary>启用复选框值。</summary>
         private bool enabledValue;
@@ -131,14 +135,17 @@ namespace RimTalkCommonKnowledge
             get { return !isNew && ShowLockOptionFor(snapshot); }
         }
 
-        /// <summary>快照对应的条目是否为需要锁定保护的本 mod 派系注入条目。</summary>
+        /// <summary>
+        /// 快照对应的条目是否为需要锁定保护的本 mod 派系注入条目。
+        /// 匹配**全部语言变体**：切换游戏语言后，旧语言注入的条目仍须提供锁定开关。
+        /// </summary>
         /// <param name="entry">待判定快照。</param>
         private static bool ShowLockOptionFor(KnowledgeEntrySnapshot entry)
         {
             return entry != null
                 && !string.IsNullOrEmpty(entry.Content)
-                && entry.Content.StartsWith(
-                    FactionKnowledgeConfig.FACTION_CONTENT_PREFIX, StringComparison.Ordinal);
+                && RimTalkMemoryBridge.StartsWithAny(
+                    entry.Content, FactionKnowledgeConfig.FACTION_CONTENT_PREFIX_VARIANTS);
         }
 
         /// <summary>窗口正文：标题 + 表单（标签 / 正文 / 重要度+启用 / 锁定）+ 错误行 + 保存 / 取消。</summary>
@@ -289,7 +296,8 @@ namespace RimTalkCommonKnowledge
 
             // 显式控件名：让 GUI 稳定维持该文本域焦点（本框仅一个文本域，属防御性写法）
             GUI.SetNextControlName("CKEditorContentArea");
-            string value = Widgets.TextArea(areaRect, buffer ?? string.Empty);
+            // D68：用 LudeonTK 的可滚动文本域替换 Widgets.TextArea
+            string value = DevGUI.TextAreaScrollable(areaRect, buffer ?? string.Empty, ref contentScrollPos);
             buffer = ClampChars(value, maxChars);
         }
 

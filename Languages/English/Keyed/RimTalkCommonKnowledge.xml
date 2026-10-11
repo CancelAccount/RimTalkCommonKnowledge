@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+
+  <!-- ========== Content prefixes (recognition markers for injected entries; new entries follow game language) ========== -->
+  <RTCK.Prefix.Faction>[Faction]</RTCK.Prefix.Faction>
+  <RTCK.Prefix.Xenotype>[Xenotype]</RTCK.Prefix.Xenotype>
+
+  <!-- ========== Injection templates: regular factions ========== -->
+  <RTCK.Tpl.FactionIdentity>{0} is a {1} faction with tech level {2}.</RTCK.Tpl.FactionIdentity>
+  <RTCK.Tpl.FactionIdentityNoTech>{0} is a {1} faction.</RTCK.Tpl.FactionIdentityNoTech>
+  <RTCK.Tpl.FactionIdentitySame>{0}, tech level {1}.</RTCK.Tpl.FactionIdentitySame>
+  <RTCK.Tpl.FactionIdentitySameNoTech>{0}.</RTCK.Tpl.FactionIdentitySameNoTech>
+  <RTCK.Tpl.FactionDescription>{0}.</RTCK.Tpl.FactionDescription>
+  <RTCK.Tpl.FactionIdeo>They follow the "{0}" ideoligion; its core memes are {1}.</RTCK.Tpl.FactionIdeo>
+  <RTCK.Tpl.FactionIdeoNoMemes>They follow the "{0}" ideoligion.</RTCK.Tpl.FactionIdeoNoMemes>
+  <RTCK.Tpl.FactionRelation>Our relationship with {0} is {1}.</RTCK.Tpl.FactionRelation>
+  <RTCK.Tpl.FactionGoodwill>Their goodwill toward us is {0}.</RTCK.Tpl.FactionGoodwill>
+  <RTCK.Tpl.FactionLeader>The leader of {0} is {1}.</RTCK.Tpl.FactionLeader>
+  <RTCK.Tpl.FactionLeaderNone>{0} currently has no known leader.</RTCK.Tpl.FactionLeaderNone>
+  <RTCK.Tpl.FactionSettlementCount>They have {0} settlements on the world map.</RTCK.Tpl.FactionSettlementCount>
+  <RTCK.Tpl.FactionSettlementNearest>The nearest one is about {0} tiles away from us.</RTCK.Tpl.FactionSettlementNearest>
+  <RTCK.Tpl.FactionMemberRaces>Their alien race members include {0}.</RTCK.Tpl.FactionMemberRaces>
+  <RTCK.Tpl.FactionMembers>Their members are mostly {0}.</RTCK.Tpl.FactionMembers>
+  <RTCK.Tpl.FactionMembersItem>{0} (about {1})</RTCK.Tpl.FactionMembersItem>
+
+  <!-- ========== Injection templates: faction UI "actual members" block ========== -->
+  <RTCK.Tpl.UiCompositionKindXenotypes>Their members include the following xenotypes: {0}.</RTCK.Tpl.UiCompositionKindXenotypes>
+  <RTCK.Tpl.UiCompositionMemberRacesTitle>Alien races</RTCK.Tpl.UiCompositionMemberRacesTitle>
+
+  <!-- ========== Injection templates: player faction ========== -->
+  <RTCK.Tpl.PlayerIdentityPrefix>"{0}"</RTCK.Tpl.PlayerIdentityPrefix>
+  <!-- ⚠ Recognition marker for recovering old player entries: any change must sync FactionKnowledgeConfig.PLAYER_IDENTITY_SUFFIX_VARIANTS -->
+  <RTCK.Tpl.PlayerIdentitySuffix> is the faction we belong to.</RTCK.Tpl.PlayerIdentitySuffix>
+  <RTCK.Tpl.PlayerScenario>Our starting scenario is "{0}".</RTCK.Tpl.PlayerScenario>
+  <RTCK.Tpl.PlayerPopulation>We have {0} colonists{1}.</RTCK.Tpl.PlayerPopulation>
+  <RTCK.Tpl.PlayerPopulationExtraLead>, plus </RTCK.Tpl.PlayerPopulationExtraLead>
+  <RTCK.Tpl.PlayerPopulationExtraItem>{0} {1}</RTCK.Tpl.PlayerPopulationExtraItem>
+  <RTCK.Tpl.PlayerPopLabelTemporary>temporary members</RTCK.Tpl.PlayerPopLabelTemporary>
+  <RTCK.Tpl.PlayerPopLabelPrisoner>prisoners</RTCK.Tpl.PlayerPopLabelPrisoner>
+  <RTCK.Tpl.PlayerPopLabelSlave>slaves</RTCK.Tpl.PlayerPopLabelSlave>
+  <RTCK.Tpl.PlayerMechs>We also have {0}.</RTCK.Tpl.PlayerMechs>
+  <RTCK.Tpl.PlayerMechsNone>We currently have no friendly mechanoids.</RTCK.Tpl.PlayerMechsNone>
+  <RTCK.Tpl.PlayerMechsItem>{0} {1}</RTCK.Tpl.PlayerMechsItem>
+  <RTCK.Tpl.PlayerSettlements>Our settlements are {0}.</RTCK.Tpl.PlayerSettlements>
+  <RTCK.Tpl.PlayerSettlementsNone>We don't have any permanent settlements yet.</RTCK.Tpl.PlayerSettlementsNone>
+  <RTCK.Tpl.PlayerClimate>The climate at our colony is {0}.</RTCK.Tpl.PlayerClimate>
+  <RTCK.Tpl.PlayerGravship>The gravship "{0}" has been stationed here for {1}.</RTCK.Tpl.PlayerGravship>
+  <RTCK.Tpl.PlayerGravshipBare>We have a gravship named "{0}".</RTCK.Tpl.PlayerGravshipBare>
+  <RTCK.Tpl.PlayerAge>This faction has been established for {0}.</RTCK.Tpl.PlayerAge>
+  <RTCK.Tpl.PlayerWealth>The wealth of our main base is about {0}.</RTCK.Tpl.PlayerWealth>
+
+  <!-- ========== Injection templates: xenotypes (first keys embed the content prefix — do not split) ========== -->
+  <RTCK.Tpl.XenotypeIntro>[Xenotype] {0}: {1}</RTCK.Tpl.XenotypeIntro>
+  <RTCK.Tpl.XenotypeIntroBare>[Xenotype] {0}</RTCK.Tpl.XenotypeIntroBare>
+  <RTCK.Tpl.XenotypeGenes>Signature genes: {0}.</RTCK.Tpl.XenotypeGenes>
+  <RTCK.Tpl.XenotypeNoGenes>They have no special genes and are naturally evolved humans.</RTCK.Tpl.XenotypeNoGenes>
+  <RTCK.Tpl.XenotypeFactions>They are mostly found among {0}.</RTCK.Tpl.XenotypeFactions>
+  <RTCK.Tpl.ListSeparator>, </RTCK.Tpl.ListSeparator>
+
+  <!-- ========== Settings page: section headers ========== -->
+  <RTCK.Set.SectionInjection>Injection timing</RTCK.Set.SectionInjection>
+  <RTCK.Set.SectionFactionSections>Faction knowledge sections</RTCK.Set.SectionFactionSections>
+  <RTCK.Set.SectionImportance>Importance &amp; category</RTCK.Set.SectionImportance>
+  <RTCK.Set.SectionXenotype>Xenotype knowledge (requires Biotech)</RTCK.Set.SectionXenotype>
+  <RTCK.Set.SectionLog>Logging</RTCK.Set.SectionLog>
+  <RTCK.Set.SectionUi>UI enhancements</RTCK.Set.SectionUi>
+
+  <!-- ========== Settings page: options &amp; tooltips ========== -->
+  <RTCK.Set.EnableInjection>Enable knowledge injection (master switch)</RTCK.Set.EnableInjection>
+  <RTCK.Set.EnableInjectionTip>When off, no knowledge is written on new game, load, or periodic correction; existing entries are unaffected.</RTCK.Set.EnableInjectionTip>
+  <RTCK.Set.EnableBackfillOnLoad>Correct on load (backfill &amp; refresh)</RTCK.Set.EnableBackfillOnLoad>
+  <RTCK.Set.EnableBackfillOnLoadTip>Compares entries on load: adds missing ones, rewrites stale ones, leaves identical ones untouched. When off, this only runs on new game and periodic correction.</RTCK.Set.EnableBackfillOnLoadTip>
+  <RTCK.Set.EnablePeriodicRefresh>Periodic correction while playing</RTCK.Set.EnablePeriodicRefresh>
+  <RTCK.Set.EnablePeriodicRefreshTip>Polls at the interval below so changes in relations, goodwill, leaders and settlements stay up to date. When off, correction only runs on new game / load.</RTCK.Set.EnablePeriodicRefreshTip>
+  <RTCK.Set.RefreshIntervalHours>Correction interval (in-game hours)</RTCK.Set.RefreshIntervalHours>
+  <RTCK.Set.RefreshIntervalHoursTip>Default: 1 hour. Polling only reads and compares without writing, so the cost is minimal; shorter intervals are timelier.</RTCK.Set.RefreshIntervalHoursTip>
+  <RTCK.Set.GoodwillRefreshThreshold>Goodwill rewrite threshold</RTCK.Set.GoodwillRefreshThreshold>
+  <RTCK.Set.GoodwillRefreshThresholdTip>Entries are not rewritten for pure numeric fluctuations when goodwill changed by less than this and nothing else changed. Default: 10.</RTCK.Set.GoodwillRefreshThresholdTip>
+  <RTCK.Set.EnableKnowledgeBaseImport>Import bundled preset library</RTCK.Set.EnableKnowledgeBaseImport>
+  <RTCK.Set.EnableKnowledgeBaseImportTip>On new game / load, imports entry files from the bundled community knowledge library that match currently enabled mods (including each block's shared entries): deduplicates by tag + content, fills gaps, and keeps the community's original importance. Players who only subscribe to a base mod without its expansions won't receive expansion content. Entries you delete manually are restored on the next new game / load. When off, nothing is written via this path.</RTCK.Set.EnableKnowledgeBaseImportTip>
+  <RTCK.Set.EnableBuiltinKnowledgeImport>Also import vanilla &amp; general knowledge</RTCK.Set.EnableBuiltinKnowledgeImport>
+  <RTCK.Set.EnableBuiltinKnowledgeImportTip>Additionally imports vanilla entries (only for DLCs you own) and mod-independent shared blocks (e.g. "custom knowledge") from the preset library. Large volume. Off by default.</RTCK.Set.EnableBuiltinKnowledgeImportTip>
+  <RTCK.Set.IncludeIdentity>Write "identity" section</RTCK.Set.IncludeIdentity>
+  <RTCK.Set.IncludeIdentityTip>Faction name, type label and tech level. When off, this section is omitted (player faction entries are unaffected).</RTCK.Set.IncludeIdentityTip>
+  <RTCK.Set.IncludeIdeology>Write "ideology" section</RTCK.Set.IncludeIdeology>
+  <RTCK.Set.IncludeIdeologyTip>Primary ideoligion and its memes. Automatically skipped without the Ideology DLC.</RTCK.Set.IncludeIdeologyTip>
+  <RTCK.Set.IncludeRelation>Write "relationship with us" section</RTCK.Set.IncludeRelation>
+  <RTCK.Set.IncludeRelationTip>Relation kind and goodwill. When off, this section is omitted.</RTCK.Set.IncludeRelationTip>
+  <RTCK.Set.IncludeSettlements>Write "leader &amp; settlements" section</RTCK.Set.IncludeSettlements>
+  <RTCK.Set.IncludeSettlementsTip>Leader name, settlement count and nearest distance. When off, this section is omitted.</RTCK.Set.IncludeSettlementsTip>
+  <RTCK.Set.KnowledgeImportancePlayer>Player faction entry importance</RTCK.Set.KnowledgeImportancePlayer>
+  <RTCK.Set.KnowledgeImportancePlayerTip>0-1, default 0.95.</RTCK.Set.KnowledgeImportancePlayerTip>
+  <RTCK.Set.KnowledgeImportanceOther>Other faction / xenotype entry importance</RTCK.Set.KnowledgeImportanceOther>
+  <RTCK.Set.KnowledgeImportanceOtherTip>0-1, default 0.80.</RTCK.Set.KnowledgeImportanceOtherTip>
+  <RTCK.Set.CategoryAlwaysLore>Always categorize entries as "Lore"</RTCK.Set.CategoryAlwaysLore>
+  <RTCK.Set.CategoryAlwaysLoreTip>When off, the upstream mod guesses the category from tags (which in practice lands on "Misc"); this only affects knowledge library UI grouping.</RTCK.Set.CategoryAlwaysLoreTip>
+  <RTCK.Set.IncludeXenotypes>Write standalone xenotype knowledge entries</RTCK.Set.IncludeXenotypes>
+  <RTCK.Set.IncludeXenotypesTip>Requires the Biotech DLC; skipped entirely without it. When off, the member composition section of faction entries is unaffected.</RTCK.Set.IncludeXenotypesTip>
+  <RTCK.Set.IncludeFactionXenotypeRefs>Write faction-xenotype cross-references</RTCK.Set.IncludeFactionXenotypeRefs>
+  <RTCK.Set.IncludeFactionXenotypeRefsTip>The "member composition" section of faction entries plus the "found among factions" section of xenotype entries; also controls whether faction tags list their signature xenotypes, so that mentioning a xenotype never surfaces an entry lacking that information.</RTCK.Set.IncludeFactionXenotypeRefsTip>
+  <RTCK.Set.XenotypeGeneCount>Signature genes per xenotype entry</RTCK.Set.XenotypeGeneCount>
+  <RTCK.Set.XenotypeGeneCountTip>0 means no gene section. Default: 4.</RTCK.Set.XenotypeGeneCountTip>
+  <RTCK.Set.EnableVerboseLog>Verbose per-entry logging</RTCK.Set.EnableVerboseLog>
+  <RTCK.Set.EnableVerboseLogTip>By default only summaries and counts are logged. When on, the full content of every faction / xenotype entry is logged.</RTCK.Set.EnableVerboseLogTip>
+  <RTCK.Set.Reinject>Re-inject into current save now</RTCK.Set.Reinject>
+  <RTCK.Set.ReinjectTip>Re-runs injection and correction on the current save, so you can see the effect of changed settings immediately without starting a new save.</RTCK.Set.ReinjectTip>
+  <RTCK.Set.ReinjectNoGameTip>No game is currently loaded.</RTCK.Set.ReinjectNoGameTip>
+  <RTCK.Set.ShowUiComposition>Show actual member composition in faction UI</RTCK.Set.ShowUiComposition>
+  <RTCK.Set.ShowUiCompositionTip>Appends an "actual members" line to faction tooltips and info cards. Fixes vanilla member statistics misreporting "Baseliner 100%" for HAR-race / pawnkind-level xenotype factions.</RTCK.Set.ShowUiCompositionTip>
+  <RTCK.Set.EnableKnowledgeUiOptimization>Optimize knowledge UI scrolling</RTCK.Set.EnableKnowledgeUiOptimization>
+  <RTCK.Set.EnableKnowledgeUiOptimizationTip>Hides off-screen knowledge entries to improve scrolling performance.</RTCK.Set.EnableKnowledgeUiOptimizationTip>
+  <RTCK.Set.OpenManager>Open knowledge manager</RTCK.Set.OpenManager>
+  <RTCK.Set.OpenManagerTip>Manage knowledge injected by this mod, organized by pack</RTCK.Set.OpenManagerTip>
+  <RTCK.Set.SliderLabelFormat>{0}: {1}{2}</RTCK.Set.SliderLabelFormat>
+  <RTCK.Set.UnitHours> h</RTCK.Set.UnitHours>
+  <RTCK.Set.UnitEntries></RTCK.Set.UnitEntries>
+
+  <!-- ========== Knowledge manager window ========== -->
+  <RTCK.Mgr.Title>Knowledge Manager (right-click to edit entries)</RTCK.Mgr.Title>
+  <RTCK.Mgr.NavAll>All entries</RTCK.Mgr.NavAll>
+  <RTCK.Mgr.NavOwn>Auto-injected</RTCK.Mgr.NavOwn>
+  <RTCK.Mgr.NavOwnFaction>Faction info</RTCK.Mgr.NavOwnFaction>
+  <RTCK.Mgr.NavOwnXenotype>Xenotype info</RTCK.Mgr.NavOwnXenotype>
+  <RTCK.Mgr.NavUser>Custom library</RTCK.Mgr.NavUser>
+  <RTCK.Mgr.NavPreset>Preset library</RTCK.Mgr.NavPreset>
+  <RTCK.Mgr.NavCustom>Custom pages</RTCK.Mgr.NavCustom>
+  <RTCK.Mgr.NewPage>+ New page</RTCK.Mgr.NewPage>
+  <RTCK.Mgr.AddToPage>Add checked to page</RTCK.Mgr.AddToPage>
+  <RTCK.Mgr.RemoveFromPage>Remove checked from page</RTCK.Mgr.RemoveFromPage>
+  <RTCK.Mgr.RenamePage>Rename</RTCK.Mgr.RenamePage>
+  <RTCK.Mgr.DeletePage>Delete</RTCK.Mgr.DeletePage>
+  <RTCK.Mgr.Confirm>OK</RTCK.Mgr.Confirm>
+  <RTCK.Mgr.Cancel>Cancel</RTCK.Mgr.Cancel>
+  <RTCK.Mgr.SelectAll>Select all</RTCK.Mgr.SelectAll>
+  <RTCK.Mgr.ClearSelection>Clear selection</RTCK.Mgr.ClearSelection>
+  <RTCK.Mgr.Refresh>Refresh</RTCK.Mgr.Refresh>
+  <RTCK.Mgr.SearchPlaceholder>Search tags or content...</RTCK.Mgr.SearchPlaceholder>
+  <RTCK.Mgr.NoGame>No game is currently loaded; the knowledge library is unavailable.</RTCK.Mgr.NoGame>
+  <RTCK.Mgr.NoPageTip>Create or select a page under "Custom pages" on the left first.</RTCK.Mgr.NoPageTip>
+  <RTCK.Mgr.ConfirmDelete>Delete this page?</RTCK.Mgr.ConfirmDelete>
+  <RTCK.Mgr.NewEntry>New entry</RTCK.Mgr.NewEntry>
+  <RTCK.Mgr.EditEntry>Edit selected</RTCK.Mgr.EditEntry>
+  <RTCK.Mgr.DeleteEntries>Delete selected</RTCK.Mgr.DeleteEntries>
+  <RTCK.Mgr.EditSingleTip>Editing supports a single entry; please check exactly one.</RTCK.Mgr.EditSingleTip>
+  <RTCK.Mgr.NoSelectionTip>Check at least one entry first.</RTCK.Mgr.NoSelectionTip>
+  <RTCK.Mgr.LockedSuffix> (locked)</RTCK.Mgr.LockedSuffix>
+  <RTCK.Mgr.BatchEnable>Enable checked</RTCK.Mgr.BatchEnable>
+  <RTCK.Mgr.BatchDisable>Disable checked</RTCK.Mgr.BatchDisable>
+  <RTCK.Mgr.BatchEnableResultFormat>Enabled {0} checked entries.</RTCK.Mgr.BatchEnableResultFormat>
+  <RTCK.Mgr.BatchDisableResultFormat>Disabled {0} checked entries.</RTCK.Mgr.BatchDisableResultFormat>
+  <RTCK.Mgr.ConfirmDeleteEntriesFormat>Delete the selected {0} knowledge entries?</RTCK.Mgr.ConfirmDeleteEntriesFormat>
+  <RTCK.Mgr.DeleteOwnWarning>Note: entries auto-injected by this mod will be re-injected on the next periodic refresh after deletion; to remove them permanently, disable the corresponding option in mod settings.</RTCK.Mgr.DeleteOwnWarning>
+  <RTCK.Mgr.ImportEntries>Import entries</RTCK.Mgr.ImportEntries>
+  <RTCK.Mgr.ExportEntries>Export entries</RTCK.Mgr.ExportEntries>
+  <RTCK.Mgr.ExportTip>Exports all checked entries if any, otherwise all entries in the current list; content is copied to the system clipboard.</RTCK.Mgr.ExportTip>
+  <RTCK.Mgr.ImportTip>Reads knowledge text from the system clipboard: paste the upstream standard format (one entry per line); preview and deduplication available before importing.</RTCK.Mgr.ImportTip>
+  <RTCK.Mgr.ExportResultFormat>Copied {0} knowledge entries to the clipboard.</RTCK.Mgr.ExportResultFormat>
+  <RTCK.Mgr.ExportEmpty>There are no entries to export.</RTCK.Mgr.ExportEmpty>
+  <RTCK.Mgr.CountFormat>{0} shown / {1} total, {2} checked</RTCK.Mgr.CountFormat>
+  <RTCK.Mgr.DefaultPageName>New page {0}</RTCK.Mgr.DefaultPageName>
+  <RTCK.Mgr.BlockRowFormat>{0} ({1} mods)</RTCK.Mgr.BlockRowFormat>
+  <RTCK.Mgr.PageRowFormat>{0} ({1})</RTCK.Mgr.PageRowFormat>
+  <RTCK.Mgr.RowSourceSeparator> — </RTCK.Mgr.RowSourceSeparator>
+  <RTCK.Mgr.EntryButtonLabel>Manage Injected Knowledge</RTCK.Mgr.EntryButtonLabel>
+  <RTCK.Mgr.EntryButtonTip>Open the management page of the auto-injection knowledge mod to view the source of each entry</RTCK.Mgr.EntryButtonTip>
+
+  <!-- ========== Import dialog ========== -->
+  <RTCK.Imp.Title>Import Knowledge Entries</RTCK.Imp.Title>
+  <RTCK.Imp.Paste>Read clipboard</RTCK.Imp.Paste>
+  <RTCK.Imp.Clear>Clear</RTCK.Imp.Clear>
+  <RTCK.Imp.SkipDuplicates>Skip duplicate entries (by tag + content)</RTCK.Imp.SkipDuplicates>
+  <RTCK.Imp.DuplicateWarning>Deduplication is off: entries already in the library and duplicate lines in the text will be added again.</RTCK.Imp.DuplicateWarning>
+  <RTCK.Imp.StatsFormat>Found {0} valid lines; {1} will be imported</RTCK.Imp.StatsFormat>
+  <RTCK.Imp.ErrorEmpty>There is nothing to import.</RTCK.Imp.ErrorEmpty>
+  <RTCK.Imp.ErrorAllDuplicate>All valid entries already exist; there is nothing new to import.</RTCK.Imp.ErrorAllDuplicate>
+  <RTCK.Imp.ResultFormat>Successfully imported {0} knowledge entries.</RTCK.Imp.ResultFormat>
+  <RTCK.Imp.AddedToPageFormat>{0} of them were added to the selected page "{1}".</RTCK.Imp.AddedToPageFormat>
+
+  <!-- ========== Edit dialog ========== -->
+  <RTCK.Edt.TitleEdit>Edit Knowledge Entry</RTCK.Edt.TitleEdit>
+  <RTCK.Edt.TitleNew>New Knowledge Entry</RTCK.Edt.TitleNew>
+  <RTCK.Edt.TagLabel>Tag</RTCK.Edt.TagLabel>
+  <RTCK.Edt.ContentLabel>Content</RTCK.Edt.ContentLabel>
+  <RTCK.Edt.ImportanceLabel>Importance</RTCK.Edt.ImportanceLabel>
+  <RTCK.Edt.Enabled>Enable this entry</RTCK.Edt.Enabled>
+  <RTCK.Edt.ExtensionLabel>Extensions</RTCK.Edt.ExtensionLabel>
+  <RTCK.Edt.ExtractLabel>Allow extraction</RTCK.Edt.ExtractLabel>
+  <RTCK.Edt.MatchLabel>Allow matching</RTCK.Edt.MatchLabel>
+  <RTCK.Edt.ExtractTip>When on, this entry's content can be exported as a memory cue when NPCs form long-term memories; when off, it never participates in extraction.</RTCK.Edt.ExtractTip>
+  <RTCK.Edt.MatchTip>When on, this entry can be hit by related text during chained association; requires "Enable this entry" to take effect.</RTCK.Edt.MatchTip>
+  <RTCK.Edt.Lock>Lock (not overwritten by auto-refresh)</RTCK.Edt.Lock>
+  <RTCK.Edt.Save>Save</RTCK.Edt.Save>
+  <RTCK.Edt.ErrorTagEmpty>The tag cannot be empty.</RTCK.Edt.ErrorTagEmpty>
+  <RTCK.Edt.ErrorContentEmpty>The content cannot be empty.</RTCK.Edt.ErrorContentEmpty>
+  <RTCK.Edt.ErrorSingleLine>Tag and content must be single-line and cannot contain line breaks.</RTCK.Edt.ErrorSingleLine>
+  <RTCK.Edt.ErrorImportance>Importance must be a number between 0 and 1.</RTCK.Edt.ErrorImportance>
+  <RTCK.Edt.SaveFailed>Save failed: the entry was not found in the upstream library or a write error occurred.</RTCK.Edt.SaveFailed>
+  <RTCK.Edt.AddFailed>Add failed: the upstream did not return an entry id.</RTCK.Edt.AddFailed>
+  <RTCK.Edt.LockTip>Automatically locked after saving; periodic refresh and load correction will not overwrite this entry.</RTCK.Edt.LockTip>
+
+</LanguageData>

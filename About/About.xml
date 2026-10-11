@@ -12,6 +12,10 @@
     自动把世界各派系的身份、意识形态、与我方关系、领袖与据点，我方派系概况，以及异种人设定整理为常识写入常识库并定期更新；
     按订阅的模组动态导入社区常识库，并提供本 mod 自建的常识管理页面。
 
+    需要依賴 RimTalk 記憶擴展。
+    自動把世界各派系的身份、意識形態、與我方關係、領袖與據點，我方派系概況，以及異種人設定整理為常識寫入常識庫並定期更新；
+    按訂閱的模組動態導入社區常識庫，並提供本 mod 自建的常識管理頁面。
+
     Requires RimTalk-Expand Memory.
     Injects faction, xenotype and player-colony knowledge into the RimTalk common knowledge library, and updates it periodically.
        dynamically imports community knowledge based on subscribed mods, and ships a knowledge manager.

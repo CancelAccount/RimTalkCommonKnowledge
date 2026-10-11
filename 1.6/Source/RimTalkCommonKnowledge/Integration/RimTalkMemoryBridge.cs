@@ -37,7 +37,8 @@ namespace RimTalkCommonKnowledge
         /// 用 <c>AddKnowledgeEx</c> 而非 <c>AddKnowledge</c>：后者完全不动两个扩展开关，
         /// 而它们在 <c>ExtendedKnowledgeEntry</c> 侧表里新建时的默认值是 **false**
         /// —— 即 <c>AddKnowledge</c> 写出的条目既不提供链式线索、也不能被链式命中。
-        /// 派系常识要求两者都放开。
+        /// 默认参数为两者都放开（玩家自建条目口径）；自动注入的派系 / 异种人条目
+        /// 由调用点传 <c>FactionKnowledgeConfig.INJECTED_ENTRY_CAN_BE_EXTRACTED</c>。
         /// </remarks>
         public static string AddLore(
             string tag, string content, float importance, bool isEnabled = true,
@@ -77,7 +78,7 @@ namespace RimTalkCommonKnowledge
 
         /// <summary>
         /// 找出「本 mod 管理的」条目 id：要求条目 tag 的**第一段**与 <paramref name="primaryTag"/> 全等，
-        /// 且内容以 <paramref name="contentPrefix"/> 开头。
+        /// 且内容以 <paramref name="contentPrefixes"/> 中**任一语言变体**开头。
         /// </summary>
         /// <remarks>
         /// 两处都必须这么判：
@@ -85,11 +86,13 @@ namespace RimTalkCommonKnowledge
         ///    不再做一次全等判会误删/误判他人条目；
         /// ② 本 mod 会把特征异种人名追加到 tag 尾段，tag 会随派系成员构成变化，
         ///    因此只能用**稳定的第一段（派系名）**作主键，不能用整串 tag 比对。
+        /// 内容前缀传**变体数组**而非单值：玩家切换游戏语言后，库内旧语言条目仍需被识别，
+        /// 否则会被当作缺失而重复注入。
         /// </remarks>
-        public static List<string> FindManagedIds(string primaryTag, string contentPrefix)
+        public static List<string> FindManagedIds(string primaryTag, string[] contentPrefixes)
         {
             string ignoredContent;
-            return FindManagedIds(primaryTag, contentPrefix, out ignoredContent);
+            return FindManagedIds(primaryTag, contentPrefixes, out ignoredContent);
         }
 
         /// <summary>
@@ -97,13 +100,13 @@ namespace RimTalkCommonKnowledge
         /// 定时刷新需要先用内容做比对，再用 id 列表整体清除（防止异常情况下残留多条）。
         /// </summary>
         /// <param name="primaryTag">主键：派系名（tag 第一段）。</param>
-        /// <param name="contentPrefix">内容前缀，用于区分本 mod 的派系条目与异种人条目。</param>
+        /// <param name="contentPrefixes">内容前缀的全部语言变体，用于区分本 mod 的派系条目与异种人条目。</param>
         /// <param name="firstContent">输出：第一条条目的内容；无条目时为 <c>null</c>。</param>
-        public static List<string> FindManagedIds(string primaryTag, string contentPrefix, out string firstContent)
+        public static List<string> FindManagedIds(string primaryTag, string[] contentPrefixes, out string firstContent)
         {
             firstContent = null;
 
-            List<CommonKnowledgeEntry> entries = FindManagedEntries(primaryTag, contentPrefix);
+            List<CommonKnowledgeEntry> entries = FindManagedEntries(primaryTag, contentPrefixes);
             List<string> result = new List<string>(entries.Count);
             for (int i = 0; i < entries.Count; i++)
             {
@@ -121,7 +124,7 @@ namespace RimTalkCommonKnowledge
         /// 本 mod 管理的条目对象集合。
         /// **上游类型只在本类内部流转**，不通过公开签名外泄。
         /// </summary>
-        private static List<CommonKnowledgeEntry> FindManagedEntries(string primaryTag, string contentPrefix)
+        private static List<CommonKnowledgeEntry> FindManagedEntries(string primaryTag, string[] contentPrefixes)
         {
             List<CommonKnowledgeEntry> result = new List<CommonKnowledgeEntry>();
             if (string.IsNullOrEmpty(primaryTag))
@@ -151,7 +154,7 @@ namespace RimTalkCommonKnowledge
                 }
 
                 if (string.Equals(entryTags[0], primaryTag, StringComparison.Ordinal) &&
-                    entry.content.StartsWith(contentPrefix, StringComparison.Ordinal))
+                    StartsWithAny(entry.content, contentPrefixes))
                 {
                     result.Add(entry);
                 }
@@ -165,42 +168,60 @@ namespace RimTalkCommonKnowledge
         /// 用主键查库会找不到旧条目、导致旧条目残留成重复项；而内容里的固定句与名字无关，
         /// 故改用它识别——旧条目无论当时叫什么名字都能被找回并删除。
         /// </summary>
-        /// <param name="contentMarker">内容里固定出现的句子（与条目名字无关）。</param>
-        /// <param name="contentPrefix">内容前缀，用于限定是本 mod 的哪一类条目。</param>
+        /// <param name="contentMarkers">
+        /// 内容固定句的全部语言变体：玩家切换游戏语言后，库内旧语言条目仍须能被找回，
+        /// 故对每个变体各做一次子串查找并合并结果（按 id 去重）。
+        /// </param>
+        /// <param name="contentPrefixes">内容前缀的全部语言变体，用于限定是本 mod 的哪一类条目。</param>
         /// <param name="firstContent">输出：第一条条目的内容；无条目时为 <c>null</c>。</param>
         public static List<string> FindManagedIdsByContent(
-            string contentMarker, string contentPrefix, out string firstContent)
+            string[] contentMarkers, string[] contentPrefixes, out string firstContent)
         {
             firstContent = null;
             List<string> result = new List<string>();
-            if (string.IsNullOrEmpty(contentMarker))
+            if (contentMarkers == null || contentMarkers.Length == 0)
             {
                 return result;
             }
 
-            // 上游这是**子串**匹配，故必须再用内容前缀限定一次，避免误伤他人条目
-            List<CommonKnowledgeEntry> found = CommonKnowledgeAPI.FindKnowledgeByContent(contentMarker);
-            if (found == null)
+            // 上游这是**子串**匹配，故必须再用内容前缀限定一次，避免误伤他人条目；
+            // 每个语言变体各查一次，合并同一批 id（HashSet 去重，防止同一内容同时命中多个变体）。
+            HashSet<string> seen = new HashSet<string>(StringComparer.Ordinal);
+            for (int v = 0; v < contentMarkers.Length; v++)
             {
-                return result;
-            }
-
-            for (int i = 0; i < found.Count; i++)
-            {
-                CommonKnowledgeEntry entry = found[i];
-                if (entry == null || string.IsNullOrEmpty(entry.id) || string.IsNullOrEmpty(entry.content))
-                {
-                    continue;
-                }
-                if (!entry.content.StartsWith(contentPrefix, StringComparison.Ordinal))
+                string marker = contentMarkers[v];
+                if (string.IsNullOrEmpty(marker))
                 {
                     continue;
                 }
 
-                result.Add(entry.id);
-                if (firstContent == null)
+                List<CommonKnowledgeEntry> found = CommonKnowledgeAPI.FindKnowledgeByContent(marker);
+                if (found == null)
                 {
-                    firstContent = entry.content;
+                    continue;
+                }
+
+                for (int i = 0; i < found.Count; i++)
+                {
+                    CommonKnowledgeEntry entry = found[i];
+                    if (entry == null || string.IsNullOrEmpty(entry.id) || string.IsNullOrEmpty(entry.content))
+                    {
+                        continue;
+                    }
+                    if (!StartsWithAny(entry.content, contentPrefixes))
+                    {
+                        continue;
+                    }
+                    if (!seen.Add(entry.id))
+                    {
+                        continue;
+                    }
+
+                    result.Add(entry.id);
+                    if (firstContent == null)
+                    {
+                        firstContent = entry.content;
+                    }
                 }
             }
             return result;
@@ -249,11 +270,35 @@ namespace RimTalkCommonKnowledge
             return false;
         }
 
-        /// <summary>内容是否由本 mod 注入（以任一本 mod 内容前缀开头）。</summary>
+        /// <summary>内容是否由本 mod 注入（以任一本 mod 内容前缀的任一语言变体开头）。</summary>
         private static bool IsOwnContent(string content)
         {
-            return content.StartsWith(FactionKnowledgeConfig.FACTION_CONTENT_PREFIX, StringComparison.Ordinal)
-                || content.StartsWith(FactionKnowledgeConfig.XENOTYPE_CONTENT_PREFIX, StringComparison.Ordinal);
+            return StartsWithAny(content, FactionKnowledgeConfig.FACTION_CONTENT_PREFIX_VARIANTS)
+                || StartsWithAny(content, FactionKnowledgeConfig.XENOTYPE_CONTENT_PREFIX_VARIANTS);
+        }
+
+        /// <summary>
+        /// 内容是否以给定前缀数组中的**任一变体**开头（Ordinal 比较）。
+        /// 供查库与界面分类共用：内容前缀随游戏语言翻译，库内可能同时存在多种语言写下的条目，
+        /// 一律按变体数组匹配，不能只比当前语言。
+        /// </summary>
+        /// <param name="content">待判定内容；为 <c>null</c> / 空串时返回 <c>false</c>。</param>
+        /// <param name="prefixes">前缀变体数组；为 <c>null</c> / 空数组时返回 <c>false</c>。</param>
+        public static bool StartsWithAny(string content, string[] prefixes)
+        {
+            if (string.IsNullOrEmpty(content) || prefixes == null)
+            {
+                return false;
+            }
+            for (int i = 0; i < prefixes.Length; i++)
+            {
+                if (!string.IsNullOrEmpty(prefixes[i]) &&
+                    content.StartsWith(prefixes[i], StringComparison.Ordinal))
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         /// <summary>按条目 id 删除一条常识。</summary>

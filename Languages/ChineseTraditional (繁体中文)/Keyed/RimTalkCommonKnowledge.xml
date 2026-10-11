@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+
+  <!-- ========== 內容前綴（注入條目識別標記，新增條目隨遊戲語言寫入） ========== -->
+  <RTCK.Prefix.Faction>【派系】</RTCK.Prefix.Faction>
+  <RTCK.Prefix.Xenotype>【異種人】</RTCK.Prefix.Xenotype>
+
+  <!-- ========== 注入內容模板：普通派系 ========== -->
+  <RTCK.Tpl.FactionIdentity>{0}是一支{1}派系，科技水平為{2}。</RTCK.Tpl.FactionIdentity>
+  <RTCK.Tpl.FactionIdentityNoTech>{0}是一支{1}派系。</RTCK.Tpl.FactionIdentityNoTech>
+  <RTCK.Tpl.FactionIdentitySame>{0}，科技水平為{1}。</RTCK.Tpl.FactionIdentitySame>
+  <RTCK.Tpl.FactionIdentitySameNoTech>{0}。</RTCK.Tpl.FactionIdentitySameNoTech>
+  <RTCK.Tpl.FactionDescription>{0}。</RTCK.Tpl.FactionDescription>
+  <RTCK.Tpl.FactionIdeo>他們信奉「{0}」，核心信條是{1}。</RTCK.Tpl.FactionIdeo>
+  <RTCK.Tpl.FactionIdeoNoMemes>他們信奉「{0}」。</RTCK.Tpl.FactionIdeoNoMemes>
+  <RTCK.Tpl.FactionRelation>我們與{0}的關係是{1}。</RTCK.Tpl.FactionRelation>
+  <RTCK.Tpl.FactionGoodwill>其對我們好感度為{0}。</RTCK.Tpl.FactionGoodwill>
+  <RTCK.Tpl.FactionLeader>{0}的領袖是{1}。</RTCK.Tpl.FactionLeader>
+  <RTCK.Tpl.FactionLeaderNone>{0}目前沒有已知的領袖。</RTCK.Tpl.FactionLeaderNone>
+  <RTCK.Tpl.FactionSettlementCount>他們在世界地圖上共有{0}處定居點。</RTCK.Tpl.FactionSettlementCount>
+  <RTCK.Tpl.FactionSettlementNearest>最近的一處距我們約{0}格。</RTCK.Tpl.FactionSettlementNearest>
+  <RTCK.Tpl.FactionMemberRaces>他們的外星種族成員包括{0}。</RTCK.Tpl.FactionMemberRaces>
+  <RTCK.Tpl.FactionMembers>他們的成員主要是{0}。</RTCK.Tpl.FactionMembers>
+  <RTCK.Tpl.FactionMembersItem>{0}（約{1}）</RTCK.Tpl.FactionMembersItem>
+
+  <!-- ========== 注入內容模板：派系介面「實際成員」塊 ========== -->
+  <RTCK.Tpl.UiCompositionKindXenotypes>他們的成員涉及以下異種人：{0}。</RTCK.Tpl.UiCompositionKindXenotypes>
+  <RTCK.Tpl.UiCompositionMemberRacesTitle>外星種族</RTCK.Tpl.UiCompositionMemberRacesTitle>
+
+  <!-- ========== 注入內容模板：我方派系 ========== -->
+  <RTCK.Tpl.PlayerIdentityPrefix>「{0}」</RTCK.Tpl.PlayerIdentityPrefix>
+  <!-- ⚠ 本句是找回我方舊條目的識別標記：改文案必須同步 FactionKnowledgeConfig.PLAYER_IDENTITY_SUFFIX_VARIANTS -->
+  <RTCK.Tpl.PlayerIdentitySuffix>是我們自己所屬的派系。</RTCK.Tpl.PlayerIdentitySuffix>
+  <RTCK.Tpl.PlayerScenario>我們的開局劇本是「{0}」。</RTCK.Tpl.PlayerScenario>
+  <RTCK.Tpl.PlayerPopulation>我們有{0}名殖民者{1}。</RTCK.Tpl.PlayerPopulation>
+  <RTCK.Tpl.PlayerPopulationExtraLead>，另有</RTCK.Tpl.PlayerPopulationExtraLead>
+  <RTCK.Tpl.PlayerPopulationExtraItem>{0}名{1}</RTCK.Tpl.PlayerPopulationExtraItem>
+  <RTCK.Tpl.PlayerPopLabelTemporary>臨時成員</RTCK.Tpl.PlayerPopLabelTemporary>
+  <RTCK.Tpl.PlayerPopLabelPrisoner>囚犯</RTCK.Tpl.PlayerPopLabelPrisoner>
+  <RTCK.Tpl.PlayerPopLabelSlave>奴隸</RTCK.Tpl.PlayerPopLabelSlave>
+  <RTCK.Tpl.PlayerMechs>我們還有{0}。</RTCK.Tpl.PlayerMechs>
+  <RTCK.Tpl.PlayerMechsNone>我們目前沒有友方機械族。</RTCK.Tpl.PlayerMechsNone>
+  <RTCK.Tpl.PlayerMechsItem>{0}台{1}</RTCK.Tpl.PlayerMechsItem>
+  <RTCK.Tpl.PlayerSettlements>我們的據點是{0}。</RTCK.Tpl.PlayerSettlements>
+  <RTCK.Tpl.PlayerSettlementsNone>我們目前還沒有固定的據點。</RTCK.Tpl.PlayerSettlementsNone>
+  <RTCK.Tpl.PlayerClimate>殖民地所在位置的氣候是{0}。</RTCK.Tpl.PlayerClimate>
+  <RTCK.Tpl.PlayerGravship>逆重飛船「{0}」已在此停留{1}。</RTCK.Tpl.PlayerGravship>
+  <RTCK.Tpl.PlayerGravshipBare>我們有一艘逆重飛船「{0}」。</RTCK.Tpl.PlayerGravshipBare>
+  <RTCK.Tpl.PlayerAge>這個派系已經建立了{0}。</RTCK.Tpl.PlayerAge>
+  <RTCK.Tpl.PlayerWealth>主基地的財富約為{0}。</RTCK.Tpl.PlayerWealth>
+
+  <!-- ========== 注入內容模板：異種人（首鍵含內容前綴，勿拆） ========== -->
+  <RTCK.Tpl.XenotypeIntro>【異種人】{0}：{1}</RTCK.Tpl.XenotypeIntro>
+  <RTCK.Tpl.XenotypeIntroBare>【異種人】{0}</RTCK.Tpl.XenotypeIntroBare>
+  <RTCK.Tpl.XenotypeGenes>標誌性基因：{0}。</RTCK.Tpl.XenotypeGenes>
+  <RTCK.Tpl.XenotypeNoGenes>沒有任何特殊基因，是自然演化的人類。</RTCK.Tpl.XenotypeNoGenes>
+  <RTCK.Tpl.XenotypeFactions>他們主要在{0}出沒。</RTCK.Tpl.XenotypeFactions>
+  <RTCK.Tpl.ListSeparator>、</RTCK.Tpl.ListSeparator>
+
+  <!-- ========== 設置頁：分組標題 ========== -->
+  <RTCK.Set.SectionInjection>注入時機</RTCK.Set.SectionInjection>
+  <RTCK.Set.SectionFactionSections>派系常識內容段</RTCK.Set.SectionFactionSections>
+  <RTCK.Set.SectionImportance>重要度與分類</RTCK.Set.SectionImportance>
+  <RTCK.Set.SectionXenotype>異種人常識（需 Biotech）</RTCK.Set.SectionXenotype>
+  <RTCK.Set.SectionLog>日誌</RTCK.Set.SectionLog>
+  <RTCK.Set.SectionUi>介面增強</RTCK.Set.SectionUi>
+
+  <!-- ========== 設置頁：設置項與懸停說明 ========== -->
+  <RTCK.Set.EnableInjection>啟用常識注入（總開關）</RTCK.Set.EnableInjection>
+  <RTCK.Set.EnableInjectionTip>關閉後新開檔、讀檔與定時校正都不再寫入常識；已寫入的條目不受影響。</RTCK.Set.EnableInjectionTip>
+  <RTCK.Set.EnableBackfillOnLoad>讀檔時校正（補齊與刷新）</RTCK.Set.EnableBackfillOnLoad>
+  <RTCK.Set.EnableBackfillOnLoadTip>讀檔時逐條比對：缺失則補、陳舊則重寫、一致則不動。關閉後僅在新開檔與定時校正時處理。</RTCK.Set.EnableBackfillOnLoadTip>
+  <RTCK.Set.EnablePeriodicRefresh>運行中定時校正</RTCK.Set.EnablePeriodicRefresh>
+  <RTCK.Set.EnablePeriodicRefreshTip>按下方間隔輪詢，讓關係、好感度、領袖、據點等變化及時跟上。關閉後僅在新開檔 / 讀檔時校正。</RTCK.Set.EnablePeriodicRefreshTip>
+  <RTCK.Set.RefreshIntervalHours>定時校正間隔（遊戲小時）</RTCK.Set.RefreshIntervalHours>
+  <RTCK.Set.RefreshIntervalHoursTip>預設 1 小時。輪詢只查庫並拼串比對、不寫庫，開銷很低；越短越及時。</RTCK.Set.RefreshIntervalHoursTip>
+  <RTCK.Set.GoodwillRefreshThreshold>好感度重寫閾值</RTCK.Set.GoodwillRefreshThreshold>
+  <RTCK.Set.GoodwillRefreshThresholdTip>好感度變化未達此值、且其它內容都沒變時，不為純數值波動重寫條目。預設 10。</RTCK.Set.GoodwillRefreshThresholdTip>
+  <RTCK.Set.EnableKnowledgeBaseImport>導入隨包預設庫</RTCK.Set.EnableKnowledgeBaseImport>
+  <RTCK.Set.EnableKnowledgeBaseImportTip>新開檔 / 讀檔時，把隨包社區常識庫中與「當前已啟用 mod」對應的條目文件（連同該塊的公共面）導入常識庫：按「標籤 + 內容」判重、缺失即補、沿用社區原始重要度。只訂閱了本體、未訂閱擴展的玩家不會被塞入擴展內容。玩家手動刪除的條目會在下次新檔 / 讀檔被補回。關閉後本路徑不寫入。</RTCK.Set.EnableKnowledgeBaseImportTip>
+  <RTCK.Set.EnableBuiltinKnowledgeImport>同時導入遊戲本體與通用常識</RTCK.Set.EnableBuiltinKnowledgeImport>
+  <RTCK.Set.EnableBuiltinKnowledgeImportTip>額外導入預設庫中的遊戲本體條目（只取你已持有 DLC 對應的部分）與不依賴任何 mod 的公共塊（如「自定義常識」）。體量較大。預設關閉。</RTCK.Set.EnableBuiltinKnowledgeImportTip>
+  <RTCK.Set.IncludeIdentity>寫入「基礎身份」段</RTCK.Set.IncludeIdentity>
+  <RTCK.Set.IncludeIdentityTip>派系名、類型標籤與科技水平。關閉後該段缺席（我方派系條目不受影響）。</RTCK.Set.IncludeIdentityTip>
+  <RTCK.Set.IncludeIdeology>寫入「意識形態」段</RTCK.Set.IncludeIdeology>
+  <RTCK.Set.IncludeIdeologyTip>主理念與其信條。無 Ideology DLC 時該段本就自動失效。</RTCK.Set.IncludeIdeologyTip>
+  <RTCK.Set.IncludeRelation>寫入「與我方關係」段</RTCK.Set.IncludeRelation>
+  <RTCK.Set.IncludeRelationTip>關係種類與好感度。關閉後該段缺席。</RTCK.Set.IncludeRelationTip>
+  <RTCK.Set.IncludeSettlements>寫入「領袖與據點」段</RTCK.Set.IncludeSettlements>
+  <RTCK.Set.IncludeSettlementsTip>領袖姓名、定居點數量與最近距離。關閉後該段缺席。</RTCK.Set.IncludeSettlementsTip>
+  <RTCK.Set.KnowledgeImportancePlayer>我方派系條目重要度</RTCK.Set.KnowledgeImportancePlayer>
+  <RTCK.Set.KnowledgeImportancePlayerTip>0~1，預設 0.95。</RTCK.Set.KnowledgeImportancePlayerTip>
+  <RTCK.Set.KnowledgeImportanceOther>其它派系 / 異種人條目重要度</RTCK.Set.KnowledgeImportanceOther>
+  <RTCK.Set.KnowledgeImportanceOtherTip>0~1，預設 0.80。</RTCK.Set.KnowledgeImportanceOtherTip>
+  <RTCK.Set.CategoryAlwaysLore>條目分類固定為「世界觀」</RTCK.Set.CategoryAlwaysLore>
+  <RTCK.Set.CategoryAlwaysLoreTip>關閉則改由上游按標籤自動猜分類，實測會落到「其它」，僅影響常識庫 UI 分組。</RTCK.Set.CategoryAlwaysLoreTip>
+  <RTCK.Set.IncludeXenotypes>寫入獨立的異種人常識條目</RTCK.Set.IncludeXenotypes>
+  <RTCK.Set.IncludeXenotypesTip>需生物科技 DLC，無 DLC 時本就整體跳過。關閉後派系條目的成員構成段不受影響。</RTCK.Set.IncludeXenotypesTip>
+  <RTCK.Set.IncludeFactionXenotypeRefs>寫入派系與異種人的雙向引用</RTCK.Set.IncludeFactionXenotypeRefs>
+  <RTCK.Set.IncludeFactionXenotypeRefsTip>派系條目的「成員構成」段 + 異種人條目的「出沒派系」段；同時決定派系標籤是否並列特徵異種人名，以免出現「提到某異種人卻帶出不含該資訊的條目」。</RTCK.Set.IncludeFactionXenotypeRefsTip>
+  <RTCK.Set.XenotypeGeneCount>異種人條目標誌性基因條數</RTCK.Set.XenotypeGeneCount>
+  <RTCK.Set.XenotypeGeneCountTip>0 表示不寫基因段。預設 4。</RTCK.Set.XenotypeGeneCountTip>
+  <RTCK.Set.EnableVerboseLog>輸出逐條明細日誌</RTCK.Set.EnableVerboseLog>
+  <RTCK.Set.EnableVerboseLogTip>預設只輸出匯總與計數。開啟後輸出每個派系 / 異種人的完整內容。</RTCK.Set.EnableVerboseLogTip>
+  <RTCK.Set.Reinject>立即對當前存檔重新注入</RTCK.Set.Reinject>
+  <RTCK.Set.ReinjectTip>對當前存檔重跑一次注入與校正，便於改完設置立刻看效果，無需重開檔。</RTCK.Set.ReinjectTip>
+  <RTCK.Set.ReinjectNoGameTip>當前沒有正在進行的存檔。</RTCK.Set.ReinjectNoGameTip>
+  <RTCK.Set.ShowUiComposition>在派系介面顯示實際成員構成</RTCK.Set.ShowUiComposition>
+  <RTCK.Set.ShowUiCompositionTip>在派系列表的懸停提示與派系資訊卡中追加一行「實際成員」。用於修正遊戲自帶的成員統計在 HAR 種族 / 兵種級異種人派系上誤報「智人種 100%」的情況。</RTCK.Set.ShowUiCompositionTip>
+  <RTCK.Set.EnableKnowledgeUiOptimization>優化常識庫介面滾動</RTCK.Set.EnableKnowledgeUiOptimization>
+  <RTCK.Set.EnableKnowledgeUiOptimizationTip>隱藏不可見的常識條目，優化介面滾動效能。</RTCK.Set.EnableKnowledgeUiOptimizationTip>
+  <RTCK.Set.OpenManager>打開常識管理頁面</RTCK.Set.OpenManager>
+  <RTCK.Set.OpenManagerTip>按包管理本模組注入常識</RTCK.Set.OpenManagerTip>
+  <RTCK.Set.SliderLabelFormat>{0}：{1}{2}</RTCK.Set.SliderLabelFormat>
+  <RTCK.Set.UnitHours> 小時</RTCK.Set.UnitHours>
+  <RTCK.Set.UnitEntries> 條</RTCK.Set.UnitEntries>
+
+  <!-- ========== 常識管理視窗 ========== -->
+  <RTCK.Mgr.Title>常識管理（右鍵點擊可快速編輯））</RTCK.Mgr.Title>
+  <RTCK.Mgr.NavAll>全部條目</RTCK.Mgr.NavAll>
+  <RTCK.Mgr.NavOwn>自動注入</RTCK.Mgr.NavOwn>
+  <RTCK.Mgr.NavOwnFaction>派系資訊</RTCK.Mgr.NavOwnFaction>
+  <RTCK.Mgr.NavOwnXenotype>異種人資訊</RTCK.Mgr.NavOwnXenotype>
+  <RTCK.Mgr.NavUser>自建庫</RTCK.Mgr.NavUser>
+  <RTCK.Mgr.NavPreset>預設庫</RTCK.Mgr.NavPreset>
+  <RTCK.Mgr.NavCustom>自定義子頁</RTCK.Mgr.NavCustom>
+  <RTCK.Mgr.NewPage>＋ 新建子頁</RTCK.Mgr.NewPage>
+  <RTCK.Mgr.AddToPage>勾選項加入本頁</RTCK.Mgr.AddToPage>
+  <RTCK.Mgr.RemoveFromPage>勾選項移出本頁</RTCK.Mgr.RemoveFromPage>
+  <RTCK.Mgr.RenamePage>重命名</RTCK.Mgr.RenamePage>
+  <RTCK.Mgr.DeletePage>刪除</RTCK.Mgr.DeletePage>
+  <RTCK.Mgr.Confirm>確定</RTCK.Mgr.Confirm>
+  <RTCK.Mgr.Cancel>取消</RTCK.Mgr.Cancel>
+  <RTCK.Mgr.SelectAll>全選</RTCK.Mgr.SelectAll>
+  <RTCK.Mgr.ClearSelection>清空勾選</RTCK.Mgr.ClearSelection>
+  <RTCK.Mgr.Refresh>刷新</RTCK.Mgr.Refresh>
+  <RTCK.Mgr.SearchPlaceholder>搜尋標籤或內容…</RTCK.Mgr.SearchPlaceholder>
+  <RTCK.Mgr.NoGame>當前沒有正在進行的存檔，無法讀取常識庫。</RTCK.Mgr.NoGame>
+  <RTCK.Mgr.NoPageTip>請先在左側「自定義子頁」中新建或選中一個子頁。</RTCK.Mgr.NoPageTip>
+  <RTCK.Mgr.ConfirmDelete>確認刪除該子頁？</RTCK.Mgr.ConfirmDelete>
+  <RTCK.Mgr.NewEntry>新增條目</RTCK.Mgr.NewEntry>
+  <RTCK.Mgr.EditEntry>編輯選中</RTCK.Mgr.EditEntry>
+  <RTCK.Mgr.DeleteEntries>刪除選中</RTCK.Mgr.DeleteEntries>
+  <RTCK.Mgr.EditSingleTip>編輯僅支援單條，請只勾選一條。</RTCK.Mgr.EditSingleTip>
+  <RTCK.Mgr.NoSelectionTip>請先勾選至少一條。</RTCK.Mgr.NoSelectionTip>
+  <RTCK.Mgr.LockedSuffix> · 已鎖定</RTCK.Mgr.LockedSuffix>
+  <RTCK.Mgr.BatchEnable>批次啟用</RTCK.Mgr.BatchEnable>
+  <RTCK.Mgr.BatchDisable>批次停用</RTCK.Mgr.BatchDisable>
+  <RTCK.Mgr.BatchEnableResultFormat>已啟用 {0} 條勾選條目。</RTCK.Mgr.BatchEnableResultFormat>
+  <RTCK.Mgr.BatchDisableResultFormat>已停用 {0} 條勾選條目。</RTCK.Mgr.BatchDisableResultFormat>
+  <RTCK.Mgr.ConfirmDeleteEntriesFormat>確認刪除選中的 {0} 條常識？</RTCK.Mgr.ConfirmDeleteEntriesFormat>
+  <RTCK.Mgr.DeleteOwnWarning>注意：本 mod 自動注入的條目刪除後，仍會在下次定時刷新時重新注入；若永久不需要，請在模組設置中關閉對應開關。</RTCK.Mgr.DeleteOwnWarning>
+  <RTCK.Mgr.ImportEntries>導入條目</RTCK.Mgr.ImportEntries>
+  <RTCK.Mgr.ExportEntries>導出條目</RTCK.Mgr.ExportEntries>
+  <RTCK.Mgr.ExportTip>有勾選項時導出全部勾選項，否則導出當前列表的全部條目；內容複製到系統剪貼簿。</RTCK.Mgr.ExportTip>
+  <RTCK.Mgr.ImportTip>從系統剪貼簿讀取常識文本：可貼上上游標準格式（每行一條），導入前可預覽與去重。</RTCK.Mgr.ImportTip>
+  <RTCK.Mgr.ExportResultFormat>已複製 {0} 條常識到剪貼簿。</RTCK.Mgr.ExportResultFormat>
+  <RTCK.Mgr.ExportEmpty>當前沒有可導出的條目。</RTCK.Mgr.ExportEmpty>
+  <RTCK.Mgr.CountFormat>當前 {0} 條 / 共 {1} 條，勾選 {2} 條</RTCK.Mgr.CountFormat>
+  <RTCK.Mgr.DefaultPageName>新子頁 {0}</RTCK.Mgr.DefaultPageName>
+  <RTCK.Mgr.BlockRowFormat>{0}（{1} 個模組）</RTCK.Mgr.BlockRowFormat>
+  <RTCK.Mgr.PageRowFormat>{0}（{1}）</RTCK.Mgr.PageRowFormat>
+  <RTCK.Mgr.RowSourceSeparator>  ——  </RTCK.Mgr.RowSourceSeparator>
+  <RTCK.Mgr.EntryButtonLabel>自動注入常識管理</RTCK.Mgr.EntryButtonLabel>
+  <RTCK.Mgr.EntryButtonTip>打開自動注入常識mod的管理頁面，可查看常識條目來源</RTCK.Mgr.EntryButtonTip>
+
+  <!-- ========== 導入對話框 ========== -->
+  <RTCK.Imp.Title>導入常識條目</RTCK.Imp.Title>
+  <RTCK.Imp.Paste>讀取剪貼簿</RTCK.Imp.Paste>
+  <RTCK.Imp.Clear>清空</RTCK.Imp.Clear>
+  <RTCK.Imp.SkipDuplicates>跳過重複條目（按標籤 + 正文）</RTCK.Imp.SkipDuplicates>
+  <RTCK.Imp.DuplicateWarning>未開啟去重：庫內已存在的條目及文本中的重複行都會被再次添加。</RTCK.Imp.DuplicateWarning>
+  <RTCK.Imp.StatsFormat>識別到 {0} 條有效行，將導入 {1} 條</RTCK.Imp.StatsFormat>
+  <RTCK.Imp.ErrorEmpty>沒有可導入的內容。</RTCK.Imp.ErrorEmpty>
+  <RTCK.Imp.ErrorAllDuplicate>有效條目均已存在，沒有可導入的新內容。</RTCK.Imp.ErrorAllDuplicate>
+  <RTCK.Imp.ResultFormat>成功導入 {0} 條常識。</RTCK.Imp.ResultFormat>
+  <RTCK.Imp.AddedToPageFormat>已將其中 {0} 條錄入選定子頁「{1}」。</RTCK.Imp.AddedToPageFormat>
+
+  <!-- ========== 編輯對話框 ========== -->
+  <RTCK.Edt.TitleEdit>編輯常識條目</RTCK.Edt.TitleEdit>
+  <RTCK.Edt.TitleNew>新增常識條目</RTCK.Edt.TitleNew>
+  <RTCK.Edt.TagLabel>標籤</RTCK.Edt.TagLabel>
+  <RTCK.Edt.ContentLabel>正文</RTCK.Edt.ContentLabel>
+  <RTCK.Edt.ImportanceLabel>重要度</RTCK.Edt.ImportanceLabel>
+  <RTCK.Edt.Enabled>啟用此條目</RTCK.Edt.Enabled>
+  <RTCK.Edt.ExtensionLabel>擴展</RTCK.Edt.ExtensionLabel>
+  <RTCK.Edt.ExtractLabel>允許提取</RTCK.Edt.ExtractLabel>
+  <RTCK.Edt.MatchLabel>允許匹配</RTCK.Edt.MatchLabel>
+  <RTCK.Edt.ExtractTip>勾選後，NPC 形成長期記憶時可把該條目內容作為記憶線索導出；關閉則不參與提取。</RTCK.Edt.ExtractTip>
+  <RTCK.Edt.MatchTip>勾選後，鏈式聯想時該條目可被相關文本命中；需同時「啟用此條目」才生效。</RTCK.Edt.MatchTip>
+  <RTCK.Edt.Lock>鎖定（不被自動刷新覆蓋）</RTCK.Edt.Lock>
+  <RTCK.Edt.Save>儲存</RTCK.Edt.Save>
+  <RTCK.Edt.ErrorTagEmpty>標籤不能為空。</RTCK.Edt.ErrorTagEmpty>
+  <RTCK.Edt.ErrorContentEmpty>正文不能為空。</RTCK.Edt.ErrorContentEmpty>
+  <RTCK.Edt.ErrorSingleLine>標籤與正文必須為單行，不能包含換行。</RTCK.Edt.ErrorSingleLine>
+  <RTCK.Edt.ErrorImportance>重要度必須是 0 到 1 之間的數字。</RTCK.Edt.ErrorImportance>
+  <RTCK.Edt.SaveFailed>儲存失敗：上游庫未找到該條目或寫入異常。</RTCK.Edt.SaveFailed>
+  <RTCK.Edt.AddFailed>新增失敗：上游未回傳條目 id。</RTCK.Edt.AddFailed>
+  <RTCK.Edt.LockTip>儲存後自動鎖定，定時刷新與讀檔校正都不會覆蓋此條目。</RTCK.Edt.LockTip>
+
+</LanguageData>

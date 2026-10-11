@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using RimWorld;
@@ -179,24 +179,30 @@ namespace RimTalkCommonKnowledge
             return IsFactionEntry(entry) || IsXenotypeEntry(entry);
         }
 
-        /// <summary>条目是否为本 mod 注入的派系信息（内容以派系前缀开头）。</summary>
+        /// <summary>
+        /// 条目是否为本 mod 注入的派系信息（内容以派系前缀开头）。
+        /// 匹配**全部语言变体**：玩家切换游戏语言后，库内旧语言条目仍须被正确归类。
+        /// </summary>
         /// <param name="entry">待判定条目。</param>
         private static bool IsFactionEntry(KnowledgeEntrySnapshot entry)
         {
             return entry != null
                 && !string.IsNullOrEmpty(entry.Content)
-                && entry.Content.StartsWith(
-                    FactionKnowledgeConfig.FACTION_CONTENT_PREFIX, StringComparison.Ordinal);
+                && RimTalkMemoryBridge.StartsWithAny(
+                    entry.Content, FactionKnowledgeConfig.FACTION_CONTENT_PREFIX_VARIANTS);
         }
 
-        /// <summary>条目是否为本 mod 注入的异种人信息（内容以异种人前缀开头）。</summary>
+        /// <summary>
+        /// 条目是否为本 mod 注入的异种人信息（内容以异种人前缀开头）。
+        /// 匹配**全部语言变体**，原因同上。
+        /// </summary>
         /// <param name="entry">待判定条目。</param>
         private static bool IsXenotypeEntry(KnowledgeEntrySnapshot entry)
         {
             return entry != null
                 && !string.IsNullOrEmpty(entry.Content)
-                && entry.Content.StartsWith(
-                    FactionKnowledgeConfig.XENOTYPE_CONTENT_PREFIX, StringComparison.Ordinal);
+                && RimTalkMemoryBridge.StartsWithAny(
+                    entry.Content, FactionKnowledgeConfig.XENOTYPE_CONTENT_PREFIX_VARIANTS);
         }
 
         /// <summary>条目是否来自随包预设库（能在来源索引里反查到块 / 模组）。</summary>

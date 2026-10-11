@@ -43,6 +43,11 @@ namespace RimTalkCommonKnowledge
         private HashSet<string> lockedEntryIds = new HashSet<string>(StringComparer.Ordinal);
 
         /// <summary>
+        /// 玩家自建的自定义子页（FR-16 / D49 / D66）：每个子页是一个有名字的条目 id 集合。
+        /// </summary>
+        private List<KnowledgeSubPage> customKnowledgePages = new List<KnowledgeSubPage>();
+
+        /// <summary>
         /// 引擎反射实例化所需的构造：
         /// <c>Game.FillComponents()</c> 用 <c>Activator.CreateInstance(type, this)</c> 传 Game，
         /// 因此子类**必须**有 <c>(Game game)</c> 构造；
@@ -75,6 +80,36 @@ namespace RimTalkCommonKnowledge
             if (Scribe.mode == LoadSaveMode.LoadingVars && lockedList != null)
             {
                 lockedEntryIds = new HashSet<string>(lockedList, StringComparer.Ordinal);
+            }
+
+            // 自定义子页（D66）：与锁定集合同处存档。旧档无此节点时列表为 null，补空集合。
+            Scribe_Collections.Look(ref customKnowledgePages, "customKnowledgePages", LookMode.Deep);
+            if (customKnowledgePages == null)
+            {
+                customKnowledgePages = new List<KnowledgeSubPage>();
+            }
+            else if (Scribe.mode == LoadSaveMode.PostLoadInit)
+            {
+                // 清理脏数据：空项、成员表为空的项、名称为空的项（老存档 / 手改文件都可能出现）。
+                customKnowledgePages.RemoveAll(page =>
+                    page == null || string.IsNullOrEmpty(page.name) || page.entryIds == null);
+            }
+        }
+
+        /// <summary>
+        /// 当前存档的自定义子页列表（UI 唯一访问口，D66）。
+        /// 无存档或组件缺失时返回 <c>null</c>，调用方须判空；返回活列表，可直接增删。
+        /// </summary>
+        public static List<KnowledgeSubPage> CurrentPages
+        {
+            get
+            {
+                if (Current.Game == null)
+                {
+                    return null;
+                }
+                FactionKnowledgeComponent component = Current.Game.GetComponent<FactionKnowledgeComponent>();
+                return component == null ? null : component.customKnowledgePages;
             }
         }
 
@@ -231,14 +266,15 @@ namespace RimTalkCommonKnowledge
                     // · 普通派系：主键 = 稳定的派系名（tag 第一段，已净化分隔符），与整串标签无关（尾段会随特征异种人变化）；
                     // · 我方派系：主键会变（派系改名 / 飞船改名都会重拼标签），改用内容里的固定句识别——
                     //   否则改名后按新名查不到旧条目，旧条目会残留成重复项、且提到旧名仍命中陈旧内容。
+                    // 固定句与前缀都传**全语言变体**：切换游戏语言后，库内旧语言条目仍须被找回，否则会重复注入。
                     string existingContent;
                     List<string> managedIds = faction.IsPlayer
                         ? RimTalkMemoryBridge.FindManagedIdsByContent(
-                            FactionKnowledgeConfig.PLAYER_SEG_IDENTITY_SUFFIX,
-                            FactionKnowledgeConfig.FACTION_CONTENT_PREFIX,
+                            FactionKnowledgeConfig.PLAYER_IDENTITY_SUFFIX_VARIANTS,
+                            FactionKnowledgeConfig.FACTION_CONTENT_PREFIX_VARIANTS,
                             out existingContent)
                         : RimTalkMemoryBridge.FindManagedIds(
-                            entry.PrimaryKey, FactionKnowledgeConfig.FACTION_CONTENT_PREFIX, out existingContent);
+                            entry.PrimaryKey, FactionKnowledgeConfig.FACTION_CONTENT_PREFIX_VARIANTS, out existingContent);
 
                     // ⚠ 玩家派系不能问「与自己的关系」：PlayerGoodwill → RelationWith(自己) 会先 Log.Error，
                     //   接着 GoodwillSituationManager.GetMaxGoodwill 对空关系 NRE。玩家派系本就不写好感度段，取 0 即可。
@@ -310,7 +346,10 @@ namespace RimTalkCommonKnowledge
                     float importance = faction.IsPlayer
                         ? FactionInfoSettings.KnowledgeImportancePlayer
                         : FactionInfoSettings.KnowledgeImportanceOther;
-                    string id = RimTalkMemoryBridge.AddLore(entry.Tag, content, importance);
+                    // D70：自动注入条目关闭「允许提取」（内容较长，避免链式提取向上下文注入大段文本）
+                    string id = RimTalkMemoryBridge.AddLore(
+                        entry.Tag, content, importance,
+                        canBeExtracted: FactionKnowledgeConfig.INJECTED_ENTRY_CAN_BE_EXTRACTED);
                     if (string.IsNullOrEmpty(id))
                     {
                         KnowledgeLog.Error(
@@ -652,8 +691,9 @@ namespace RimTalkCommonKnowledge
                             continue;
                         }
 
+                        // 前缀传全语言变体：切换游戏语言后，旧语言注入的异种人条目仍须被识别为「已存在」
                         List<string> managedIds = RimTalkMemoryBridge.FindManagedIds(
-                            tag, FactionKnowledgeConfig.XENOTYPE_CONTENT_PREFIX);
+                            tag, FactionKnowledgeConfig.XENOTYPE_CONTENT_PREFIX_VARIANTS);
                         if (managedIds.Count > 0)
                         {
                             skippedExisting++;
@@ -665,7 +705,8 @@ namespace RimTalkCommonKnowledge
 
                         // 重要度分档（D43）：异种人归入「其它」档，对齐社区「派系本体」档
                         string id = RimTalkMemoryBridge.AddLore(
-                            tag, content, FactionInfoSettings.KnowledgeImportanceOther);
+                            tag, content, FactionInfoSettings.KnowledgeImportanceOther,
+                            canBeExtracted: FactionKnowledgeConfig.INJECTED_ENTRY_CAN_BE_EXTRACTED);
                         if (string.IsNullOrEmpty(id))
                         {
                             KnowledgeLog.Error(

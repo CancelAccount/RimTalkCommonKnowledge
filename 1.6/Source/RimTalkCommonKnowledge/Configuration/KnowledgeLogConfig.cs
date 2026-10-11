@@ -32,15 +32,13 @@ namespace RimTalkCommonKnowledge
         // ---------- 模块前缀染色 ----------
 
         /// <summary>
-        /// 模块前缀的染色值（RGB 168,230,255，浅青蓝）。
-        /// 刻意区别于 mod 前缀的淡黄（<see cref="FactionKnowledgeConfig.LOG_PREFIX_COLOR"/>），
-        /// 使日志窗口中两级前缀一眼可分。
+        /// 模块前缀的染色值（RGB 255,255,198，淡黄），与 mod 前缀保持一致。
         /// </summary>
         public const string MODULE_PREFIX_COLOR = "#FFFFC6";
 
         /// <summary>
-        /// 生成染色后的模块前缀：给模块名套上方括号与浅青蓝染色，形如 <c>[注入]</c>。
-        /// 与 mod 前缀同理：日志窗口按富文本渲染为浅青蓝；写入 Player.log 时保留方括号文本，
+        /// 生成染色后的模块前缀：给模块名套上方括号与淡黄染色，形如 <c>[注入]</c>。
+        /// 与 mod 前缀同理：日志窗口按富文本渲染为淡黄；写入 Player.log 时保留方括号文本，
         /// 按「[模块名]」搜索仍可命中。
         /// </summary>
         /// <param name="module">模块名，须取本类的 <c>MODULE_*</c> 常量；传空则返回空串（不输出模块段）。</param>

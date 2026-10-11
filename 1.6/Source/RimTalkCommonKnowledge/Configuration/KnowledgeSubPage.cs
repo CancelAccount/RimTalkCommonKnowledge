@@ -4,9 +4,9 @@ using Verse;
 namespace RimTalkCommonKnowledge
 {
     /// <summary>
-    /// 玩家自建的「自定义子页」（FR-16 / D49）：一个有名字的条目集合，成员按条目 id 引用。
-    /// 落在本 mod 设置（<see cref="FactionInfoSettings.customKnowledgePages"/>）里，
-    /// 随设置文件持久化，不写入上游常识库、不污染其数据。
+    /// 玩家自建的「自定义子页」（FR-16 / D49 / D66）：一个有名字的条目集合，成员按条目 id 引用。
+    /// 落在存档内 <see cref="FactionKnowledgeComponent"/>（D66 起），随存档持久化，
+    /// 不写入上游常识库、不污染其数据。条目 id 由上游按存档分配，故不可跨存档存储。
     /// </summary>
     public class KnowledgeSubPage : IExposable
     {

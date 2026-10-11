@@ -1,3 +1,5 @@
+using Verse;
+
 namespace RimTalkCommonKnowledge
 {
     /// <summary>
@@ -31,7 +33,7 @@ namespace RimTalkCommonKnowledge
         // ---------- 前缀与标签 ----------
 
         /// <summary>日志统一前缀（纯文本），所有日志行以此开头，便于按本 mod 过滤。</summary>
-        public const string LOG_PREFIX = "[派系常识]";
+        public const string LOG_PREFIX = "[RimTalk常识+]";
 
         /// <summary>日志前缀的染色值（RGB 255,255,198，淡黄），供日志窗口按富文本解析。</summary>
         public const string LOG_PREFIX_COLOR = "#FFFFC6";
@@ -44,11 +46,39 @@ namespace RimTalkCommonKnowledge
         public const string LOG_PREFIX_COLORED =
             "<color=" + LOG_PREFIX_COLOR + ">" + LOG_PREFIX + "</color>";
 
-        /// <summary>派系常识的内容前缀，同时作为「本 mod 注入」的幂等判定标记。</summary>
-        public const string FACTION_CONTENT_PREFIX = "【派系】";
+        /// <summary>
+        /// 派系常识的内容前缀，同时作为「本 mod 注入」的幂等判定标记。
+        /// 随游戏语言翻译；新写入条目用当前语言前缀，查库识别用 <see cref="FACTION_CONTENT_PREFIX_VARIANTS"/>。
+        /// </summary>
+        public static string FACTION_CONTENT_PREFIX => "RTCK.Prefix.Faction".Translate();
 
-        /// <summary>异种人常识的内容前缀，同时作为「本 mod 注入」的幂等判定标记。</summary>
-        public const string XENOTYPE_CONTENT_PREFIX = "【异种人】";
+        /// <summary>
+        /// 异种人常识的内容前缀，同时作为「本 mod 注入」的幂等判定标记。
+        /// 随游戏语言翻译；新写入条目用当前语言前缀，查库识别用 <see cref="XENOTYPE_CONTENT_PREFIX_VARIANTS"/>。
+        /// 注意：异种人内容模板（<c>XENOTYPE_SEG_INTRO</c> 等）的译文已内嵌此前缀，生成侧不再单独拼接。
+        /// </summary>
+        public static string XENOTYPE_CONTENT_PREFIX => "RTCK.Prefix.Xenotype".Translate();
+
+        /// <summary>
+        /// 派系内容前缀的全部语言变体（简中 / 繁中 / 英文）。
+        /// ⚠ 识别标记：玩家切换游戏语言后，库内旧语言条目仍需被识别，查库一律按本数组逐变体匹配；
+        ///   译文调整时必须把旧值保留在本数组中（只增不减），否则旧条目会失配并被重复注入。
+        /// </summary>
+        public static readonly string[] FACTION_CONTENT_PREFIX_VARIANTS =
+        {
+            "【派系】",
+            "[Faction]",
+        };
+
+        /// <summary>
+        /// 异种人内容前缀的全部语言变体（简中 / 繁中 / 英文）。约束同 <see cref="FACTION_CONTENT_PREFIX_VARIANTS"/>。
+        /// </summary>
+        public static readonly string[] XENOTYPE_CONTENT_PREFIX_VARIANTS =
+        {
+            "【异种人】",
+            "【異種人】",
+            "[Xenotype]",
+        };
 
         /// <summary>触发标签内多关键词的分隔符（半角逗号）。</summary>
         public const string TAG_SEPARATOR = ",";
@@ -61,8 +91,12 @@ namespace RimTalkCommonKnowledge
         /// </summary>
         public static readonly char[] TAG_SEPARATOR_CHARS = { ',', '，', '、', ';', '；' };
 
-        /// <summary>内容内部的列表连接符（与标签分隔符无关，内容不参与标签切分）。</summary>
-        public const string LIST_SEPARATOR = "、";
+        /// <summary>
+        /// 内容内部的列表连接符（与标签分隔符无关，内容不参与标签切分）。
+        /// 随游戏语言翻译（Keyed：RTCK.Tpl.ListSeparator；中文顿号 / 英文逗号空格）。
+        /// 注：切换语言后由它拼接的指纹随之变化，会触发一次全量重写——语言切换本就该重写，属预期行为。
+        /// </summary>
+        public static string LIST_SEPARATOR => "RTCK.Tpl.ListSeparator".Translate();
 
         // ---------- 随包预设库（KnowledgeBase）----------
 
@@ -154,6 +188,13 @@ namespace RimTalkCommonKnowledge
         /// 属代码级口径开关、不是玩家设置项——该决策不需要玩家参与，故不在设置页暴露。
         /// </summary>
         public const bool ENABLE_DEF_DESCRIPTION_DEFERRAL = false;
+
+        /// <summary>
+        /// 自动注入条目（派系 / 异种人）的「允许提取」开关（D70）。
+        /// 派系与异种人条目内容较长，被上游链式提取时会向 LLM 上下文注入大段文本，
+        /// 故自动注入一律关闭提取；「允许匹配」仍保持开（条目本体可被检索命中）。
+        /// </summary>
+        public const bool INJECTED_ENTRY_CAN_BE_EXTRACTED = false;
 
         // ---------- 设置项默认值与取值边界 ----------
 
@@ -343,12 +384,11 @@ namespace RimTalkCommonKnowledge
         /// <summary>上游「工具栏」方法名（补丁在其绘制完成后追加入口按钮）。</summary>
         public const string UPSTREAM_UI_METHOD_DRAW_TOOLBAR = "DrawToolbar";
 
-        /// <summary>入口按钮文案。</summary>
-        public const string UPSTREAM_UI_MANAGER_BUTTON_LABEL = "自动注入常识管理";
+        /// <summary>入口按钮文案。随游戏语言翻译（Keyed：RTCK.Mgr.EntryButtonLabel）。</summary>
+        public static string UPSTREAM_UI_MANAGER_BUTTON_LABEL => "RTCK.Mgr.EntryButtonLabel".Translate();
 
-        /// <summary>入口按钮的悬停说明。</summary>
-        public const string UPSTREAM_UI_MANAGER_BUTTON_TIP =
-            "打开自动注入常识mod的管理页面，可查看常识条目来源";
+        /// <summary>入口按钮的悬停说明。随游戏语言翻译（Keyed：RTCK.Mgr.EntryButtonTip）。</summary>
+        public static string UPSTREAM_UI_MANAGER_BUTTON_TIP => "RTCK.Mgr.EntryButtonTip".Translate();
 
         /// <summary>入口按钮在工具栏内的横向偏移（左内边距 5 + 上游搜索框 300 + 间距 10）。</summary>
         public const float UPSTREAM_UI_MANAGER_BUTTON_OFFSET_X = 315f;

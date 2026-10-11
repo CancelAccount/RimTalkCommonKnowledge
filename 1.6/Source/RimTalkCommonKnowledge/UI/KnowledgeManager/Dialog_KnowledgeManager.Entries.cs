@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using RimWorld;
@@ -32,6 +32,15 @@ namespace RimTalkCommonKnowledge
                 byId.TryGetValue(id, out target);
                 break;
             }
+            OpenEditEntryFor(target);
+        }
+
+        /// <summary>
+        /// 打开指定条目的编辑对话框（右键快捷编辑 / 勾选编辑共用入口）。
+        /// </summary>
+        /// <param name="target">待编辑条目快照；为 <c>null</c>（条目已被删除等）时静默返回。</param>
+        private void OpenEditEntryFor(KnowledgeEntrySnapshot target)
+        {
             if (target == null)
             {
                 return;

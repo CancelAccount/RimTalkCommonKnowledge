@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using RimWorld;
@@ -413,6 +413,16 @@ namespace RimTalkCommonKnowledge
                 SetSelection(entry.Id, selectResult.value);
             }
             bool check = selectResult.value;
+
+            // 右键快捷编辑（D67）：直接打开该行的编辑对话框，不改勾选态、不参与滑动批量。
+            // DraggableToggle 底层只轮询左键，右键无冲突；Use() 消费事件防止穿透到下层控件。
+            if (Event.current.type == EventType.MouseDown
+                && Event.current.button == 1
+                && Mouse.IsOver(rect))
+            {
+                OpenEditEntryFor(entry);
+                Event.current.Use();
+            }
 
             Widgets.CheckboxDraw(
                 checkRect.x,
