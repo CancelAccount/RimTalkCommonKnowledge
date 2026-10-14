@@ -2,17 +2,20 @@
 # bin / obj 由 dotnet build 生成，一律不入库
 1.6/Source/bin/
 1.6/Source/obj/
+1.7/Source/bin/
+1.7/Source/obj/
 
 # Debug 编译输出：csproj 已把 Debug 配置隔离到此目录，防止调试 dll 覆盖入库的发行 dll
 1.6/AssembliesDebug/
+1.7/AssembliesDebug/
 
 # ===== 发布流水线产物 =====
 # Tools/Build-Release.ps1 的输出（stage 组装目录 + 两个 zip），一律不入库
 dist/
 
 # 调试符号：不入库
-# 注意：1.6/Assemblies/ 下的 mod dll 是刻意入库的（clone 即可玩，不依赖任何外部构建）；
-# 若改为不跟踪二进制，再补一行 1.6/Assemblies/*.dll
+# 注意：1.6/Assemblies/ 与 1.7/Assemblies/ 下的 mod dll 是刻意入库的（clone 即可玩，不依赖任何外部构建）；
+# 若改为不跟踪二进制，再补对应 Assemblies/*.dll 规则
 *.pdb
 
 # ===== IDE / 编辑器 =====

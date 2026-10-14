@@ -27,8 +27,9 @@
     <ManagedDir>$(RimWorldDir)RimWorldWin64_Data\Managed\</ManagedDir>
     <Workshop294100>$(RimWorldDir)..\..\workshop\content\294100\</Workshop294100>
     <RimTalkMemoryDir>$(Workshop294100)3608181242\1.6\Assemblies\</RimTalkMemoryDir>
-    <!-- HarmonyMod 的 1.6 程序集目录；游戏自身 Managed 目录不含 0Harmony.dll，只能从工坊模组引用 -->
-    <HarmonyDir>$(Workshop294100)2009463077\Current\Assemblies\</HarmonyDir>
+    <!-- HarmonyMod 的 1.6 程序集目录；固定版本目录而非 Current——Current 随本机游戏大版本跳转，
+         1.7 环境下指向 net10 的 0Harmony，net48 工程引用会 CS1705。游戏自身 Managed 目录不含 0Harmony.dll，只能从工坊模组引用 -->
+    <HarmonyDir>$(Workshop294100)2009463077\1.6\Assemblies\</HarmonyDir>
   </PropertyGroup>
 
   <ItemGroup>

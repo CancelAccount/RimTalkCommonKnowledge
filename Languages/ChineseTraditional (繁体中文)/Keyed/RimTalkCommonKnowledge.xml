@@ -116,7 +116,7 @@
   <RTCK.Set.UnitEntries> 條</RTCK.Set.UnitEntries>
 
   <!-- ========== 常識管理視窗 ========== -->
-  <RTCK.Mgr.Title>常識管理（右鍵點擊可快速編輯））</RTCK.Mgr.Title>
+  <RTCK.Mgr.Title>常識管理（右鍵點擊可快速編輯）</RTCK.Mgr.Title>
   <RTCK.Mgr.NavAll>全部條目</RTCK.Mgr.NavAll>
   <RTCK.Mgr.NavOwn>自動注入</RTCK.Mgr.NavOwn>
   <RTCK.Mgr.NavOwnFaction>派系資訊</RTCK.Mgr.NavOwnFaction>

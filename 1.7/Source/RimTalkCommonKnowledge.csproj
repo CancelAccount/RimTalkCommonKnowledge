@@ -1,0 +1,80 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    1.7（Waylith 引擎）工程：源码与 1.6 工程完全共享，仅引用程序集与目标框架不同。
+    工程位置与 1.6 工程平行（Build-Release.ps1 按 <版本>\Source\<AssemblyName>.csproj 定位）。
+    - TFM：1.7 运行时为定制 CoreCLR（net10.0），1.7 的 0Harmony / Assembly-CSharp 均为 net10 程序集，
+      net48 引用会报 CS1705（System.Runtime 10.0 高于 4.1.2.0），故本工程必须 net10.0。
+    - 源码：Compile 通配指向 1.6 工程目录（单一源码事实源，零复制零同步）；
+      关闭默认源码 glob，避免本目录将来混入 .cs 后被重复编译。
+    - 引擎 API：Assembly-CSharp.dll 已移至游戏根目录；Unity 各 Module 由 UnityStubs.dll 单垫片替代。
+    - 业务代码零改动：2026-10-14 全量源码探针编译 0 错误 0 警告。
+  -->
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <AssemblyName>RimTalkCommonKnowledge</AssemblyName>
+    <RootNamespace>RimTalkCommonKnowledge</RootNamespace>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <!-- 关闭 TFM 子目录追加：OutputPath 直接就是 dll 落点（否则会多出 net10.0\ 一层） -->
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <!-- 关闭 git 提交号嵌入，保证 dll 字节只由源码决定，同工具链跨 commit 可复现（见 rimworld-mod-release 技能） -->
+    <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+    <!-- 本目录不放置 .cs（源码共享自 1.6 工程），关闭默认 glob 后由下方显式通配引入 -->
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+  </PropertyGroup>
+
+  <!-- 输出目录按配置隔离，与 1.6 工程同约定：
+       Debug -> 1.7\AssembliesDebug（.gitignore 忽略）；Release -> 1.7\Assemblies（入库）。 -->
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+    <OutputPath>..\AssembliesDebug\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <OutputPath>..\Assemblies\</OutputPath>
+  </PropertyGroup>
+
+  <!-- 路径集中声明，业务代码与其余配置里不得再出现裸路径字面量 -->
+  <PropertyGroup>
+    <RimWorldDir>..\..\..\..\</RimWorldDir>
+    <!-- 1.7：Assembly-CSharp.dll 在游戏根目录，Unity API 由 UnityStubs.dll 单垫片提供 -->
+    <GameAssemblyDir>$(RimWorldDir)</GameAssemblyDir>
+    <Workshop294100>$(RimWorldDir)..\..\workshop\content\294100\</Workshop294100>
+    <RimTalkMemoryDir>$(Workshop294100)3608181242\1.7\Assemblies\</RimTalkMemoryDir>
+    <!-- HarmonyMod 的 1.7 程序集目录（net10）；运行时由 brrainz.harmony 提供，About.xml 已 loadAfter -->
+    <HarmonyDir>$(Workshop294100)2009463077\1.7\Assemblies\</HarmonyDir>
+    <!-- 共享源码：1.6 工程目录是全版本唯一源码事实源 -->
+    <SharedSourceDir>..\..\1.6\Source\RimTalkCommonKnowledge\</SharedSourceDir>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="$(SharedSourceDir)**\*.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>$(GameAssemblyDir)Assembly-CSharp.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <!-- Rect / GUI / Input 等 Unity 基础类型，1.7 由 UnityStubs 垫片统一提供（等价 1.6 的四个 UnityEngine.*Module） -->
+    <Reference Include="UnityStubs">
+      <HintPath>$(GameAssemblyDir)UnityStubs.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <!-- 上游注入 API（1.7 版）：编译期校验签名；Private=false 不把上游 dll 复制进本 mod 的 Assemblies -->
+    <Reference Include="RimTalkMemoryPatch">
+      <HintPath>$(RimTalkMemoryDir)RimTalkMemoryPatch.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <!-- 上游 1.7 程序集依赖 Newtonsoft.Json（随上游 mod 分发），编译期解析其签名 -->
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>$(RimTalkMemoryDir)Newtonsoft.Json.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <!-- Harmony 运行时由 brrainz.harmony 提供（About.xml 已 loadAfter），编译期仅校验签名 -->
+    <Reference Include="0Harmony">
+      <HintPath>$(HarmonyDir)0Harmony.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+
+</Project>

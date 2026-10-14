@@ -5,13 +5,14 @@
 .DESCRIPTION
     版本号唯一来源为 About/About.xml 的 <modVersion>，脚本负责：
       1. 校验工作区状态与 tag 是否已存在（仅告警，不阻塞）；
-      2. 分别以 Release / Debug 配置编译（输出目录由 csproj 隔离：
-         Release -> 1.6\Assemblies，Debug -> 1.6\AssembliesDebug）；
+      2. 对每个受支持游戏版本（$GameVersionDirs）分别以 Release / Debug 配置编译
+         （输出目录由各版本 csproj 隔离：Release -> <版本>\Assemblies，Debug -> <版本>\AssembliesDebug）；
       3. 按发布目录白名单组装两个包，复制根级必需文件（LoadFolders.xml），
          开发目录（Source / AssembliesDebug 等）在复制阶段即排除；
-      4. Debug 包把包内 <modVersion> 改写为 "<版本>-debug"，仓库原文件不动；
-      5. 压缩为 dist/ 下的两个 zip（UTF-8 条目名，兼容中文文件名）。
-    前置要求（已在 1.6\Source\RimTalkCommonKnowledge.csproj 中配置）：
+      4. 每个版本的 dll 分别放入包内 <版本>\Assemblies（LoadFolders.xml 按游戏版本择一加载）；
+      5. Debug 包把包内 <modVersion> 改写为 "<版本>-debug"，仓库原文件不动；
+      6. 压缩为 dist/ 下的两个 zip（UTF-8 条目名，兼容中文文件名）。
+    前置要求（已在各版本 <版本>\Source\RimTalkCommonKnowledge.csproj 中配置）：
       - Debug/Release 输出目录隔离（AssembliesDebug / Assemblies）
       - <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
       - <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
@@ -38,18 +39,32 @@ $ErrorActionPreference = 'Stop'
 # ==== 可配置项（按目标 mod 修改）====
 $PackageName    = 'RimTalkCommonKnowledge'              # 发布包顶层文件夹名（zip 解压后的目录名，通常等于 mod 文件夹名）
 $AssemblyName   = 'RimTalkCommonKnowledge'              # 编译产物 dll 名（取自 csproj 项目名，不含 .dll）
-$GameVersionDir = '1.6'                                 # 游戏版本目录
+# 受支持的游戏版本目录：每个版本各有一个 <版本>\Source\<AssemblyName>.csproj，
+# 脚本对其分别编译并把 dll 放入包内 <版本>\Assemblies（LoadFolders.xml 按运行版本择一加载）。
+# 1.6=Unity/Mono(net48)；1.7=Waylith/CoreCLR(net10.0)
+$GameVersionDirs = @('1.6', '1.7')
+# 本次从源码重新编译的版本（要求本机装有对应版本的游戏引用程序集）。
+# 未列入的版本视为「冻结成熟版」：不编译，直接使用仓库内已入库的
+# <版本>\Assemblies 与 <版本>\AssembliesDebug 现存 dll（下方会打印时间戳供发布前肉眼核对）。
+# 1.6 于 1.7 发布后冻结：本机游戏升级 1.7 后旧 Managed 目录被删除，net48 工程无法引用
+# 1.7 的 net10 程序集（CS1705）；将来恢复 1.6 编译环境后（Steam beta 切回 1.6，
+# 或建库内引用程序集目录），把 '1.6' 加回本数组即可恢复双版本编译。
+$BuildVersionDirs = @('1.7')
 $RequiredDirs   = @('About', 'KnowledgeBase', 'Languages')  # 发布包必需目录（缺失即报错）
 $IncludeDirs    = @('About', 'KnowledgeBase', 'Languages')  # 进入发布包的目录白名单；KnowledgeBase=常识库数据（按 modid 注入的资产，必须随包）；Languages=三语 Keyed 翻译（D69，缺了游戏内只显示键名）
 $OptionalDirs   = @()                                   # 白名单中缺失时跳过而非报错的目录（本 mod 暂无需选目录）
 
-# 根级必需文件：LoadFolders.xml 声明「根 + 1.6」布局，必须带上，否则包内容缺失
+# 根级必需文件：LoadFolders.xml 声明「根 + 各版本」布局，必须带上，否则包内容缺失
 $IncludeRootFiles = @('LoadFolders.xml')
 
 # 绝不能进发布包的开发目录（相对包根）：复制阶段即用 robocopy /XD 排除，组装后兜底自检。
-# 当前白名单只有 About，1.6 整目录不复制、dll 由脚本单独放入；此处保留为防御性配置，
-# 若将来把 '1.6' 加入 $IncludeDirs，这两个排除项会立即生效（Source\obj 的句柄争抢问题见下）。
-$ExcludeRelativeDirs = @('1.6\Source', '1.6\AssembliesDebug')
+# 版本目录整目录不进白名单、dll 由脚本单独放入；此处为防御性配置（若将来把版本目录加入
+# $IncludeDirs 即立即生效），同时覆盖全部受支持版本（Source\obj 的句柄争抢问题见下）。
+$ExcludeRelativeDirs = @()
+foreach ($v in $GameVersionDirs) {
+    $ExcludeRelativeDirs += "$v\Source"
+    $ExcludeRelativeDirs += "$v\AssembliesDebug"
+}
 
 # 需要从包内剔除的文件模式（相对包根递归匹配）：本 mod 无本机后处理产物，留空
 $ExcludeFilePatterns = @()
@@ -59,7 +74,6 @@ $DebugModSuffix = 'debug'                               # 调试包版本号与�
 # ====================================
 
 $RepoRoot   = Split-Path -Parent $PSScriptRoot
-$CsprojPath = Join-Path $RepoRoot "$GameVersionDir\Source\$AssemblyName.csproj"
 $AboutPath  = Join-Path $RepoRoot 'About\About.xml'
 $DistDir    = Join-Path $RepoRoot $DistDirName
 $StageDir   = Join-Path $DistDir 'stage'
@@ -89,14 +103,22 @@ function Get-ModVersion {
 }
 
 <#
-.SYNOPSIS 以指定配置编译工程，失败即终止整个流程。
+.SYNOPSIS 以指定配置编译单个游戏版本的工程，失败即终止整个流程。
+.PARAMETER VersionDir 游戏版本目录（如 1.6 / 1.7），工程位于其 Source 子目录。
+.PARAMETER Configuration 编译配置（Release / Debug）。
 #>
 function Invoke-Build {
-    param([string]$Configuration)
+    param(
+        [string]$VersionDir,
+        [string]$Configuration
+    )
 
-    Write-Step "编译 $Configuration 配置"
-    & dotnet build $CsprojPath -c $Configuration -v minimal
-    if ($LASTEXITCODE -ne 0) { throw "$Configuration 编译失败（exit $LASTEXITCODE）" }
+    $csproj = Join-Path $RepoRoot "$VersionDir\Source\$AssemblyName.csproj"
+    if (-not (Test-Path $csproj)) { throw "未找到工程文件：$csproj" }
+
+    Write-Step "编译 $VersionDir / $Configuration 配置"
+    & dotnet build $csproj -c $Configuration -v minimal
+    if ($LASTEXITCODE -ne 0) { throw "$VersionDir $Configuration 编译失败（exit $LASTEXITCODE）" }
 }
 
 <#
@@ -144,17 +166,20 @@ function Copy-DirectoryExcluding {
 
 <#
 .SYNOPSIS 按白名单组装单个发布包目录；Debug 包改写包内版本号。
+.PARAMETER DllByVersion 哈希表：游戏版本目录（如 1.6）→ 该版本编译产物 dll 全路径。
 #>
 function Copy-PackageLayout {
     param(
         [string]$ModRoot,
-        [string]$DllPath,
+        [hashtable]$DllByVersion,
         [bool]$IsDebug,
         [string]$Version
     )
 
-    if (-not (Test-Path $DllPath)) {
-        throw "未找到编译产物：$DllPath（请确认 csproj 已按配置隔离输出目录）"
+    foreach ($pair in $DllByVersion.GetEnumerator()) {
+        if (-not (Test-Path $pair.Value)) {
+            throw "未找到编译产物：$($pair.Value)（请确认 $($pair.Key) 工程已按配置隔离输出目录）"
+        }
     }
 
     if (Test-Path $ModRoot) { Remove-Item $ModRoot -Recurse -Force }
@@ -204,10 +229,12 @@ function Copy-PackageLayout {
         }
     }
 
-    # 编译产物放入版本目录下的 Assemblies
-    $asmDir = Join-Path $ModRoot "$GameVersionDir\Assemblies"
-    New-Item -ItemType Directory -Path $asmDir -Force | Out-Null
-    Copy-Item -Path $DllPath -Destination $asmDir -Force
+    # 编译产物按版本分别放入 <版本>\Assemblies（LoadFolders.xml 只加载当前游戏版本对应目录）
+    foreach ($pair in $DllByVersion.GetEnumerator()) {
+        $asmDir = Join-Path $ModRoot "$($pair.Key)\Assemblies"
+        New-Item -ItemType Directory -Path $asmDir -Force | Out-Null
+        Copy-Item -Path $pair.Value -Destination $asmDir -Force
+    }
 
     # 调试包：改写包内版本号，便于玩家在游戏内 mod 列表区分（不改动仓库原文件）
     if ($IsDebug) {
@@ -267,21 +294,44 @@ if ($existingTag) {
     Write-Warning "tag v$version 已存在，请确认是否已提升 <modVersion>"
 }
 
-Invoke-Build 'Release'
-Invoke-Build 'Debug'
+# 仅对 $BuildVersionDirs 从源码编译 Release / Debug（同一源码、同一次运行产出，保证双包同源）；
+# 其余版本使用仓库内库存 dll（冻结成熟版，见配置区注释）
+foreach ($v in $BuildVersionDirs) {
+    Invoke-Build -VersionDir $v -Configuration 'Release'
+    Invoke-Build -VersionDir $v -Configuration 'Debug'
+}
 
 if (Test-Path $StageDir) { Remove-Item $StageDir -Recurse -Force }
 New-Item -ItemType Directory -Path $StageDir -Force | Out-Null
+
+# 版本目录 → 各配置产物 dll 路径（由 csproj 输出隔离约定保证）
+$releaseDlls = @{}
+$debugDlls   = @{}
+foreach ($v in $GameVersionDirs) {
+    $releaseDlls[$v] = Join-Path $RepoRoot "$v\Assemblies\$AssemblyName.dll"
+    $debugDlls[$v]   = Join-Path $RepoRoot "$v\AssembliesDebug\$AssemblyName.dll"
+}
+
+# 冻结版本：库存 dll 存在性硬校验 + 打印时间戳（防止把忘记更新的旧 dll 发出去）
+foreach ($v in $GameVersionDirs) {
+    if ($v -in $BuildVersionDirs) { continue }
+    Write-Step "版本 $v 为冻结成熟版，使用仓库库存 dll（未重新编译）"
+    foreach ($dll in @($releaseDlls[$v], $debugDlls[$v])) {
+        if (-not (Test-Path $dll)) { throw "冻结版本 $v 缺少库存 dll：$dll" }
+        $item = Get-Item $dll
+        Write-Host "    $($item.FullName.Replace($RepoRoot + '\',''))  编译时间 $($item.LastWriteTime.ToString('yyyy-MM-dd HH:mm'))  $($item.Length) 字节"
+    }
+}
 
 $releaseModRoot = Join-Path $StageDir "release\$PackageName"
 $debugModRoot   = Join-Path $StageDir "$DebugModSuffix\$PackageName"
 
 Copy-PackageLayout -ModRoot $releaseModRoot `
-    -DllPath (Join-Path $RepoRoot "$GameVersionDir\Assemblies\$AssemblyName.dll") `
+    -DllByVersion $releaseDlls `
     -IsDebug $false -Version $version
 
 Copy-PackageLayout -ModRoot $debugModRoot `
-    -DllPath (Join-Path $RepoRoot "$GameVersionDir\AssembliesDebug\$AssemblyName.dll") `
+    -DllByVersion $debugDlls `
     -IsDebug $true -Version $version
 
 $releaseZip = Join-Path $DistDir "$PackageName-$version.zip"
